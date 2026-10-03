@@ -321,122 +321,119 @@ body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
 }
 
 /* Landscape mobile: transparent controls sit beside the combatants. */
-@media(orientation:landscape) and (max-height:650px){
-  body:is(.touch-active,.force-touch){overflow:hidden}
-  body:is(.touch-active,.force-touch)>.masthead,body:is(.touch-active,.force-touch) .title-row,body:is(.touch-active,.force-touch) .play-guide,body:is(.touch-active,.force-touch) main>footer{display:none!important}
-  body:is(.touch-active,.force-touch) main{width:100%;max-width:none;height:100dvh;margin:0;padding:0}
-  body:is(.touch-active,.force-touch) #arcade{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:flex-start;width:100%;height:100dvh;min-height:0;padding:0;margin:0!important;overflow:hidden;background:#101820;box-shadow:none}
-  body:is(.touch-active,.force-touch) .arena-topline{flex:0 0 44px;height:44px;min-height:44px;width:100%;max-width:none;margin:0;padding:0 max(10px,env(safe-area-inset-left));font-size:7px;letter-spacing:.6px;z-index:12;background:#101923}
-  body:is(.touch-active,.force-touch) .arena-topline #mode-label{display:none}
-  body:is(.touch-active,.force-touch) .arena-topline .arena-utilities{gap:2px}
-  body:is(.touch-active,.force-touch) .arena-topline button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;width:44px;height:44px;border:0;border-radius:0}
-  body:is(.touch-active,.force-touch) .arena-bottomline{display:none}
-  body:is(.touch-active,.force-touch).playing #arcade>.viewport{position:absolute;top:44px;bottom:0;left:0;right:0;flex:none;width:min(100%,calc((100dvh - 44px)*16/9));height:calc(100dvh - 44px);min-height:0;max-height:none;margin:0 auto;aspect-ratio:16/9;overflow:hidden}
-  body:is(.touch-active,.force-touch).playing #arcade>.viewport>#game{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:16/9}
-  body:is(.touch-active,.force-touch) .touch-controls{--pad-key:46px;position:absolute;inset:auto 0 0;z-index:11;flex:none;width:100%;max-width:none;min-height:0;height:auto;grid-template-columns:auto 176px;grid-template-rows:auto;justify-content:space-between;align-items:end;column-gap:0;row-gap:0;margin:0;padding:0 max(12px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));border:0;background:none;pointer-events:none}
-  body:is(.touch-active,.force-touch) .touch-console-meta,body:is(.touch-active,.force-touch) .touch-console-note{display:none}
-  body:is(.touch-active,.force-touch) .touch-directions,body:is(.touch-active,.force-touch) .touch-deck{pointer-events:auto;align-self:end;filter:drop-shadow(0 2px 6px #06101dbb)}
-  body:is(.touch-active,.force-touch) .touch-directions{gap:4px;grid-template-rows:var(--pad-key) var(--pad-key) 16px}
-  body:is(.touch-active,.force-touch) .touch-deck{gap:6px}
-  body:is(.touch-active,.force-touch) .touch-attacks{grid-template-rows:repeat(2,47px);gap:6px}
-  body:is(.touch-active,.force-touch) .touch-controls button{min-height:44px;opacity:.91;font-size:8px;background:#293b49e8;border-color:#9eb4b478;box-shadow:inset 0 1px #fff3d51a,0 3px #07121dd9}
-  body:is(.touch-active,.force-touch) .touch-directions button{font-size:25px}
-  body:is(.touch-active,.force-touch) .touch-controls button:active,body:is(.touch-active,.force-touch) .touch-controls button.pressed{opacity:1;background:#edc883;color:#1a2a37}
-  body:is(.touch-active,.force-touch) .touch-defenses{gap:6px}
-  body:is(.touch-active,.force-touch) .touch-defenses button{font-size:7px;gap:3px;color:#d8e8e7}
-  body:is(.touch-active,.force-touch) .touch-defenses button[data-action="legBlock"]{background:#3e4032e8;color:#e9d7a5}
-  body:is(.touch-active,.force-touch) .touch-attacks .special-touch{background:#d75c36ed;border-color:#ffc287;color:#ffebc8}
-  body:is(.touch-active,.force-touch) .touch-pad-core{background:#1424329c}
-  body:is(.touch-active,.force-touch) .touch-dash-hint{font-size:5px;color:#a4b0b6;letter-spacing:.3px;margin-top:2px;text-shadow:0 1px 3px #071320}
-  body:is(.touch-active,.force-touch) .touch-dash-hint b{font-size:6px}
-  body:is(.touch-active,.force-touch) .stage-caption{display:none}
-  body:is(.touch-active,.force-touch) .hud{top:4%;left:3%;right:3%}
-  body:is(.touch-active,.force-touch) .overlay-panel{gap:8px}
-  body:is(.touch-active,.force-touch) .overlay-panel h2{font-size:36px}
-  body:is(.touch-active,.force-touch) .overlay-panel .primary-button,body:is(.touch-active,.force-touch) .overlay-panel .secondary-button{min-height:44px;min-width:215px;font-size:11px;padding:8px 12px}
-}
+/* Shared by native and virtual landscape; dimensions come from the visible viewport. */
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested){overflow:hidden}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested)>.masthead,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .title-row,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .play-guide,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) main>footer{display:none!important}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) main{width:100%;max-width:none;height:var(--layout-height,100dvh);margin:0;padding:0}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #arcade{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:flex-start;width:100%;height:var(--layout-height,100dvh);min-height:0;padding:0;margin:0!important;overflow:hidden;background:#101820;box-shadow:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-topline{flex:0 0 44px;height:44px;min-height:44px;width:100%;max-width:none;margin:0;padding:0 max(10px,env(safe-area-inset-left));font-size:7px;letter-spacing:.6px;z-index:12;background:#101923}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-topline #mode-label{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-topline .arena-utilities{gap:2px}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-topline button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;width:44px;height:44px;border:0;border-radius:0}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-bottomline{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested).playing #arcade>.viewport{position:absolute;top:44px;bottom:auto;left:0;right:0;flex:none;width:min(100%,calc((var(--layout-height,100dvh) - 44px)*16/9));height:min(calc(var(--layout-height,100dvh) - 44px),calc(var(--layout-width,100vw)*9/16));min-height:0;max-height:none;margin:0 auto;aspect-ratio:16/9;overflow:hidden}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested).playing #arcade>.viewport>#game{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:16/9}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-controls{--pad-key:46px;position:absolute;inset:auto 0 0;z-index:11;flex:none;width:100%;max-width:none;min-height:0;height:auto;grid-template-columns:auto 176px;grid-template-rows:auto;justify-content:space-between;align-items:end;column-gap:0;row-gap:0;margin:0;padding:0 max(12px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));border:0;background:none;pointer-events:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-console-meta,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-console-note{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-directions,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-deck{pointer-events:auto;align-self:end;filter:drop-shadow(0 2px 6px #06101dbb)}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-directions{gap:4px;grid-template-rows:var(--pad-key) var(--pad-key) 16px}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-deck{gap:6px}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-attacks{grid-template-rows:repeat(2,47px);gap:6px}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-controls button{min-height:44px;opacity:.91;font-size:8px;background:#293b49e8;border-color:#9eb4b478;box-shadow:inset 0 1px #fff3d51a,0 3px #07121dd9}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-directions button{font-size:25px}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-controls button:active,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-controls button.pressed{opacity:1;background:#edc883;color:#1a2a37}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-defenses{gap:6px}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-defenses button{font-size:7px;gap:3px;color:#d8e8e7}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-defenses button[data-action="legBlock"]{background:#3e4032e8;color:#e9d7a5}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-attacks .special-touch{background:#d75c36ed;border-color:#ffc287;color:#ffebc8}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-pad-core{background:#1424329c}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-dash-hint{font-size:5px;color:#a4b0b6;letter-spacing:.3px;margin-top:2px;text-shadow:0 1px 3px #071320}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-dash-hint b{font-size:6px}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .stage-caption{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .hud{top:4%;left:3%;right:3%}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .overlay-panel{gap:8px}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .overlay-panel h2{font-size:36px}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .overlay-panel .primary-button,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .overlay-panel .secondary-button{min-height:44px;min-width:215px;font-size:11px;padding:8px 12px}
 
 /* Short cabinets: title fits; only the selection panel may scroll. */
-@media(orientation:landscape) and (max-height:650px){
-  body:is(.touch-active,.force-touch,.embedded):is(.front-title,.front-select,.front-versus) #arcade>.viewport{position:relative;inset:auto;flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto;margin:0}
-  body:is(.touch-active,.force-touch,.embedded):is(.front-title,.front-select,.front-versus) .arena-bottomline{display:none}
-  body:is(.touch-active,.force-touch,.embedded) .title-content{width:62%;height:100%;justify-content:center;padding:6px 10px 18px}
-  body:is(.touch-active,.force-touch,.embedded) .title-dojo{font-size:7px;letter-spacing:2.6px}
-  body:is(.touch-active,.force-touch,.embedded) .title-dojo span{font-size:5px;letter-spacing:1.8px;margin-top:4px}
-  body:is(.touch-active,.force-touch,.embedded) .title-emblem{width:55px;height:55px;flex-shrink:0;margin:8px 0 10px}
-  body:is(.touch-active,.force-touch,.embedded) .game-wordmark>span{font-size:39px;letter-spacing:.3px;-webkit-text-stroke:0}
-  body:is(.touch-active,.force-touch,.embedded) .game-wordmark>strong{font-size:68px;letter-spacing:1px;margin-top:4px}
-  body:is(.touch-active,.force-touch,.embedded) .title-motto{font-size:6px;letter-spacing:2px;margin:13px 0 12px}
-  body:is(.touch-active,.force-touch,.embedded) .press-start{min-height:44px;min-width:210px;font-size:20px;padding:9px 18px;gap:16px}
-  body:is(.touch-active,.force-touch,.embedded) .title-instruction{font-size:5px;letter-spacing:.8px;line-height:1.5;margin-top:9px}
-  body:is(.touch-active,.force-touch,.embedded) .title-foot{font-size:5px;letter-spacing:.6px;left:15px;right:15px;bottom:8px}
-  body:is(.touch-active,.force-touch,.embedded) .title-art{width:43%;height:98%;opacity:.37}
-  body:is(.touch-active,.force-touch,.embedded) .title-art-left{left:-7%}
-  body:is(.touch-active,.force-touch,.embedded) .title-art-right{right:-7%}
-  body:is(.touch-active,.force-touch,.embedded) .selection-panel{display:grid;grid-template-columns:minmax(250px,1fr) minmax(270px,.95fr);grid-template-rows:44px minmax(80px,1fr) auto;gap:9px 16px;padding:10px 15px 12px;overflow-y:auto;overscroll-behavior:contain;align-content:stretch}
-  body:is(.touch-active,.force-touch,.embedded) .select-heading{grid-column:1/-1;grid-row:1;gap:8px}
-  body:is(.touch-active,.force-touch,.embedded) .select-heading h2{font-size:20px;max-width:none;margin:4px 0 0}
-  body:is(.touch-active,.force-touch,.embedded) .select-heading>div>span{font-size:6px;letter-spacing:3px}
-  body:is(.touch-active,.force-touch,.embedded) .arcade-back{width:44px;height:44px;min-height:44px;min-width:44px;padding:6px;justify-content:center}
-  body:is(.touch-active,.force-touch,.embedded) .arcade-back span{display:none}
-  body:is(.touch-active,.force-touch,.embedded) .select-stamp{font-size:20px}
-  body:is(.touch-active,.force-touch,.embedded) .select-stage{grid-column:1;grid-row:2/4;min-height:190px;grid-template-columns:1fr 8% 1fr;gap:0}
-  body:is(.touch-active,.force-touch,.embedded) .fighter-showcase{min-height:0}
-  body:is(.touch-active,.force-touch,.embedded) .fighter-showcase canvas{width:126%;height:100%;left:-13%;top:0;object-fit:contain}
-  body:is(.touch-active,.force-touch,.embedded) .fighter-bio{bottom:8px;left:5px;right:5px}
-  body:is(.touch-active,.force-touch,.embedded) .fighter-bio>span{font-size:5px;letter-spacing:.5px}
-  body:is(.touch-active,.force-touch,.embedded) .fighter-bio h3{font-size:21px;line-height:1.02;margin:5px 0;max-width:145px}
-  body:is(.touch-active,.force-touch,.embedded) .fighter-bio>small{font-size:4px;letter-spacing:.2px}
-  body:is(.touch-active,.force-touch,.embedded) .select-player-tag{font-size:5px;padding:4px;left:5px;top:3px}
-  body:is(.touch-active,.force-touch,.embedded) .showcase-p2 .select-player-tag{left:auto;right:5px}
-  body:is(.touch-active,.force-touch,.embedded) .select-versus>span,body:is(.touch-active,.force-touch,.embedded) .select-versus small{display:none}
-  body:is(.touch-active,.force-touch,.embedded) .select-versus b{font-size:36px;top:-10px}
-  body:is(.touch-active,.force-touch,.embedded) .roster-section{grid-column:2;grid-row:2;justify-content:center}
-  body:is(.touch-active,.force-touch,.embedded) .roster-instruction{font-size:6px;margin-bottom:8px}
-  body:is(.touch-active,.force-touch,.embedded) .roster-instruction small{display:none}
-  body:is(.touch-active,.force-touch,.embedded) .selection-panel .fighter-select{gap:12px;width:calc(100% - 6px)}
-  body:is(.touch-active,.force-touch,.embedded) .selection-panel .fighter-option{height:62px;min-height:44px}
-  body:is(.touch-active,.force-touch,.embedded) .selection-panel .fighter-option canvas{width:65%;height:100%}
-  body:is(.touch-active,.force-touch,.embedded) .roster-name{font-size:19px;right:6px;bottom:9px}
-  body:is(.touch-active,.force-touch,.embedded) .roster-name small{font-size:5px;margin-top:4px}
-  body:is(.touch-active,.force-touch,.embedded) .selection-status{font-size:5px;margin-top:7px;letter-spacing:.7px}
-  body:is(.touch-active,.force-touch,.embedded) .select-footer{grid-column:2;grid-row:3;grid-template-columns:1fr 1fr;gap:7px 10px;padding-top:9px}
-  body:is(.touch-active,.force-touch,.embedded) .select-footer .mode-side{grid-column:1/-1}
-  body:is(.touch-active,.force-touch,.embedded) .select-footer .field-label{display:none}
-  body:is(.touch-active,.force-touch,.embedded) .select-footer .mode-select{gap:4px;justify-content:space-between}
-  body:is(.touch-active,.force-touch,.embedded) .select-footer .mode-select button{flex:1;min-height:44px;font-size:6px;letter-spacing:.1px;padding:8px 4px}
-  body:is(.touch-active,.force-touch,.embedded) .mobile-versus-note{font-size:5px;margin-top:4px}
-  body:is(.touch-active,.force-touch,.embedded) .select-footer .difficulty-label{font-size:5px;gap:4px;letter-spacing:1px}
-  body:is(.touch-active,.force-touch,.embedded) .select-footer .difficulty-label select{min-height:44px;max-width:none;font-size:10px;padding:7px}
-  body:is(.touch-active,.force-touch,.embedded) .select-footer .start-button{align-self:end;min-height:44px;font-size:20px;padding:9px 12px}
-  body:is(.touch-active,.force-touch,.embedded) .versus-screen{padding:45px 20px 20px}
-  body:is(.touch-active,.force-touch,.embedded) .versus-heading{top:9px}
-  body:is(.touch-active,.force-touch,.embedded) .versus-heading>span{font-size:21px}
-  body:is(.touch-active,.force-touch,.embedded) .versus-heading>strong{font-size:5px;margin-top:5px}
-  body:is(.touch-active,.force-touch,.embedded) .versus-mark{font-size:78px;top:48%}
-  body:is(.touch-active,.force-touch,.embedded) .versus-fighter h2{font-size:25px;bottom:13%;max-width:none}
-  body:is(.touch-active,.force-touch,.embedded) .versus-fighter>span{bottom:6%;font-size:5px;letter-spacing:1.5px}
-  body:is(.touch-active,.force-touch,.embedded) .versus-loading{bottom:10px;font-size:5px;letter-spacing:1.5px}
-  body:is(.touch-active,.force-touch,.embedded) .versus-loading i{margin-top:6px;height:2px}
-}
-@media(orientation:landscape) and (max-height:380px){
-  body:is(.touch-active,.force-touch) .touch-controls{--pad-key:44px;grid-template-columns:auto 164px;padding-bottom:max(6px,env(safe-area-inset-bottom))}
-  body:is(.touch-active,.force-touch) .touch-attacks{grid-template-rows:44px 44px;gap:5px}
-  body:is(.touch-active,.force-touch,.embedded) .title-emblem{width:44px;height:44px;margin:5px 0 7px}
-  body:is(.touch-active,.force-touch,.embedded) .game-wordmark>span{font-size:34px}
-  body:is(.touch-active,.force-touch,.embedded) .game-wordmark>strong{font-size:59px}
-  body:is(.touch-active,.force-touch,.embedded) .title-motto{margin:10px 0}
-  body:is(.touch-active,.force-touch,.embedded) .title-foot{display:none}
-  body:is(.touch-active,.force-touch,.embedded) .selection-panel{gap:7px 12px;padding:8px 12px;grid-template-columns:minmax(230px,1fr) minmax(260px,.95fr)}
-  body:is(.touch-active,.force-touch,.embedded) .select-stage{min-height:178px}
-}
+/* Shared by native and virtual landscape; dimensions come from the visible viewport. */
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus) #arcade>.viewport{position:relative;inset:auto;flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto;margin:0}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus) .arena-bottomline{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-content{width:62%;height:100%;justify-content:center;padding:6px 10px 18px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-dojo{font-size:7px;letter-spacing:2.6px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-dojo span{font-size:5px;letter-spacing:1.8px;margin-top:4px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-emblem{width:55px;height:55px;flex-shrink:0;margin:8px 0 10px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .game-wordmark>span{font-size:39px;letter-spacing:.3px;-webkit-text-stroke:0}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .game-wordmark>strong{font-size:68px;letter-spacing:1px;margin-top:4px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-motto{font-size:6px;letter-spacing:2px;margin:13px 0 12px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .press-start{min-height:44px;min-width:210px;font-size:20px;padding:9px 18px;gap:16px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-instruction{font-size:5px;letter-spacing:.8px;line-height:1.5;margin-top:9px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-foot{font-size:5px;letter-spacing:.6px;left:15px;right:15px;bottom:8px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-art{width:43%;height:98%;opacity:.37}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-art-left{left:-7%}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-art-right{right:-7%}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .selection-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.95fr);grid-template-rows:44px minmax(80px,1fr) auto;gap:9px 16px;padding:10px 15px 12px;overflow-y:auto;overscroll-behavior:contain;align-content:stretch}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-heading{grid-column:1/-1;grid-row:1;gap:8px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-heading h2{font-size:20px;max-width:none;margin:4px 0 0}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-heading>div>span{font-size:6px;letter-spacing:3px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .arcade-back{width:44px;height:44px;min-height:44px;min-width:44px;padding:6px;justify-content:center}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .arcade-back span{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-stamp{font-size:20px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-stage{grid-column:1;grid-row:2/4;min-height:190px;grid-template-columns:1fr 8% 1fr;gap:0}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .fighter-showcase{min-height:0}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .fighter-showcase canvas{width:126%;height:100%;left:-13%;top:0;object-fit:contain}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .fighter-bio{bottom:8px;left:5px;right:5px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .fighter-bio>span{font-size:5px;letter-spacing:.5px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .fighter-bio h3{font-size:21px;line-height:1.02;margin:5px 0;max-width:145px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .fighter-bio>small{font-size:4px;letter-spacing:.2px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-player-tag{font-size:5px;padding:4px;left:5px;top:3px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .showcase-p2 .select-player-tag{left:auto;right:5px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-versus>span,body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-versus small{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-versus b{font-size:36px;top:-10px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .roster-section{grid-column:2;grid-row:2;justify-content:center}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .roster-instruction{font-size:6px;margin-bottom:8px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .roster-instruction small{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .selection-panel .fighter-select{gap:12px;width:calc(100% - 6px)}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .selection-panel .fighter-option{height:62px;min-height:44px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .selection-panel .fighter-option canvas{width:65%;height:100%}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .roster-name{font-size:19px;right:6px;bottom:9px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .roster-name small{font-size:5px;margin-top:4px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .selection-status{font-size:5px;margin-top:7px;letter-spacing:.7px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-footer{grid-column:2;grid-row:3;grid-template-columns:1fr 1fr;gap:7px 10px;padding-top:9px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-footer .mode-side{grid-column:1/-1}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-footer .field-label{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-footer .mode-select{gap:4px;justify-content:space-between}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-footer .mode-select button{flex:1;min-height:44px;font-size:6px;letter-spacing:.1px;padding:8px 4px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .mobile-versus-note{font-size:5px;margin-top:4px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-footer .difficulty-label{font-size:5px;gap:4px;letter-spacing:1px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-footer .difficulty-label select{min-height:44px;max-width:none;font-size:10px;padding:7px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-footer .start-button{align-self:end;min-height:44px;font-size:20px;padding:9px 12px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-screen{padding:45px 20px 20px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-heading{top:9px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-heading>span{font-size:21px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-heading>strong{font-size:5px;margin-top:5px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-mark{font-size:78px;top:48%}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-fighter h2{font-size:25px;bottom:13%;max-width:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-fighter>span{bottom:6%;font-size:5px;letter-spacing:1.5px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-loading{bottom:10px;font-size:5px;letter-spacing:1.5px}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-loading i{margin-top:6px;height:2px}
+/* Shared by native and virtual landscape; dimensions come from the visible viewport. */
+  body.landscape-short:is(.touch-active,.force-touch,.landscape-requested) .touch-controls{--pad-key:44px;grid-template-columns:auto 164px;padding-bottom:max(6px,env(safe-area-inset-bottom))}
+  body.landscape-short:is(.touch-active,.force-touch,.landscape-requested) .touch-attacks{grid-template-rows:44px 44px;gap:5px}
+  body.landscape-short:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-emblem{width:44px;height:44px;margin:5px 0 7px}
+  body.landscape-short:is(.touch-active,.force-touch,.embedded,.landscape-requested) .game-wordmark>span{font-size:34px}
+  body.landscape-short:is(.touch-active,.force-touch,.embedded,.landscape-requested) .game-wordmark>strong{font-size:59px}
+  body.landscape-short:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-motto{margin:10px 0}
+  body.landscape-short:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-foot{display:none}
+  body.landscape-short:is(.touch-active,.force-touch,.embedded,.landscape-requested) .selection-panel{gap:7px 12px;padding:8px 12px;grid-template-columns:minmax(0,1fr) minmax(0,.95fr)}
+  body.landscape-short:is(.touch-active,.force-touch,.embedded,.landscape-requested) .select-stage{min-height:178px}
 @media(orientation:portrait) and (min-width:600px) and (max-width:900px){
-  body:is(.touch-active,.force-touch) .touch-controls{--pad-key:64px;grid-template-columns:auto minmax(250px,330px);padding:24px 35px 30px;column-gap:30px}
-  body:is(.touch-active,.force-touch) .touch-attacks{grid-template-rows:repeat(2,66px);gap:10px}
-  body:is(.touch-active,.force-touch) .touch-attacks button{font-size:12px}
-  body:is(.touch-active,.force-touch) .touch-defenses button{min-height:48px;font-size:9px}
-  body:is(.touch-active,.force-touch) .touch-console-meta{font-size:8px}
-  body:is(.touch-active,.force-touch) .touch-console-meta b{display:inline}
+  body:not(.landscape-layout):is(.touch-active,.force-touch) .touch-controls{--pad-key:64px;grid-template-columns:auto minmax(250px,330px);padding:24px 35px 30px;column-gap:30px}
+  body:not(.landscape-layout):is(.touch-active,.force-touch) .touch-attacks{grid-template-rows:repeat(2,66px);gap:10px}
+  body:not(.landscape-layout):is(.touch-active,.force-touch) .touch-attacks button{font-size:12px}
+  body:not(.landscape-layout):is(.touch-active,.force-touch) .touch-defenses button{min-height:48px;font-size:9px}
+  body:not(.landscape-layout):is(.touch-active,.force-touch) .touch-console-meta{font-size:8px}
+  body:not(.landscape-layout):is(.touch-active,.force-touch) .touch-console-meta b{display:inline}
 }
 
 /* Mobile combat is landscape-only; keep this inside the fullscreen cabinet. */
@@ -472,6 +469,28 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
 @media(max-height:620px){.rotate-illustration{margin:14px 0 8px;height:140px;transform:scale(.85)}.rotate-screen h2{font-size:34px}.rotate-screen p{font-size:11px;margin:15px 0 20px}.rotate-signature{margin-top:20px}}
 @media(prefers-reduced-motion:reduce){.rotate-device{animation:none;transform:rotate(-90deg)}}
 
+/* Fullscreen owns an untransformed shell; the running cabinet never moves in the DOM. */
+#game-shell:fullscreen{width:100%;height:100%;padding:0;margin:0;overflow:hidden;background:#101820}
+body.landscape-requested{overflow:hidden!important;overscroll-behavior:none;background:#101820}
+body.landscape-requested>.masthead,body.landscape-requested .title-row,body.landscape-requested .play-guide,body.landscape-requested main>footer{display:none!important}
+body.landscape-requested main{max-width:none;width:100%;margin:0;padding:0}
+body.virtual-landscape #arcade{position:fixed!important;inset:auto!important;left:calc(var(--view-left,0px) + var(--view-width))!important;top:var(--view-top,0px)!important;width:var(--layout-width)!important;height:var(--layout-height)!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;transform:rotate(90deg)!important;transform-origin:0 0!important;overflow:hidden;z-index:50}
+body.virtual-landscape .arena-topline{padding-left:max(10px,env(safe-area-inset-top))!important;padding-right:max(10px,env(safe-area-inset-bottom))!important}
+body.virtual-landscape .touch-controls{padding-left:max(12px,env(safe-area-inset-top))!important;padding-right:max(12px,env(safe-area-inset-bottom))!important;padding-bottom:max(9px,env(safe-area-inset-left))!important}
+body.landscape-layout .fighter-hud strong{font-size:clamp(14px,calc(var(--layout-width)*.022),24px)}
+body.landscape-layout .timer-box>b{font-size:clamp(34px,calc(var(--layout-width)*.045),55px)}
+body.landscape-layout .selection-panel{overflow-x:hidden}
+body.landscape-layout .select-footer>*,body.landscape-layout .mode-side{min-width:0}
+body.landscape-layout .title-content{min-height:0}
+body.landscape-short .title-content{padding-top:5px;padding-bottom:8px}
+body.landscape-short .title-dojo span,body.landscape-short .title-instruction{display:none}
+body.landscape-short .title-emblem{width:36px!important;height:36px!important;margin:5px 0 6px!important}
+body.landscape-short .title-motto{margin:8px 0!important}
+#game-shell>dialog{overflow:auto;overscroll-behavior:contain}
+body.virtual-landscape dialog{position:fixed;inset:auto!important;left:calc(var(--view-left,0px) + var(--view-width)/2)!important;top:calc(var(--view-top,0px) + var(--view-height)/2)!important;width:min(760px,calc(var(--layout-width) - 24px))!important;max-width:none!important;max-height:calc(var(--layout-height) - 24px)!important;margin:0!important;padding:24px 28px!important;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center;overflow:auto;overscroll-behavior:contain}
+body.virtual-landscape dialog .close-dialog{position:sticky;float:right;top:0;right:0;min-width:44px;min-height:44px;margin:-12px -15px 0 8px;background:#f0ede2;z-index:2}
+body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;gap:16px}
+
 </style>
   
   
@@ -491,6 +510,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
       <div class="title-note"><span class="live-dot"></span> 2 FIGHTERS. ONE DOJO.<p>Il rispetto prima di tutto.<br>Il combattimento subito dopo.</p></div>
     </section>
 
+    <div id="game-shell">
     <section class="arcade" id="arcade" aria-label="Arena di combattimento">
       <div class="arena-topline"><span><i></i> BODYPLANET ARENA</span><span id="mode-label">TURBO EDITION / 02</span><div class="arena-utilities"><button id="mobile-sound-button" class="mobile-utility" title="Musica ed effetti" aria-label="Disattiva musica ed effetti" aria-pressed="true">♪</button><button id="mobile-help-button" class="mobile-utility" title="Come si gioca" aria-label="Apri la guida ai comandi">?</button><button id="touch-toggle-button" title="Mostra o nascondi i comandi touch" aria-label="Mostra i comandi touch" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M6 7h12c2 0 3 2 3 4v6c0 2-2 3-3.5 1.5L15 16H9l-2.5 2.5C5 20 3 19 3 17v-6c0-2 1-4 3-4Z" stroke="currentColor" stroke-width="1.6"/><path d="M8 10v5m-2.5-2.5h5" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="11" r="1" fill="currentColor"/><circle cx="18" cy="14" r="1" fill="currentColor"/></svg></button><button id="pause-button" title="Pausa (Esc)" aria-label="Pausa" disabled>Ⅱ</button><button id="fullscreen-button" title="Schermo intero" aria-label="Schermo intero">⛶</button></div></div>
       <div class="viewport" id="viewport">
@@ -575,13 +595,14 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
           <span class="rotate-eyebrow">BODYPLANET DOJO <i>·</i> MOBILE ARCADE</span>
           <div class="rotate-illustration" aria-hidden="true"><span class="rotate-orbit">↻</span><div class="rotate-device"><span class="rotate-device-arena"></span><span class="rotate-device-controls"></span></div><span class="rotate-landscape-line"></span></div>
           <h2 id="rotate-title">RUOTA IL<br><em>TELEFONO.</em></h2>
-          <p id="rotate-description">Gioca in orizzontale per avere il tatami e i comandi a portata di pollice.</p>
+          <p id="rotate-description">Ruota il telefono oppure premi il pulsante: il dojo si adatta subito in orizzontale.</p>
           <button id="rotate-fullscreen-button" type="button"><span aria-hidden="true">⛶</span> APRI IN ORIZZONTALE</button>
-          <small>Ruota il dispositivo con il lato lungo in basso.</small>
+          <small>Il gioco resta aperto anche quando ruoti il dispositivo.</small>
           <span class="rotate-signature">FULL CONTACT. FULL SPIRIT.</span>
         </div>
       </section>
     </section>
+    </div>
 
     <section class="play-guide" id="play-guide"><div class="guide-intro"><span class="eyebrow">IL TUO PRIMO KUMITE</span><h2>ENTRA IN GUARDIA.</h2><p>Accorcia la distanza, trova il tempo.<br>Ogni colpo ha il suo momento.</p><button class="text-button" id="all-moves-button">Tutte le tecniche <span>↗</span></button></div><div class="guide-item"><span class="guide-number">01</span><h3>MUOVITI E DIFENDI</h3><div class="keys"><kbd>A</kbd><kbd>D</kbd><span>spostati</span><kbd>W</kbd><span>salta</span></div><p>Arretra: guardia braccia<br><kbd>F</kbd> alza il ginocchio<br><b>A A / D D</b> scatto rapido</p></div><div class="guide-item"><span class="guide-number">02</span><h3>COLLEGA I COLPI</h3><div class="keys"><kbd>J</kbd><span>pugno</span><kbd>K</kbd><span>mae</span><kbd>L</kbd><span>mawashi</span></div><p>Collega anche in anticipo: <b>J → J → K → L</b></p></div><div class="guide-item"><span class="guide-number">03</span><h3>LIBERA LO SPIRITO</h3><div class="keys"><kbd class="red-key">O</kbd><span>Kaiten geri</span></div><p>Carica lo Spirit colpendo. Il kaiten usa 45 punti.</p></div></section>
     <footer><span>CREATO PER IL DOJO. MOSSO DALLO SPIRITO.</span><span>KYOKUSHIN SPIRIT <b>© 2026</b> <button id="credits-button">Il dojo & i crediti ↗</button></span></footer>
@@ -2346,6 +2367,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
   const portraitMedia = window.matchMedia('(orientation: portrait)');
   let touchPreference = pageOptions.get('touch') === '1' ? true : null;
   let touchDetected = touchMedia.matches || navigator.maxTouchPoints > 0;
+  let landscapeRequested = false, landscapeAttempt = 0, viewportFrame = 0;
   document.body.classList.toggle('embedded', pageOptions.get('embed') === '1' || window.self !== window.top);
   const canvas = $('game'), ctx = canvas.getContext('2d', { alpha: false });
   const characters = {
@@ -2410,6 +2432,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
     onTouch: ()=>{if(!touchDetected){touchDetected=true;syncControlSurface();}}
   });
   function needsRotation(){
+    if(landscapeRequested)return false;
     if(!(touchPreference??touchDetected))return false;
     // In an iframe, viewport shape is the widget's shape, not the phone's.
     // Real touch devices use the physical screen; desktop previews use their viewport.
@@ -2420,7 +2443,26 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
     }
     return portraitMedia.matches;
   }
+  function syncLandscapeLayout(){
+    const viewport=window.visualViewport;
+    const width=Math.max(1,viewport?.width||window.innerWidth);
+    const height=Math.max(1,viewport?.height||window.innerHeight);
+    const virtual=landscapeRequested&&height>width;
+    const logicalWidth=virtual?height:width,logicalHeight=virtual?width:height;
+    const wasVirtual=document.body.classList.contains('virtual-landscape');
+    const root=document.documentElement;
+    for(const [name,value] of Object.entries({
+      'view-width':width,'view-height':height,'view-left':viewport?.offsetLeft||0,'view-top':viewport?.offsetTop||0,
+      'layout-width':logicalWidth,'layout-height':logicalHeight
+    }))root.style.setProperty('--'+name,value+'px');
+    document.body.classList.toggle('landscape-requested',landscapeRequested);
+    document.body.classList.toggle('virtual-landscape',virtual);
+    document.body.classList.toggle('landscape-layout',logicalWidth>logicalHeight&&(logicalHeight<=650||virtual));
+    document.body.classList.toggle('landscape-short',logicalWidth>logicalHeight&&logicalHeight<=380);
+    if(wasVirtual!==virtual)clearCombatInput();
+  }
   function syncControlSurface(){
+    syncLandscapeLayout();
     const enabled=touchPreference??touchDetected;
     const rotate=needsRotation();
     const wasBlocked=document.body.classList.contains('orientation-blocked');
@@ -2712,9 +2754,13 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
   window.addEventListener('blur',()=>{if(active&&!paused&&!resultShown)togglePause(true);clearCombatInput();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){if(active&&!paused&&!resultShown)togglePause(true);clearCombatInput();}sound.update(audioState());});
   const orientationChanged=()=>{clearCombatInput();syncControlSurface();};
+  const viewportChanged=()=>{if(!viewportFrame)viewportFrame=requestAnimationFrame(()=>{viewportFrame=0;syncControlSurface();});};
   window.addEventListener('orientationchange',orientationChanged);
   window.screen.orientation?.addEventListener('change',orientationChanged);
   portraitMedia.addEventListener('change',orientationChanged);
+  window.addEventListener('resize',viewportChanged);
+  window.visualViewport?.addEventListener('resize',viewportChanged);
+  window.visualViewport?.addEventListener('scroll',viewportChanged);
   touchMedia.addEventListener('change',()=>{touchDetected=touchMedia.matches||navigator.maxTouchPoints>0;clearCombatInput();syncControlSurface();});
   $('touch-toggle-button')?.addEventListener('click',()=>{touchPreference=!(touchPreference??touchDetected);clearCombatInput();syncControlSurface();});
   $('title-start-button').addEventListener('click',showSelection);
@@ -2731,22 +2777,43 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
   const unlockAudio=()=>{sound.init();sound.update(audioState());};
   window.addEventListener('pointerdown',e=>{unlockAudio();if(e.pointerType==='touch'&&!touchDetected){touchDetected=true;syncControlSurface();}},{capture:true});
   window.addEventListener('keydown',e=>{if(!e.repeat)unlockAudio();},{capture:true});
-  function syncFullscreenButton(){const expanded=!!document.fullscreenElement||$('arcade').classList.contains('expanded');$('fullscreen-button').setAttribute('aria-label',expanded?'Esci da schermo intero':'Schermo intero');$('fullscreen-button').title=expanded?'Esci da schermo intero':'Schermo intero';}
+  function syncFullscreenButton(){const expanded=!!document.fullscreenElement||$('arcade').classList.contains('expanded')||landscapeRequested;$('fullscreen-button').setAttribute('aria-label',expanded?'Esci da schermo intero':'Schermo intero');$('fullscreen-button').title=expanded?'Esci da schermo intero':'Schermo intero';}
   $('fullscreen-button').addEventListener('click',async()=>{
     clearCombatInput();
-    if($('arcade').classList.contains('expanded'))$('arcade').classList.remove('expanded');
-    else try{if(document.fullscreenElement)await document.exitFullscreen();else await $('arcade').requestFullscreen();}catch{$('arcade').classList.add('expanded');}
-    syncFullscreenButton();
+    if(document.fullscreenElement||$('arcade').classList.contains('expanded')||landscapeRequested){
+      landscapeRequested=false;landscapeAttempt++;$('arcade').classList.remove('expanded');
+      try{window.screen.orientation?.unlock?.();}catch{}
+      try{if(document.fullscreenElement)await document.exitFullscreen();}catch{}
+    }else{
+      const attempt=++landscapeAttempt;
+      $('arcade').classList.add('expanded');
+      try{await $('game-shell').requestFullscreen?.();}catch{/* The cabinet still fills the available browser viewport. */}
+      if(attempt!==landscapeAttempt&&!landscapeRequested&&!$('arcade').classList.contains('expanded')){
+        try{if(document.fullscreenElement===$('game-shell'))await document.exitFullscreen();}catch{}
+      }
+    }
+    syncFullscreenButton();syncControlSurface();
   });
-  document.addEventListener('fullscreenchange',()=>{clearCombatInput();syncFullscreenButton();});
+  document.addEventListener('fullscreenchange',()=>{clearCombatInput();syncFullscreenButton();syncControlSurface();});
   async function openLandscape(){
     clearCombatInput();
-    try{if(!document.fullscreenElement)await $('arcade').requestFullscreen();}catch{$('arcade').classList.add('expanded');}
-    try{await window.screen.orientation?.lock('landscape');}catch{/* Safari and some iframe hosts require physically rotating the device. */}
+    const attempt=++landscapeAttempt;
+    // Start native fullscreen while the button's user activation is still live.
+    let fullscreen;
+    try{if(!document.fullscreenElement)fullscreen=$('game-shell').requestFullscreen?.();}catch{}
+    landscapeRequested=true;$('arcade').classList.add('expanded');
+    syncFullscreenButton();syncControlSurface();
+    try{await fullscreen;}catch{/* iPhone/embedded browsers retain the virtual landscape fallback. */}
+    if(attempt!==landscapeAttempt){
+      try{if(!landscapeRequested&&document.fullscreenElement===$('game-shell'))await document.exitFullscreen();}catch{}
+      return;
+    }
+    try{await window.screen.orientation?.lock?.('landscape');}catch{/* The same cabinet stays rotated in CSS when native rotation is denied. */}
+    if(attempt!==landscapeAttempt){try{if(!landscapeRequested)window.screen.orientation?.unlock?.();}catch{}return;}
     syncFullscreenButton();syncControlSurface();
   }
   $('rotate-fullscreen-button')?.addEventListener('click',openLandscape);
-  function showDialog(id){if(active&&!paused&&!resultShown)togglePause(true);sound.effect('menuMove');if(document.fullscreenElement)document.fullscreenElement.append($(id));$(id).showModal();}
+  function showDialog(id){if(active&&!paused&&!resultShown)togglePause(true);sound.effect('menuMove');$('game-shell').append($(id));$(id).showModal();}
   $('help-button').addEventListener('click',()=>showDialog('help-dialog'));$('all-moves-button').addEventListener('click',()=>showDialog('help-dialog'));$('credits-button').addEventListener('click',()=>showDialog('credits-dialog'));
   $('mobile-help-button')?.addEventListener('click',()=>showDialog('help-dialog'));
   document.querySelectorAll('dialog').forEach(d=>{d.querySelector('.close-dialog').addEventListener('click',()=>d.close());d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}});});
