@@ -1,0 +1,46 @@
+KYOKUSHIN SPIRIT — INCORPORA IL GIOCO NEL TUO SITO
+
+1. CARICA IL GIOCO
+Carica Gioca.html sul tuo hosting HTTPS. Il file contiene già grafica,
+musica ed effetti: non occorrono librerie esterne.
+
+2. PREPARA IL CODICE
+Apri Incorpora.html, inserisci l'URL pubblico di Gioca.html e premi
+"Aggiorna anteprima". Prova il gioco nell'iframe, poi premi "Copia codice".
+Se la copia automatica non è disponibile, usa Cmd+C o Ctrl+C sul testo selezionato.
+
+3. INCOLLA NEL SITO
+Incolla il codice in un blocco HTML/iframe e salva la pagina del tuo sito.
+Il server che ospita il gioco deve permettere l'incorporamento tramite iframe.
+Musica ed effetti partono al primo clic o tasto dentro il gioco.
+
+Il parametro embed=1 attiva la presentazione per iframe.
+Un indirizzo localhost o 127.0.0.1 non è raggiungibile dai visitatori.
+Per un sito esterno usa un vero URL HTTPS pubblico, per esempio:
+https://tuo-dominio.it/Gioca.html?embed=1
+Questo indirizzo è SOLO UN SEGNAPOSTO: sostituiscilo con il tuo URL reale.
+
+ESEMPIO PER IL GIOCO NELLA RADICE DELLO STESSO SITO
+Il percorso /Gioca.html?embed=1 qui sotto funziona quando il file Gioca.html
+è nella cartella pubblica principale del sito in cui incolli il codice.
+Per un hosting diverso, sostituisci src con l'URL pubblico completo del gioco.
+
+<style>
+  .kyokushin-embed { width: 100%; height: clamp(560px, 66vw, 900px); overflow: hidden; background: #101722; }
+  .kyokushin-embed iframe { display: block; width: 100%; height: 100%; border: 0; }
+  @media (max-width: 700px) and (orientation: portrait) {
+    .kyokushin-embed { height: clamp(760px, 175vw, 1000px); }
+  }
+  @media (max-width: 900px) and (orientation: landscape) {
+    .kyokushin-embed { height: clamp(420px, 85svh, 760px); }
+  }
+</style>
+<div class="kyokushin-embed">
+  <iframe src="/Gioca.html?embed=1"
+    title="Kyokushin Spirit — BodyPlanet Dojo"
+    allow="autoplay; fullscreen" allowfullscreen
+    scrolling="no" loading="lazy"></iframe>
+</div>
+
+Conserva anche i sorgenti del progetto. Dopo una modifica, ricrea Gioca.html
+con build_portable.py e sostituisci sul tuo hosting il file pubblicato.
