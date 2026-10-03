@@ -491,7 +491,65 @@ body.virtual-landscape dialog{position:fixed;inset:auto!important;left:calc(var(
 body.virtual-landscape dialog .close-dialog{position:sticky;float:right;top:0;right:0;min-width:44px;min-height:44px;margin:-12px -15px 0 8px;background:#f0ede2;z-index:2}
 body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;gap:16px}
 
+/* Four-button mobile fighter HUD. Logical dimensions follow the rotated cabinet. */
+#touch-controls{--stick-size:148px;--orbit-width:204px;--orbit-height:150px;--primary-size:84px;--satellite-size:54px;grid-template-columns:var(--stick-size) var(--orbit-width);grid-template-rows:auto 1fr auto;min-height:0;column-gap:30px;row-gap:12px}
+#touch-controls .joystick-area{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;align-self:end;pointer-events:auto;filter:drop-shadow(0 3px 8px #06101d66)}
+#touch-controls .touch-joystick{position:relative;width:var(--stick-size);height:var(--stick-size);border:1px solid #dae8e843;border-radius:50%;background:radial-gradient(circle,#091b294a 0 22%,#82969e0e 23% 54%,#152b384a 55% 67%,#91a6aa16 68%);box-shadow:inset 0 0 24px #07142233,0 3px 18px #07121d22;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#touch-controls .joystick-ring{position:absolute;inset:20%;border:1px solid #c8d9d529;border-radius:50%;pointer-events:none}
+#touch-controls .joystick-up{position:absolute;left:0;right:0;top:8px;text-align:center;font-size:6px;font-weight:700;letter-spacing:1.2px;color:#cad5d5a6;pointer-events:none}
+#touch-controls .joystick-up b{display:block;font:20px/1 Arial;margin-top:1px;color:#d2dfdfb3}
+#touch-controls .joystick-left,#touch-controls .joystick-right{position:absolute;top:calc(50% - 14px);font:25px/1 Arial;color:#d2dfdf8f;pointer-events:none}
+#touch-controls .joystick-left{left:9px}#touch-controls .joystick-right{right:9px}
+#touch-controls .joystick-knob{position:absolute;left:50%;top:50%;width:45%;height:45%;display:grid;place-items:center;border-radius:50%;border:1px solid #dce7e479;background:radial-gradient(circle at 35% 25%,#a0b8bd80,#506d7da6 48%,#223c51e3);box-shadow:inset 0 2px 4px #eafcff30,inset 0 -4px 7px #05122366,0 5px 13px #07121b5e;transform:translate(calc(-50% + var(--stick-x,0px)),calc(-50% + var(--stick-y,0px)));transition:transform .12s ease-out,border-color .12s,background .12s;pointer-events:none}
+#touch-controls .joystick-knob i{width:23%;height:23%;border:1px solid #d9e3db5e;border-radius:50%;box-shadow:0 0 12px #d2e3de0c;background:#a9c1c522}
+#touch-controls .touch-joystick.engaged .joystick-knob{transition:border-color .12s,background .12s;border-color:#ffe0a5;background:radial-gradient(circle at 35% 25%,#eacb8588,#ad905bc2 48%,#69553be6);box-shadow:inset 0 2px 5px #fff5d44d,0 4px 15px #e5b35b22}
+#touch-controls .touch-joystick.jumping .joystick-up{color:#ffe2a4}
+#touch-controls .joystick-caption{display:block;margin:9px 0 0;color:#b8c7cd;font-size:6px;font-weight:700;letter-spacing:.7px;text-shadow:0 1px 4px #0b1723}
+#touch-controls .joystick-caption b{color:#edcc8e;margin-left:4px}
+#touch-controls .touch-deck{display:grid;grid-template-rows:46px var(--orbit-height);gap:7px;width:var(--orbit-width);min-width:0;align-self:end;pointer-events:auto;filter:drop-shadow(0 3px 7px #06101d66)}
+#touch-controls .touch-bank-switch{display:grid;grid-template-columns:repeat(3,1fr);width:100%;height:46px;align-items:stretch;background:#101e2bc9;border:1px solid #d4dfdd2e;border-radius:7px;padding:0;overflow:hidden;box-shadow:0 2px 8px #06121b33}
+#touch-controls .touch-bank-switch button{display:flex;flex-direction:row;min-height:44px;min-width:44px;width:100%;height:44px;gap:0;padding:0 3px;margin:0;border:0;border-radius:0;background:transparent;color:#c3cfd3;font-size:7px;font-weight:800;letter-spacing:.45px;opacity:1;box-shadow:none;transform:none;transition:background .1s,color .1s}
+#touch-controls .touch-bank-switch button+button{border-left:1px solid #8c9eab24}
+#touch-controls .touch-bank-switch button[aria-pressed="true"]{color:#ffe5b0;background:linear-gradient(#f2c06f1a,#f2c06f0b);box-shadow:inset 0 -2px #efc577}
+#touch-controls .touch-bank-switch button:active{background:#f2c06f33;color:#ffedc9;transform:none}
+#touch-controls .action-orbit{position:relative;width:var(--orbit-width);height:var(--orbit-height);pointer-events:none}
+#touch-controls .action-orbit button{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:44px;min-height:44px;width:var(--satellite-size);height:var(--satellite-size);padding:3px;border:1px solid #f2d6a280;border-bottom-width:2px;border-radius:50%;color:#fae8c8;background:radial-gradient(circle at 35% 20%,#55697aa8,#20394dd6 65%,#182d42ea);box-shadow:inset 0 2px 3px #f7f2d614,0 3px 0 #091725b3,0 4px 12px #0917254d;font-size:8px;font-weight:900;letter-spacing:.15px;opacity:.93;pointer-events:auto;transform:none;transition:background .07s,box-shadow .07s}
+#touch-controls .action-orbit button>small{font-size:4px;letter-spacing:.5px;color:#b9c3c7;font-weight:600}
+#touch-controls .action-orbit button.action-primary{left:29.4%;bottom:0;width:var(--primary-size);height:var(--primary-size);font-size:14px;letter-spacing:.6px;border-color:#ffd49cb3;background:radial-gradient(circle at 35% 20%,#d4a767bb,#976a43eb 65%,#80502ee8);box-shadow:inset 0 2px 5px #ffe8c136,0 4px 0 #36271ed1,0 6px 18px #08131b66;color:#fff1d0;gap:7px}
+#touch-controls .action-orbit button.action-primary>small{font-size:6px;color:#f9dfb4;letter-spacing:.8px}
+#touch-controls .action-orbit .satellite-left{left:0;bottom:14px}
+#touch-controls .action-orbit .satellite-top{left:31.4%;top:0}
+#touch-controls .action-orbit .satellite-right{right:0;top:30%}
+#touch-controls[data-active-bank="special"] .action-primary{background:radial-gradient(circle at 35% 20%,#f5945acd,#ae472ede 65%,#762b23f0);border-color:#ffc792}
+#touch-controls .action-orbit button[data-action="block"],#touch-controls .action-orbit button[data-action="legBlock"]{border-color:#b9e8e9b3;color:#d2f3f3;background:radial-gradient(circle at 35% 20%,#547b83b3,#284650de 65%,#17313aef)}
+#touch-controls .action-orbit button:is(:active,.pressed){opacity:1;background:#edc887;color:#223347;border-color:#ffedc5;box-shadow:inset 0 2px 7px #5e4a364d,0 1px #142431,0 0 22px #ffe4a347;transform:none}
+#touch-controls .action-orbit button:is(:active,.pressed)>small{color:#705731}
+body.landscape-layout #touch-controls{position:absolute;inset:auto 0 0;z-index:11;grid-template-columns:var(--stick-size) var(--orbit-width);grid-template-rows:auto;column-gap:0;row-gap:0;width:100%;max-width:none;height:auto;min-height:0;flex:none;align-items:end;justify-content:space-between;margin:0;padding:0 max(15px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));border:0;background:transparent;pointer-events:none}
+body.landscape-layout #touch-controls .touch-console-meta,body.landscape-layout #touch-controls .touch-console-note{display:none}
+body.landscape-layout #touch-controls .joystick-area{padding-bottom:4px}
+body.landscape-short #touch-controls{--stick-size:126px;--orbit-width:184px;--orbit-height:132px;--primary-size:76px;--satellite-size:48px}
+body.landscape-short #touch-controls .touch-deck{gap:5px}
+body.landscape-short #touch-controls .joystick-caption{font-size:5px;margin-top:7px}
+body.landscape-short #touch-controls .action-orbit button{font-size:7px;gap:4px}
+body.landscape-short #touch-controls .action-orbit button.action-primary{font-size:12px;gap:6px}
+body.landscape-short #touch-controls .action-orbit .satellite-left{bottom:9px}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud{top:7px;left:12px;right:12px;grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr);gap:12px;text-shadow:0 1px 3px #0c1821;pointer-events:none}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .fighter-meta{display:none}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .fighter-hud strong{display:block;font:700 10px/1.25 Arial,Helvetica,sans-serif;letter-spacing:.65px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff5dc}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .health-track{height:10px;margin-top:5px;border-width:1px;border-color:#fbe5bdc9;box-shadow:0 2px #10202a99;transform:skewX(-8deg)}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .right .health-track{transform:skewX(8deg)}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .under-health{margin-top:4px;gap:6px;height:8px}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .round-dots{font-size:9px;line-height:1;letter-spacing:3px}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .ki-track{height:3px;max-width:95px;background:#172c3bd9}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .ki-label{font-size:5px;letter-spacing:.5px}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .timer-box{margin-top:-1px}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .timer-box>span{display:block;font-size:5px;letter-spacing:.45px;white-space:nowrap;color:#d4d9d6}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .timer-box>b{font:400 29px/1.1 Impact,Dojo,sans-serif;text-shadow:1px 2px #20313e}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .timer-box>small{display:none}
+@media(prefers-reduced-motion:reduce){#touch-controls .joystick-knob{transition:none}}
+
 </style>
+  
   
   
   
@@ -514,7 +572,7 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     <section class="arcade" id="arcade" aria-label="Arena di combattimento">
       <div class="arena-topline"><span><i></i> BODYPLANET ARENA</span><span id="mode-label">TURBO EDITION / 02</span><div class="arena-utilities"><button id="mobile-sound-button" class="mobile-utility" title="Musica ed effetti" aria-label="Disattiva musica ed effetti" aria-pressed="true">♪</button><button id="mobile-help-button" class="mobile-utility" title="Come si gioca" aria-label="Apri la guida ai comandi">?</button><button id="touch-toggle-button" title="Mostra o nascondi i comandi touch" aria-label="Mostra i comandi touch" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M6 7h12c2 0 3 2 3 4v6c0 2-2 3-3.5 1.5L15 16H9l-2.5 2.5C5 20 3 19 3 17v-6c0-2 1-4 3-4Z" stroke="currentColor" stroke-width="1.6"/><path d="M8 10v5m-2.5-2.5h5" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="11" r="1" fill="currentColor"/><circle cx="18" cy="14" r="1" fill="currentColor"/></svg></button><button id="pause-button" title="Pausa (Esc)" aria-label="Pausa" disabled>Ⅱ</button><button id="fullscreen-button" title="Schermo intero" aria-label="Schermo intero">⛶</button></div></div>
       <div class="viewport" id="viewport">
-        <canvas id="game" width="1280" height="720" tabindex="0" aria-label="Gioco Kyokushin. Usa A D per muoverti, doppio A o D per scattare, W per saltare, J K L U I O per attaccare. Arretra per parare di braccia, F per alzare il ginocchio. Premi Esc per mettere in pausa."></canvas>
+        <canvas id="game" width="1280" height="720" tabindex="0" aria-label="Gioco Kyokushin. Usa A D per muoverti, doppio A o D per scattare, W per saltare, J H N per i pugni, K L U I O per i calci. Arretra per parare di braccia, F per alzare il ginocchio. Premi Esc per mettere in pausa."></canvas>
         <div class="arena-shade"></div>
         <div class="hud" id="hud">
           <div class="fighter-hud left"><div class="fighter-meta"><span class="player-tag" id="p1-tag">PLAYER 01</span><span id="p1-rank">SENSEI · III DAN</span></div><strong id="p1-name">ANGELO PIERINO</strong><div class="health-track"><div class="health-ghost" id="p1-ghost"></div><div class="health-fill" id="p1-health"></div></div><div class="under-health"><span class="round-dots" id="p1-rounds">○ ○</span><div class="ki-track"><div id="p1-ki"></div></div><span class="ki-label" id="p1-ki-label">SPIRIT</span></div></div>
@@ -566,29 +624,30 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
       </div>
       <div class="arena-bottomline"><span><span class="status-dot"></span><span id="status-label">IL DOJO TI ASPETTA</span></span><span id="bottom-hint"><kbd>INVIO</kbd> PER COMINCIARE <span class="hint-divider">/</span> <kbd>ESC</kbd> PAUSA</span><span>空手道</span></div>
       <div class="touch-controls" id="touch-controls" aria-label="Comandi touch del giocatore 1" aria-hidden="true" inert>
-        <div class="touch-console-meta"><span><i></i> PLAYER 01 <b>TOUCH ARCADE</b></span><span class="touch-rotate-hint"><span aria-hidden="true">↻</span> RUOTA PER PIÙ SPAZIO</span></div>
-        <div class="touch-directions" role="group" aria-label="Movimento e salto">
-          <button data-action="jump" class="touch-jump" aria-label="Salta"><span aria-hidden="true">↑</span><small>SALTA</small></button>
-          <button data-action="left" aria-label="Muoviti a sinistra. Tocca due volte per scattare"><span aria-hidden="true">←</span></button>
-          <span class="touch-pad-core" aria-hidden="true">極</span>
-          <button data-action="right" aria-label="Muoviti a destra. Tocca due volte per scattare"><span aria-hidden="true">→</span></button>
-          <span class="touch-dash-hint">DOPPIO TOCCO <b>SCATTO</b></span>
+        <div class="touch-console-meta"><span><i></i> PLAYER 01 <b>TOUCH ARCADE</b></span><span>MUOVI · COLLEGA · OSU!</span></div>
+        <div class="joystick-area">
+          <div class="touch-joystick" id="touch-joystick" data-joystick role="group" aria-label="Joystick: trascina a sinistra o destra per muoverti, in alto per saltare. Due flick nella stessa direzione per scattare.">
+            <span class="joystick-ring" aria-hidden="true"></span>
+            <span class="joystick-up" aria-hidden="true">SALTA <b>⌃</b></span>
+            <span class="joystick-left" aria-hidden="true">‹</span><span class="joystick-right" aria-hidden="true">›</span>
+            <span class="joystick-knob" aria-hidden="true"><i></i></span>
+          </div>
+          <span class="joystick-caption">DOPPIO FLICK <b>SCATTO</b></span>
         </div>
         <div class="touch-deck">
-          <div class="touch-defenses" role="group" aria-label="Difese">
-            <button data-action="block" aria-label="Tieni premuto per la parata di braccia"><span class="touch-button-icon" aria-hidden="true">▰</span><span>BRACCIA</span></button>
-            <button data-action="legBlock" aria-label="Tieni premuto per parare i calci alzando il ginocchio"><span class="touch-button-icon" aria-hidden="true">⌁</span><span>GINOCCHIO</span></button>
+          <div class="touch-bank-switch" role="group" aria-label="Banco delle tecniche">
+            <button type="button" data-bank="punches" aria-pressed="true">PUGNI</button>
+            <button type="button" data-bank="kicks" aria-pressed="false">CALCI</button>
+            <button type="button" data-bank="special" aria-pressed="false">SPECIALI</button>
           </div>
-          <div class="touch-attacks" role="group" aria-label="Tecniche d’attacco">
-            <button data-action="tsuki" aria-label="Tsuki, pugno al corpo"><span>TSUKI</span><small>PUGNO</small></button>
-            <button data-action="mae" aria-label="Mae geri, calcio frontale"><span>MAE</span><small>FRONTALE</small></button>
-            <button data-action="mawashi" aria-label="Mawashi geri, calcio circolare alto"><span>MAWASHI</span><small>CIRCOLARE</small></button>
-            <button data-action="ushiro" aria-label="Ushiro geri, calcio all’indietro"><span>USHIRO</span><small>ROTAZIONE</small></button>
-            <button data-action="gedan" aria-label="Gedan, calcio basso"><span>GEDAN</span><small>LOW KICK</small></button>
-            <button data-action="kaiten" class="special-touch" aria-label="Kaiten geri, tecnica speciale da 45 Spirit"><span>KAITEN</span><small>45 SPIRIT</small></button>
+          <div class="action-orbit" role="group" aria-label="Quattro tecniche del banco selezionato">
+            <button type="button" class="action-primary" data-action-slot="0" data-action="tsuki" aria-label="Tsuki, pugno diretto al corpo"><span data-action-name>TSUKI</span><small data-action-hint>DIRETTO</small></button>
+            <button type="button" class="action-satellite satellite-left" data-action-slot="1" data-action="shita" aria-label="Shita tsuki, montante al corpo"><span data-action-name>SHITA</span><small data-action-hint>MONTANTE</small></button>
+            <button type="button" class="action-satellite satellite-top" data-action-slot="2" data-action="kagi" aria-label="Kagi tsuki, gancio al corpo"><span data-action-name>KAGI</span><small data-action-hint>GANCIO</small></button>
+            <button type="button" class="action-satellite satellite-right" data-action-slot="3" data-action="mae" aria-label="Mae geri, calcio frontale"><span data-action-name>MAE</span><small data-action-hint>FRONTALE</small></button>
           </div>
         </div>
-        <p class="touch-console-note"><span aria-hidden="true">●</span> TIENI LA DIREZIONE E COLLEGA I COLPI CON L’ALTRO POLLICE.</p>
+        <p class="touch-console-note"><span aria-hidden="true">●</span> PARATE NEL BANCO SPECIALI · TIENI PREMUTO BRACCIA O GINOCCHIO.</p>
       </div>
       <section id="rotate-screen" class="rotate-screen" role="dialog" aria-modal="true" aria-labelledby="rotate-title" aria-describedby="rotate-description" aria-hidden="true" inert>
         <div class="rotate-screen-content">
@@ -608,13 +667,13 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     <footer><span>CREATO PER IL DOJO. MOSSO DALLO SPIRITO.</span><span>KYOKUSHIN SPIRIT <b>© 2026</b> <button id="credits-button">Il dojo & i crediti ↗</button></span></footer>
   </main>
 
-  <dialog id="help-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">KYOKUSHIN / COMANDI</span><h2>IL TUO ARSENALE.</h2><p>Vince chi conquista due round. Porta a zero l’energia dell’avversario o conserva più vita allo scadere dei 60 secondi.</p><div class="mobile-help-note"><b>DUE POLLICI. TUTTO LO SPIRITO.</b><p>Tieni una freccia per muoverti, toccala due volte per scattare. Con l’altro pollice premi e collega gli attacchi. Le parate funzionano finché tieni premuto il tasto. Su telefono si gioca sempre in orizzontale.</p><small>Il touch controlla il giocatore 1. Per giocare in due serve una tastiera.</small></div><div class="controls-columns"><div><h3>GIOCATORE 1</h3><p><kbd>A</kbd> <kbd>D</kbd> Muoviti · <kbd>W</kbd> Salta</p><p><kbd>A A</kbd> / <kbd>D D</kbd> Dash nella direzione scelta</p><p><kbd>SPAZIO</kbd> Braccia · <kbd>F</kbd> Ginocchio · <kbd>ESC</kbd> Pausa</p></div><div><h3>GIOCATORE 2</h3><p><kbd>←</kbd> <kbd>→</kbd> Muoviti · <kbd>↑</kbd> Salta</p><p><kbd>← ←</kbd> / <kbd>→ →</kbd> Dash nella direzione scelta</p><p><kbd>SHIFT</kbd> Braccia · <kbd>0</kbd> Ginocchio · <kbd>1–6</kbd> Colpi</p></div></div><div class="defense-guide">
+  <dialog id="help-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">KYOKUSHIN / COMANDI</span><h2>IL TUO ARSENALE.</h2><p>Vince chi conquista due round. Porta a zero l’energia dell’avversario o conserva più vita allo scadere dei 60 secondi.</p><div class="mobile-help-note"><b>DUE POLLICI. TUTTO LO SPIRITO.</b><p>Trascina il joystick per muoverti; spingilo in alto per saltare. Torna al centro e spingi di nuovo nella stessa direzione per scattare. Con l’altro pollice collega i quattro attacchi: cambia banco fra PUGNI, CALCI e SPECIALI. Le parate BRACCIA e GINOCCHIO sono nel banco SPECIALI e si tengono premute. Su telefono si gioca sempre in orizzontale.</p><small>Il touch controlla il giocatore 1. Per giocare in due serve una tastiera.</small></div><div class="controls-columns"><div><h3>GIOCATORE 1</h3><p><kbd>A</kbd> <kbd>D</kbd> Muoviti · <kbd>W</kbd> Salta</p><p><kbd>A A</kbd> / <kbd>D D</kbd> Dash nella direzione scelta</p><p><kbd>SPAZIO</kbd> Braccia · <kbd>F</kbd> Ginocchio · <kbd>ESC</kbd> Pausa</p><p><kbd>J</kbd> Diretto · <kbd>H</kbd> Shita · <kbd>N</kbd> Kagi</p><p><kbd>K L U I O</kbd> Mae · Mawashi · Ushiro · Gedan · Kaiten</p></div><div><h3>GIOCATORE 2</h3><p><kbd>←</kbd> <kbd>→</kbd> Muoviti · <kbd>↑</kbd> Salta</p><p><kbd>← ←</kbd> / <kbd>→ →</kbd> Dash nella direzione scelta</p><p><kbd>SHIFT</kbd> Braccia · <kbd>0</kbd> Ginocchio</p><p><kbd>1</kbd> Diretto · <kbd>7</kbd> Shita · <kbd>8</kbd> Kagi</p><p><kbd>2–6</kbd> Mae · Mawashi · Ushiro · Gedan · Kaiten</p></div></div><div class="defense-guide">
   <article><span class="field-label">PARATA DI BRACCIA</span><canvas id="arms-demo" width="400" height="260" aria-label="Dimostrazione della guardia di braccia"></canvas><h3>ARRETRA E COPRITI</h3><p>Tieni la direzione opposta all’avversario: proteggi corpo e testa mentre arretri. Da fermo, tieni <kbd>SPAZIO</kbd>.</p><small>I low kick passano sotto la guardia.</small></article>
   <article><span class="field-label">PARATA DI GAMBA</span><canvas id="leg-demo" width="400" height="260" aria-label="Dimostrazione della parata con ginocchio alzato"></canvas><h3>ALZA IL GINOCCHIO</h3><p>Tieni <kbd>F</kbd> per bloccare tutti i calci in arrivo da davanti: gedan, mae, mawashi, ushiro e kaiten. Rilascia il tasto per tornare in guardia.</p><small>Para i calci a ogni altezza; i pugni superano questa guardia.</small></article>
 </div><div class="defense-guide motion-guide">
-  <article><span class="field-label">PASSI &amp; DASH</span><canvas id="walk-demo" width="400" height="280" aria-label="Dimostrazione animata di camminata e scatti avanti e indietro"></canvas><strong class="motion-caption" id="walk-demo-caption">PASSO AVANTI</strong><h3>ACCORCIA LA DISTANZA</h3><p>Premi due volte <kbd>D</kbd> o <kbd>A</kbd> rapidamente per scattare nella direzione scelta. Su touch, tocca due volte la freccia. Da vicino puoi attraversare l’avversario e passare alle sue spalle.</p><small>Durante lo scatto sei esposto ai colpi. La parata di ginocchio resta su F. Non è prevista l’accovacciata.</small></article>
+  <article><span class="field-label">PASSI &amp; DASH</span><canvas id="walk-demo" width="400" height="280" aria-label="Dimostrazione animata di camminata e scatti avanti e indietro"></canvas><strong class="motion-caption" id="walk-demo-caption">PASSO AVANTI</strong><h3>ACCORCIA LA DISTANZA</h3><p>Premi due volte <kbd>D</kbd> o <kbd>A</kbd> rapidamente per scattare nella direzione scelta. Su touch, spingi due volte il joystick nella stessa direzione, tornando al centro tra i due flick. Da vicino puoi attraversare l’avversario e passare alle sue spalle.</p><small>Durante lo scatto sei esposto ai colpi. La parata di ginocchio resta su F. Non è prevista l’accovacciata.</small></article>
   <article><span class="field-label">TECNICA SPECIALE</span><canvas id="kaiten-demo" width="400" height="280" aria-label="Dimostrazione animata del kaiten geri"></canvas><strong class="motion-caption" id="kaiten-demo-caption">O · 45 SPIRIT</strong><h3>KAITEN GERI</h3><p>Preparazione, tuffo, calcio in rotazione e ritorno sul tatami. Chiudi la combinazione con <kbd>O</kbd>.</p><small>La rotazione colpisce in alto: scegli il momento per sorprendere l’avversario.</small></article>
-</div><div class="move-table"><div><b>TECNICA</b><b>P1 / P2</b><b>QUANDO USARLA</b></div><div><strong>Seiken tsuki</strong><span><kbd>J</kbd> / <kbd>1</kbd></span><span>Pugno al corpo. Ripeti J per il gyaku tsuki.</span></div><div><strong>Mae geri</strong><span><kbd>K</kbd> / <kbd>2</kbd></span><span>Calcio frontale per tenere la distanza.</span></div><div><strong>Mawashi geri</strong><span><kbd>L</kbd> / <kbd>3</kbd></span><span>Calcio circolare alto, potente ma più lento.</span></div><div><strong>Ushiro geri</strong><span><kbd>U</kbd> / <kbd>4</kbd></span><span>Calcio all’indietro con rotazione e spinta.</span></div><div><strong>Gedan mawashi</strong><span><kbd>I</kbd> / <kbd>5</kbd></span><span>Calcio basso: si blocca alzando il ginocchio.</span></div><div><strong>Kaiten geri</strong><span><kbd>O</kbd> / <kbd>6</kbd></span><span>Calcio in rotolamento. Richiede 45 Spirit.</span></div></div><div class="combo-note"><b>COMBO PIÙ FLUIDE</b><span>J → J → K → L</span><p>Puoi inserire in anticipo fino a tre colpi: partono in sequenza, appena il precedente va a segno. Avvicinati prima di iniziare.</p><div class="combo-routes"><div><b>CAMBIA LIVELLO</b><span>J → J → I → K → L → O</span></div><div><b>GIRA E CHIUDI</b><span>I → K → U</span></div></div><p>Massimo sei colpi collegati, poi atterramento. Il finale con kaiten richiede 45 Spirit.</p></div><p class="small-note">Ritmo Turbo: azioni e spostamenti al 130%, round sempre di 60 secondi reali. In allenamento la vita si rigenera. Le tecniche sono interpretate in chiave arcade.</p></dialog>
+</div><div class="move-table"><div><b>TECNICA</b><b>P1 / P2</b><b>QUANDO USARLA</b></div><div><strong>Seiken tsuki</strong><span><kbd>J</kbd> / <kbd>1</kbd></span><span>Pugno al corpo. Ripeti J per il gyaku tsuki.</span></div><div><strong>Shita tsuki</strong><span><kbd>H</kbd> / <kbd>7</kbd></span><span>Montante al corpo: utile da distanza ravvicinata.</span></div><div><strong>Kagi tsuki</strong><span><kbd>N</kbd> / <kbd>8</kbd></span><span>Gancio al corpo per variare la combinazione.</span></div><div><strong>Mae geri</strong><span><kbd>K</kbd> / <kbd>2</kbd></span><span>Calcio frontale per tenere la distanza.</span></div><div><strong>Mawashi geri</strong><span><kbd>L</kbd> / <kbd>3</kbd></span><span>Calcio circolare alto, potente ma più lento.</span></div><div><strong>Ushiro geri</strong><span><kbd>U</kbd> / <kbd>4</kbd></span><span>Calcio all’indietro con rotazione e spinta.</span></div><div><strong>Gedan mawashi</strong><span><kbd>I</kbd> / <kbd>5</kbd></span><span>Calcio basso: si blocca alzando il ginocchio.</span></div><div><strong>Kaiten geri</strong><span><kbd>O</kbd> / <kbd>6</kbd></span><span>Calcio in rotolamento. Richiede 45 Spirit.</span></div></div><div class="combo-note"><b>COMBO PIÙ FLUIDE</b><span>J → J → K → L</span><p>Puoi inserire in anticipo fino a tre colpi: partono in sequenza, appena il precedente va a segno. Avvicinati prima di iniziare.</p><div class="combo-routes"><div><b>CAMBIA LIVELLO</b><span>J → J → I → K → L → O</span></div><div><b>GIRA E CHIUDI</b><span>I → K → U</span></div></div><p>Massimo sei colpi collegati, poi atterramento. Il finale con kaiten richiede 45 Spirit.</p></div><p class="small-note">Ritmo Turbo: azioni e spostamenti al 130%, round sempre di 60 secondi reali. In allenamento la vita si rigenera. Le tecniche sono interpretate in chiave arcade.</p></dialog>
   <dialog id="credits-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">STAGE 01 / LE NOSTRE RADICI</span><h2>IL DOJO BODYPLANET.</h2><p>Un omaggio arcade al karate Kyokushinkai e al dojo presso Fitness & Wellness BodyPlanet, a Catania.</p><p>I personaggi illustrati sono ispirati alle fotografie fornite: <b>Sensei Angelo Pierino, III Dan</b> e <b>Senpai Samuel Villani, 1 Kyu</b>. Angelo ha la testa rasata e la cintura nera con tre strisce; Samuel ha i capelli scuri e la cintura marrone con una striscia nera.</p><div id="source-links"></div><p class="small-note">Illustrazioni originali generate per questo progetto. Logo fornito dall’utente. Musica originale ed effetti sintetizzati nel browser, attivi dal primo tocco. Il pulsante ♪ controlla tutto l’audio. Il combattimento è un’interpretazione videoludica; nessuna affiliazione con Street Fighter o MUGEN.</p></dialog>
 <script>
 (function () {
@@ -647,12 +706,14 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
   const QUEUE_WINDOW = .68;
   const MAX_COMBO = 6;
   const DASH_TAP_WINDOW = .25;
-  const ACTIONS = ['left', 'right', 'jump', 'block', 'legBlock', 'tsuki', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten'];
-  const ATTACKS = ['tsuki', 'gyaku', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten'];
+  const ACTIONS = ['left', 'right', 'jump', 'block', 'legBlock', 'tsuki', 'shita', 'kagi', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten'];
+  const ATTACKS = ['tsuki', 'gyaku', 'shita', 'kagi', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten'];
   const KICKS = new Set(['mae', 'mawashi', 'ushiro', 'gedan', 'kaiten']);
   const BASE_MOVES = {
     tsuki:  { name: 'Chūdan tsuki', shortName: 'TSUKI', duration: .34, start: .095, end: .17, damage: 65, reach: 142, height: 149, radius: 37, level: 'body', stun: .25, push: 140, lunge: 52, ki: 7 },
     gyaku:  { name: 'Gyaku tsuki', shortName: 'GYAKU TSUKI', duration: .43, start: .13, end: .22, damage: 95, reach: 161, height: 143, radius: 36, level: 'body', stun: .29, push: 185, lunge: 105, ki: 9 },
+    shita:  { name: 'Shita tsuki', shortName: 'SHITA TSUKI', duration: .46, start: .135, end: .235, damage: 90, reach: 149, height: 155, radius: 31, level: 'body', stun: .30, push: 145, lunge: 95, ki: 9 },
+    kagi:   { name: 'Kagi tsuki', shortName: 'KAGI TSUKI', duration: .54, start: .19, end: .29, damage: 110, reach: 174, height: 145, radius: 34, level: 'body', stun: .36, push: 205, lunge: 105, ki: 10 },
     gedan:  { name: 'Gedan mawashi geri', shortName: 'GEDAN', duration: .57, start: .20, end: .31, damage: 90, reach: 199, height: 57, radius: 33, level: 'low', stun: .32, push: 165, lunge: 50, ki: 10 },
     mae:    { name: 'Mae geri', shortName: 'MAE GERI', duration: .62, start: .20, end: .32, damage: 120, reach: 218, height: 145, radius: 38, level: 'body', stun: .36, push: 235, lunge: 90, ki: 11 },
     mawashi:{ name: 'Jōdan mawashi geri', shortName: 'MAWASHI GERI', duration: .75, start: .265, end: .385, damage: 145, reach: 235, height: 215, radius: 28, level: 'high', stun: .39, push: 280, lunge: 75, ki: 13 },
@@ -663,7 +724,11 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     ...def, duration: def.duration / PACE, start: def.start / PACE, end: def.end / PACE,
     stun: def.stun / PACE, lunge: def.lunge * PACE, push: def.push * PACE,
   })])));
-  const CHAINS = { tsuki: ['gyaku', 'mae', 'gedan'], gyaku: ['mae', 'gedan'], mae: ['mawashi', 'ushiro'], gedan: ['mae'], mawashi: ['kaiten'] };
+  const CHAINS = {
+    tsuki: ['gyaku', 'shita', 'mae', 'gedan'], gyaku: ['shita', 'kagi', 'mae', 'gedan'],
+    shita: ['kagi', 'mae'], kagi: ['mae', 'mawashi', 'ushiro'],
+    mae: ['mawashi', 'ushiro'], gedan: ['mae'], mawashi: ['kaiten'],
+  };
   const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
   const mix = (a, b, t) => a + (b - a) * t;
 
@@ -1171,7 +1236,8 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
         if (!f.attack && f.stun <= 0 && !f.knockdown && ai.attackCooldown <= 0 && ai.guard <= 0) {
           if (distance < 252 && this.random() < [.50, .72, .86][skill]) {
             let choices;
-            if (distance < 160) choices = ['tsuki', 'tsuki', 'gedan', 'mae', 'gyaku'];
+            if (distance < 160) choices = ['tsuki', 'tsuki', 'shita', 'kagi', 'gyaku', 'gedan', 'mae'];
+            else if (distance < 195) choices = ['kagi', 'mae', 'gedan', 'mawashi', 'ushiro'];
             else if (distance < 212) choices = ['mae', 'gedan', 'mawashi', 'mae', 'ushiro'];
             else choices = ['mawashi', 'ushiro', 'mae'];
             let move = choices[Math.floor(this.random() * choices.length)];
@@ -1260,6 +1326,7 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
   const ROOT = new URL('.', document.currentScript?.src || document.baseURI);
   const sheets = {};
   const textures = {};
+  const punchRigs = {};
   let guardSheet;
   const guardTextures = {};
   let portraitSheet;
@@ -1334,6 +1401,42 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
       [922, 453, 451, 372, 1098, 881], [1393, 460, 300, 425, 1555, 876],
     ],
   };
+
+  // Reuse the painted gi, skin and fist as an articulated arm. The torso,
+  // guard hand, face and belt remain the original character artwork.
+  const punchRegions = {
+    angelo: { shoulder: [956, 95], elbow: [1028, 96], sleeve: [942, 65, 88, 73], forearm: [1025, 74, 87, 45], erase: [950, 60, 171, 89] },
+    samuel: { shoulder: [930, 94], elbow: [997, 95], sleeve: [918, 65, 84, 68], forearm: [994, 73, 86, 45], erase: [924, 59, 162, 90] },
+  };
+
+  function buildPunchRig(id) {
+    const [sx, sy, sw, sh] = regions[id][2];
+    const config = punchRegions[id], original = textures[id]?.[2];
+    const makeCanvas = (width, height) => { const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; return canvas; };
+    const base = makeCanvas(sw, sh), c = base.getContext('2d');
+    if (original) c.drawImage(original, 0, 0);
+    else c.drawImage(sheets[id], sx, sy, sw, sh, 0, 0, sw, sh);
+    const part = rect => {
+      const [x, y, width, height] = rect, canvas = makeCanvas(width, height);
+      canvas.getContext('2d').drawImage(base, x - sx, y - sy, width, height, 0, 0, width, height);
+      return canvas;
+    };
+    const sleeve = part(config.sleeve), forearm = part(config.forearm);
+    // Round the shoulder cap so rotating the cropped cloth never exposes a
+    // rectangular patch of the original chest above the articulated sleeve.
+    const sc = sleeve.getContext('2d'), [cx, cy] = config.sleeve;
+    const [px, py] = config.shoulder, [ex, ey] = config.elbow;
+    sc.globalCompositeOperation = 'destination-in';
+    sc.beginPath(); sc.moveTo(px - cx - 12, py - cy);
+    sc.quadraticCurveTo(px - cx - 12, py - cy - 23, px - cx + 14, py - cy - 23);
+    sc.lineTo(ex - cx + 3, ey - cy - 22); sc.lineTo(ex - cx + 3, ey - cy + 29);
+    sc.lineTo(px - cx + 14, py - cy + 26);
+    sc.quadraticCurveTo(px - cx - 12, py - cy + 20, px - cx - 12, py - cy);
+    sc.closePath(); sc.fill(); sc.globalCompositeOperation = 'source-over';
+    const [x, y, width, height] = config.erase;
+    c.clearRect(x - sx, y - sy, width, height);
+    punchRigs[id] = { base, sleeveImage: sleeve, forearmImage: forearm, ...config };
+  }
 
   // Extract the large, continuous silhouettes and their antialiased edges.
   // This prevents a neighbouring frame's hand entering an irregular rectangle.
@@ -1417,6 +1520,7 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
       img.onload = () => {
         sheets[id] = img;
         textures[id] = isolate(img, regions[id]);
+        buildPunchRig(id);
         resolve();
       };
       img.onerror = () => reject(new Error(`Impossibile caricare il personaggio ${id}`));
@@ -1464,7 +1568,7 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     return loading;
   }
 
-  const attackPose = { tsuki: 2, gyaku: 3, gedan: 4, mae: 5, mawashi: 6, ushiro: 7, kaiten: 8 };
+  const attackPose = { tsuki: 2, gyaku: 3, shita: 2, kagi: 2, gedan: 4, mae: 5, mawashi: 6, ushiro: 7, kaiten: 8 };
   const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
   const ease = n => n * n * (3 - 2 * n);
 
@@ -1592,6 +1696,87 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     ctx.restore();
   }
 
+  function punchMotion(move, p) {
+    const uppercut = move === 'shita';
+    const begin = uppercut ? .13 : .18, impact = uppercut ? .30 : .355, release = uppercut ? .55 : .57;
+    const drive = p < impact ? ease(clamp((p - begin) / (impact - begin), 0, 1)) : 1 - ease(clamp((p - release) / (.92 - release), 0, 1));
+    const windup = ease(clamp(p / begin, 0, 1));
+    return {
+      drive,
+      upper: uppercut ? 1.60 - drive * .60 : 2.40 - drive * 2.85,
+      forearm: uppercut ? 1.05 - drive * 1.78 : -.20 + drive * 1.20,
+      offset: drive * (uppercut ? 25 : 23) - (1 - drive) * windup * 3,
+      dip: uppercut ? 8 * (1 - drive) - drive * 2 : 2 * (1 - drive),
+      twist: uppercut ? 1 : .91 + drive * .11,
+      alpha: ease(clamp(Math.min(p / .12, (1 - p) / .13), 0, 1)),
+    };
+  }
+
+  function drawPunch(ctx, id, f, p) {
+    const rig = punchRigs[id];
+    if (!rig) return;
+    const size = f.scale ?? 1, base = HEIGHT / (id === 'angelo' ? 359 : 348);
+    const [sx, sy, sw, sh, ax, ay] = regions[id][2], pose = punchMotion(f.move, p);
+    const shoulder = [(rig.shoulder[0] - ax) * base, (rig.shoulder[1] - ay) * base];
+    const armLength = (rig.elbow[0] - rig.shoulder[0]) * base;
+    const elbow = [shoulder[0] + Math.cos(pose.upper) * armLength, shoulder[1] + Math.sin(pose.upper) * armLength];
+    ctx.save(); ctx.translate(f.x, f.y); ctx.scale((f.facing === -1 ? -1 : 1) * size, size);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    if (pose.alpha < 1) { ctx.save(); paint(ctx, id, 0, base, 1 - pose.alpha); ctx.restore(); }
+    ctx.translate(pose.offset, pose.dip); ctx.scale(pose.twist, 1);
+    ctx.globalAlpha *= pose.alpha;
+    // Short, contact-bound trails describe the rising or circular fist path.
+    if (p > .17 && p < .57) {
+      ctx.save(); ctx.globalAlpha *= Math.sin(clamp((p - .17) / .40, 0, 1) * Math.PI) * .57;
+      ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.strokeStyle = '#ffdb9a';
+      ctx.beginPath();
+      if (f.move === 'shita') { ctx.moveTo(76, -90); ctx.quadraticCurveTo(145, -120, 110, -181); }
+      else { ctx.moveTo(19, -173); ctx.bezierCurveTo(80, -193, 142, -181, 149, -156); }
+      ctx.stroke(); ctx.restore();
+    }
+    ctx.drawImage(rig.base, (sx - ax) * base, (sy - ay) * base, sw * base, sh * base);
+    const limb = (image, rect, pivot, position, angle) => {
+      ctx.save(); ctx.translate(position[0], position[1]); ctx.rotate(angle);
+      ctx.drawImage(image, (rect[0] - pivot[0]) * base, (rect[1] - pivot[1]) * base, rect[2] * base, rect[3] * base);
+      ctx.restore();
+    };
+    limb(rig.sleeveImage, rig.sleeve, rig.shoulder, shoulder, pose.upper);
+    limb(rig.forearmImage, rig.forearm, rig.elbow, elbow, pose.forearm);
+    ctx.restore();
+  }
+
+  function drawUshiro(ctx, id, f, p) {
+    const size = f.scale ?? 1, base = HEIGHT / (id === 'angelo' ? 359 : 348) * size;
+    let frame = 1, turn = 1, drive = 0;
+    if (p < .27) { turn = 1 - ease(clamp((p - .07) / .20, 0, 1)) * .43; if (p >= .12) frame = -1; }
+    else if (p < .69) {
+      frame = 7;
+      const extension = ease(clamp((p - .27) / .14, 0, 1));
+      const recoil = ease(clamp((p - .56) / .13, 0, 1));
+      turn = .57 + .43 * extension - recoil * .36;
+      drive = extension * (1 - recoil);
+    } else { turn = .64 + .36 * ease(clamp((p - .69) / .20, 0, 1)); frame = p < .78 ? -1 : p > .9 ? 0 : 1; }
+    ctx.save(); ctx.translate(f.x, f.y); ctx.scale(f.facing === -1 ? -1 : 1, 1);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    // Hip rotation precedes the rear-facing heel extension; the contact pose
+    // is fully extended at .41, matching the existing .409–.557 hit window.
+    if (p > .12 && p < .41) {
+      ctx.save(); ctx.scale(size, size); ctx.globalAlpha = Math.sin((p - .12) / .29 * Math.PI) * .5;
+      ctx.strokeStyle = '#f4d18a'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.ellipse(0, -117, 66, 19, -.12, -.2, Math.PI * 1.2); ctx.stroke(); ctx.restore();
+    }
+    if (p >= .38 && p <= .59) {
+      ctx.save(); ctx.scale(size, size); ctx.globalAlpha = drive * .55;
+      ctx.strokeStyle = '#ffdda0'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(75, -145); ctx.quadraticCurveTo(114, -154, 165, -151); ctx.stroke(); ctx.restore();
+    }
+    ctx.translate(drive * 17 * size, 0); ctx.scale(turn, 1);
+    if (drive > .9) { ctx.save(); ctx.translate(-13 * size, 1); paint(ctx, id, 7, base, .12); ctx.restore(); }
+    if (frame === -1) paintGuard(ctx, id, 1, size);
+    else paint(ctx, id, frame, base);
+    ctx.restore();
+  }
+
   function draw(ctx, f, t = 0) {
     if (!ready) return;
     const id = regions[f.id] ? f.id : 'angelo';
@@ -1618,6 +1803,14 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     visual.falling = falling;
     if (f.state === 'attack' && f.move === 'kaiten') {
       drawKaiten(ctx, id, f, p);
+      return;
+    }
+    if (f.state === 'attack' && (f.move === 'shita' || f.move === 'kagi')) {
+      drawPunch(ctx, id, f, p);
+      return;
+    }
+    if (f.state === 'attack' && f.move === 'ushiro') {
+      drawUshiro(ctx, id, f, p);
       return;
     }
     const movingGuard = guardKind === 'arms' && guardStep;
@@ -1907,7 +2100,7 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
         case 'pause': tone(440, .13, .08); tone(294, .19, .07, 'triangle', .07); break;
         case 'resume': tone(294, .10, .07); tone(588, .17, .085, 'triangle', .06); break;
         case 'attack': {
-          const punch = ['tsuki', 'gyaku'].includes(options.move);
+          const punch = ['tsuki', 'gyaku', 'shita', 'kagi'].includes(options.move);
           const spinning = ['ushiro', 'kaiten'].includes(options.move);
           noise(punch ? .075 : spinning ? .18 : .12, punch ? .07 : .10, punch ? 1800 : 1100, 'bandpass');
           if (spinning) noise(.10, .065, 2100, 'highpass', .07, -pan);
@@ -2122,7 +2315,27 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
 /* Aggregated keyboard and multitouch input for the local arcade game. */
 (function (global) {
   'use strict';
-  const ACTIONS = new Set(['left', 'right', 'jump', 'block', 'legBlock', 'tsuki', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten']);
+  const ACTIONS = new Set(['left', 'right', 'jump', 'block', 'legBlock', 'tsuki', 'shita', 'kagi', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten']);
+  const BANKS = {
+    punches: [
+      ['tsuki', 'TSUKI', 'DIRETTO', 'Tsuki, pugno diretto al corpo'],
+      ['shita', 'SHITA', 'MONTANTE', 'Shita tsuki, montante al corpo'],
+      ['kagi', 'KAGI', 'GANCIO', 'Kagi tsuki, gancio al corpo'],
+      ['mae', 'MAE', 'FRONTALE', 'Mae geri, calcio frontale']
+    ],
+    kicks: [
+      ['mae', 'MAE', 'FRONTALE', 'Mae geri, calcio frontale'],
+      ['mawashi', 'MAWASHI', 'CIRCOLARE', 'Mawashi geri, calcio circolare alto'],
+      ['gedan', 'GEDAN', 'LOW KICK', 'Gedan, calcio basso'],
+      ['ushiro', 'USHIRO', 'POSTERIORE', 'Ushiro geri, calcio posteriore']
+    ],
+    special: [
+      ['kaiten', 'KAITEN', '45 SPIRIT', 'Kaiten geri, tecnica speciale da 45 Spirit'],
+      ['block', 'BRACCIA', 'TIENI', 'Tieni premuto per parare con le braccia'],
+      ['legBlock', 'GINOCCHIO', 'TIENI', 'Tieni premuto per parare i calci con il ginocchio'],
+      ['ushiro', 'USHIRO', 'POSTERIORE', 'Ushiro geri, calcio posteriore']
+    ]
+  };
 
   class DojoControls {
     constructor({ element, setInput, canPlay = () => true, onTouch = () => {} } = {}) {
@@ -2136,6 +2349,7 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
       this.actions = new Map();
       this.pointers = new Map();
       this.padKeys = new Map();
+      this.bank = 'punches';
       this.destroyed = false;
       this.listeners = [];
       this.originalStyle = {};
@@ -2150,6 +2364,14 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
       this._listen(element, 'lostpointercapture', event => this._end(event, 'lostcapture'));
       this._listen(element, 'keydown', event => this._keyDown(event));
       this._listen(element, 'keyup', event => this._keyUp(event));
+      this._listen(element, 'click', event => {
+        const tab = this._within(event.target, '[data-bank]');
+        if (!tab) return;
+        event.preventDefault();event.stopPropagation();
+        if (!this.canPlay() || tab.disabled) return;
+        this.setBank(tab.dataset.bank);
+        this.onTouch(event);
+      });
       this._listen(element, 'focusout', event => {
         for (const [code, record] of [...this.padKeys]) {
           if (record.button === this._button(event.target)) this._releasePadKey(code, 'blur');
@@ -2164,12 +2386,13 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
       }
       for (const type of ['click', 'contextmenu', 'dragstart']) {
         this._listen(element, type, event => {
-          if (!this._button(event.target)) return;
+          if (!this._button(event.target) && !this._within(event.target, '[data-joystick]')) return;
           event.preventDefault();
           if (type === 'click') event.stopPropagation(); // No delayed synthetic attack/click.
         });
       }
       this._syncButtons();
+      this.setBank(this.bank);
     }
 
     _listen(target, type, listener) {
@@ -2181,8 +2404,37 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     _valid(player, action) { return (player === 0 || player === 1) && ACTIONS.has(action); }
 
     _button(target) {
-      const button = target?.closest?.('[data-action]') || target?.parentElement?.closest?.('[data-action]');
-      return button && this.element.contains(button) ? button : null;
+      return this._within(target, '[data-action]');
+    }
+
+    _within(target, selector) {
+      const node = target?.closest?.(selector) || target?.parentElement?.closest?.(selector);
+      return node && this.element.contains(node) ? node : null;
+    }
+
+    /** Changing banks releases only touch actions, preserving a held joystick/key. */
+    setBank(bank) {
+      if (this.destroyed || !BANKS[bank]) return false;
+      const buttons = [...this.element.querySelectorAll('[data-action-slot]')];
+      if (bank !== this.bank) {
+        for (const record of [...this.pointers.values()]) if (record.kind !== 'joystick') this._finishPointer(record.pointerId, 'bank');
+        for (const [code, record] of [...this.padKeys]) if (buttons.includes(record.button)) this._releasePadKey(code, 'bank');
+      }
+      this.bank = bank;
+      this.element.dataset.activeBank = bank;
+      for (const button of buttons) {
+        const spec = BANKS[bank][Number(button.dataset.actionSlot)];
+        if (!spec) continue;
+        const [action, label, hint, description] = spec;
+        button.dataset.action = action;
+        button.setAttribute('aria-label', description);
+        const name = button.querySelector('[data-action-name]'), subtitle = button.querySelector('[data-action-hint]');
+        if (name) name.textContent = label;
+        if (subtitle) subtitle.textContent = hint;
+      }
+      for (const tab of this.element.querySelectorAll('[data-bank]')) tab.setAttribute('aria-pressed', String(tab.dataset.bank === bank));
+      this._syncButtons();
+      return true;
     }
 
     _binding(button) {
@@ -2281,6 +2533,8 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
 
     _down(event) {
       if (this.destroyed || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      const joystick = this._within(event.target, '[data-joystick]');
+      if (joystick) { this._joystickDown(event, joystick); return; }
       const button = this._button(event.target), binding = this._binding(button);
       if (!binding) return;
       event.preventDefault();
@@ -2297,11 +2551,63 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
       this.onTouch(event);
     }
 
+    _joystickDown(event, joystick) {
+      event.preventDefault();
+      if (!this.canPlay() || this.pointers.has(event.pointerId) || [...this.pointers.values()].some(record => record.joystick === joystick)) return;
+      const record = { kind: 'joystick', joystick, source: Symbol(`stick:${event.pointerId}`),
+        jumpSource: Symbol(`stick-jump:${event.pointerId}`), horizontal: null, jumping: false,
+        pointerId: event.pointerId, pointerType: event.pointerType || 'touch', captured: false };
+      this.pointers.set(event.pointerId, record);
+      try {
+        if (this.element.setPointerCapture) { this.element.setPointerCapture(event.pointerId); record.captured = true; }
+      } catch (_) { record.captured = false; }
+      this._joystickMove(event, record);
+      this.onTouch(event);
+    }
+
+    _joystickMove(event, record) {
+      const rect = record.joystick.getBoundingClientRect();
+      let dx = event.clientX - rect.left - rect.width / 2, dy = event.clientY - rect.top - rect.height / 2;
+      // The cabinet's CSS fallback rotates clockwise. Convert physical screen
+      // deltas back to the game's own horizontal/up axes before interpreting input.
+      if (this.document?.body?.classList.contains('virtual-landscape')) [dx, dy] = [dy, -dx];
+      const radius = Math.max(1, Math.min(rect.width, rect.height) / 2);
+      const x = dx / radius, y = dy / radius;
+      const old = record.horizontal;
+      const direction = x > (old === 'right' ? .16 : .27) ? 'right' : x < (old === 'left' ? -.16 : -.27) ? 'left' : null;
+      if (direction !== old) {
+        this._release(record.source, this._meta(record, direction ? 'move' : 'up'));
+        // A new flick from neutral is a deliberate tap. Crossing directly from
+        // left to right is movement and must not accidentally prime a dash.
+        if (direction) this._press(record.source, 0, direction, this._meta(record, old ? 'move' : 'down'));
+        record.horizontal = direction;
+      }
+      const jumping = y < (record.jumping ? -.28 : -.48);
+      if (jumping !== record.jumping) {
+        if (jumping) this._press(record.jumpSource, 0, 'jump', this._meta(record, 'down'));
+        else this._release(record.jumpSource, this._meta(record, 'move'));
+        record.jumping = jumping;
+      }
+      const length = Math.hypot(x, y), travel = radius * .55 / Math.max(1, length);
+      record.joystick.style.setProperty('--stick-x', `${x * travel}px`);
+      record.joystick.style.setProperty('--stick-y', `${y * travel}px`);
+      record.joystick.classList.toggle('engaged', true);
+      record.joystick.classList.toggle('jumping', jumping);
+      record.joystick.setAttribute('aria-label', `Joystick: ${direction === 'left' ? 'sinistra' : direction === 'right' ? 'destra' : 'neutro'}${jumping ? ', salto' : ''}. Trascina per muoverti, verso l’alto per saltare.`);
+    }
+
+    _resetJoystick(joystick) {
+      joystick.style.setProperty('--stick-x', '0px');joystick.style.setProperty('--stick-y', '0px');
+      joystick.classList.toggle('engaged', false);joystick.classList.toggle('jumping', false);
+      joystick.setAttribute('aria-label', 'Joystick: trascina a sinistra o destra per muoverti, in alto per saltare. Due flick nella stessa direzione per scattare.');
+    }
+
     _move(event) {
       const record = this.pointers.get(event.pointerId);
       if (!record) return;
       event.preventDefault();
       if (!this.canPlay()) { this._finishPointer(event.pointerId, 'cancel'); return; }
+      if (record.kind === 'joystick') { this._joystickMove(event, record); return; }
       // Pointer capture retargets events, so hit-test using the iframe's own
       // document and viewport coordinates instead of event.target.
       const hit = this.document?.elementFromPoint?.(event.clientX, event.clientY);
@@ -2323,6 +2629,10 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
       if (!record) return;
       this.pointers.delete(pointerId);
       this._release(record.source, this._meta(record, phase));
+      if (record.kind === 'joystick') {
+        this._release(record.jumpSource, this._meta(record, phase));
+        this._resetJoystick(record.joystick);
+      }
       this._releaseCapture(record);
     }
 
@@ -2339,7 +2649,10 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
       this.pointers.clear();
       this.padKeys.clear();
       for (const source of [...this.sources.keys()]) this._release(source, { origin: 'system', phase: 'clear' });
-      for (const record of pointers) this._releaseCapture(record);
+      for (const record of pointers) {
+        if (record.kind === 'joystick') this._resetJoystick(record.joystick);
+        this._releaseCapture(record);
+      }
       this._syncButtons();
     }
 
@@ -2358,6 +2671,56 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
 
 </script>
 <script>
+/* orientation.js */
+/* Resolve native and virtual landscape without reading or changing the browser. */
+(function (global) {
+  'use strict';
+
+  const ROUNDING_TOLERANCE = 2;
+  const positive = value => Number.isFinite(value) && value > 0;
+  const shape = (width, height) => Math.sign(width - height);
+  const clampOffset = (value, maximum) => Number.isFinite(value) ? Math.max(0, Math.min(maximum, value)) : 0;
+
+  function resolve(input = {}) {
+    input = input || {};
+    // These are the containing document's inner dimensions, never device pixels.
+    const layoutWidth = positive(input.width) ? input.width : 1;
+    const layoutHeight = positive(input.height) ? input.height : 1;
+    const portrait = layoutHeight > layoutWidth;
+    let width = layoutWidth, height = layoutHeight, left = 0, top = 0;
+
+    // A late visualViewport update must not invert a freshly resized layout.
+    // Smaller, consistently oriented dimensions still support pinch zoom/panning.
+    const visualFits = positive(input.visualWidth) && positive(input.visualHeight)
+      && shape(input.visualWidth, input.visualHeight) === shape(layoutWidth, layoutHeight)
+      && input.visualWidth <= layoutWidth + ROUNDING_TOLERANCE
+      && input.visualHeight <= layoutHeight + ROUNDING_TOLERANCE;
+    if (visualFits) {
+      width = Math.min(layoutWidth, input.visualWidth);
+      height = Math.min(layoutHeight, input.visualHeight);
+      left = clampOffset(input.offsetLeft, layoutWidth - width);
+      top = clampOffset(input.offsetTop, layoutHeight - height);
+    }
+
+    const physicalLandscape = input.physicalLandscape === true;
+    const virtual = !!input.requested && !input.nativePending && !input.nativeLocked
+      && portrait && !physicalLandscape;
+    const blocked = !!input.touchEnabled && !input.requested && portrait && !physicalLandscape;
+    return {
+      width, height, left, top, virtual,
+      logicalWidth: virtual ? height : width,
+      logicalHeight: virtual ? width : height,
+      blocked
+    };
+  }
+
+  const DojoOrientation = Object.freeze({ resolve });
+  global.DojoOrientation = DojoOrientation;
+  if (typeof module !== 'undefined' && module.exports) module.exports = { DojoOrientation };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
 /* main.js */
 (() => {
   'use strict';
@@ -2368,6 +2731,7 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
   let touchPreference = pageOptions.get('touch') === '1' ? true : null;
   let touchDetected = touchMedia.matches || navigator.maxTouchPoints > 0;
   let landscapeRequested = false, landscapeAttempt = 0, viewportFrame = 0;
+  let nativeLandscapePending = false, nativeLandscapeLocked = false, viewportSettleTimer = 0;
   document.body.classList.toggle('embedded', pageOptions.get('embed') === '1' || window.self !== window.top);
   const canvas = $('game'), ctx = canvas.getContext('2d', { alpha: false });
   const characters = {
@@ -2431,40 +2795,43 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     canPlay: ()=>screen==='game'&&active&&!paused&&!resultShown&&!document.body.classList.contains('orientation-blocked')&&!document.querySelector('dialog[open]'),
     onTouch: ()=>{if(!touchDetected){touchDetected=true;syncControlSurface();}}
   });
-  function needsRotation(){
-    if(landscapeRequested)return false;
-    if(!(touchPreference??touchDetected))return false;
-    // In an iframe, viewport shape is the widget's shape, not the phone's.
-    // Real touch devices use the physical screen; desktop previews use their viewport.
-    if(touchMedia.matches||navigator.maxTouchPoints>0){
-      if(typeof window.orientation==='number')return Math.abs(window.orientation)%180===0;
-      const type=window.screen.orientation?.type;
-      if(type)return type.startsWith('portrait');
-    }
-    return portraitMedia.matches;
+  function physicalLandscape(){
+    // Desktop responsive previews must use their viewport, not the monitor.
+    if(!touchMedia.matches && navigator.maxTouchPoints===0)return null;
+    const type=window.screen.orientation?.type;
+    if(type?.startsWith('landscape'))return true;
+    if(type?.startsWith('portrait'))return false;
+    if(typeof window.orientation==='number')return Math.abs(window.orientation)%180===90;
+    return null;
   }
   function syncLandscapeLayout(){
     const viewport=window.visualViewport;
-    const width=Math.max(1,viewport?.width||window.innerWidth);
-    const height=Math.max(1,viewport?.height||window.innerHeight);
-    const virtual=landscapeRequested&&height>width;
-    const logicalWidth=virtual?height:width,logicalHeight=virtual?width:height;
+    const layout=window.DojoOrientation.resolve({
+      requested:landscapeRequested,touchEnabled:touchPreference??touchDetected,
+      nativePending:nativeLandscapePending,nativeLocked:nativeLandscapeLocked,
+      width:window.innerWidth,height:window.innerHeight,
+      visualWidth:viewport?.width,visualHeight:viewport?.height,
+      offsetLeft:viewport?.offsetLeft,offsetTop:viewport?.offsetTop,
+      physicalLandscape:physicalLandscape()
+    });
     const wasVirtual=document.body.classList.contains('virtual-landscape');
     const root=document.documentElement;
     for(const [name,value] of Object.entries({
-      'view-width':width,'view-height':height,'view-left':viewport?.offsetLeft||0,'view-top':viewport?.offsetTop||0,
-      'layout-width':logicalWidth,'layout-height':logicalHeight
+      'view-width':layout.width,'view-height':layout.height,'view-left':layout.left,'view-top':layout.top,
+      'layout-width':layout.logicalWidth,'layout-height':layout.logicalHeight
     }))root.style.setProperty('--'+name,value+'px');
     document.body.classList.toggle('landscape-requested',landscapeRequested);
-    document.body.classList.toggle('virtual-landscape',virtual);
-    document.body.classList.toggle('landscape-layout',logicalWidth>logicalHeight&&(logicalHeight<=650||virtual));
-    document.body.classList.toggle('landscape-short',logicalWidth>logicalHeight&&logicalHeight<=380);
-    if(wasVirtual!==virtual)clearCombatInput();
+    document.body.classList.toggle('virtual-landscape',layout.virtual);
+    document.body.classList.toggle('landscape-layout',layout.logicalWidth>layout.logicalHeight&&(layout.logicalHeight<=650||layout.virtual));
+    document.body.classList.toggle('landscape-short',layout.logicalWidth>layout.logicalHeight&&layout.logicalHeight<=380);
+    document.body.dataset.orientationMode=layout.virtual?'virtual':nativeLandscapePending?'native-pending':'native';
+    if(wasVirtual!==layout.virtual)clearCombatInput();
+    return layout;
   }
   function syncControlSurface(){
-    syncLandscapeLayout();
+    const layout=syncLandscapeLayout();
     const enabled=touchPreference??touchDetected;
-    const rotate=needsRotation();
+    const rotate=layout.blocked;
     const wasBlocked=document.body.classList.contains('orientation-blocked');
     document.body.classList.toggle('orientation-blocked',rotate);
     document.body.classList.toggle('touch-active',enabled);
@@ -2482,7 +2849,7 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     if(!rotate&&wasBlocked)requestAnimationFrame(()=>(paused?$('resume-button'):screen==='title'?$('title-start-button'):screen==='select'?$('start-button'):canvas)?.focus({preventScroll:true}));
     const toggle=$('touch-toggle-button');
     if(toggle){toggle.setAttribute('aria-pressed',String(enabled));toggle.setAttribute('aria-label',enabled?'Nascondi comandi touch':'Mostra comandi touch');toggle.title=enabled?'Nascondi comandi touch':'Mostra comandi touch';}
-    if(screen==='game')$('stage-tip').textContent=enabled?'2× FRECCIA: DASH · ARRETRA: PARATA':'2× A/D: DASH · INDIETRO: PARATA · F: GINOCCHIO';
+    if(screen==='game')$('stage-tip').textContent=enabled?'JOYSTICK: MUOVI · 2× SCATTO · SWITCH: TECNICHE':'2× A/D: DASH · INDIETRO: PARATA · F: GINOCCHIO';
     if(rotate&&active&&!paused&&!resultShown)togglePause(true);
   }
   // Exposed for automated smoke tests and deterministic bug reports.
@@ -2709,8 +3076,8 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     updateHud(dt);drawDefenseGuide(clock);drawMotionGuide(clock);sound.update(audioState());requestAnimationFrame(frame);
   }
 
-  const p1={KeyA:'left',KeyD:'right',KeyW:'jump',Space:'block',KeyF:'legBlock',KeyJ:'tsuki',KeyK:'mae',KeyL:'mawashi',KeyU:'ushiro',KeyI:'gedan',KeyO:'kaiten'};
-  const p2={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'jump',ShiftRight:'block',ShiftLeft:'block',Digit0:'legBlock',Numpad0:'legBlock',Digit1:'tsuki',Digit2:'mae',Digit3:'mawashi',Digit4:'ushiro',Digit5:'gedan',Digit6:'kaiten',Numpad1:'tsuki',Numpad2:'mae',Numpad3:'mawashi',Numpad4:'ushiro',Numpad5:'gedan',Numpad6:'kaiten'};
+  const p1={KeyA:'left',KeyD:'right',KeyW:'jump',Space:'block',KeyF:'legBlock',KeyJ:'tsuki',KeyH:'shita',KeyN:'kagi',KeyK:'mae',KeyL:'mawashi',KeyU:'ushiro',KeyI:'gedan',KeyO:'kaiten'};
+  const p2={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'jump',ShiftRight:'block',ShiftLeft:'block',Digit0:'legBlock',Numpad0:'legBlock',Digit1:'tsuki',Digit2:'mae',Digit3:'mawashi',Digit4:'ushiro',Digit5:'gedan',Digit6:'kaiten',Digit7:'shita',Digit8:'kagi',Numpad1:'tsuki',Numpad2:'mae',Numpad3:'mawashi',Numpad4:'ushiro',Numpad5:'gedan',Numpad6:'kaiten',Numpad7:'shita',Numpad8:'kagi'};
   function keyboard(e,pressed){
     // Release keys even if focus has since moved onto a menu control.
     if(!pressed){const held=heldKeys.get(e.code);if(held){controls.release('key:'+e.code);heldKeys.delete(e.code);e.preventDefault();}return;}
@@ -2753,8 +3120,16 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
   window.addEventListener('keydown',e=>keyboard(e,true));window.addEventListener('keyup',e=>keyboard(e,false));
   window.addEventListener('blur',()=>{if(active&&!paused&&!resultShown)togglePause(true);clearCombatInput();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){if(active&&!paused&&!resultShown)togglePause(true);clearCombatInput();}sound.update(audioState());});
-  const orientationChanged=()=>{clearCombatInput();syncControlSurface();};
-  const viewportChanged=()=>{if(!viewportFrame)viewportFrame=requestAnimationFrame(()=>{viewportFrame=0;syncControlSurface();});};
+  const viewportChanged=()=>{
+    if(!viewportFrame)viewportFrame=requestAnimationFrame(()=>{viewportFrame=0;syncControlSurface();});
+    // Mobile engines can dispatch orientation/fullscreen before their final resize.
+    clearTimeout(viewportSettleTimer);viewportSettleTimer=setTimeout(syncControlSurface,160);
+  };
+  const orientationChanged=()=>{
+    clearCombatInput();
+    if(!nativeLandscapePending&&physicalLandscape()===false)nativeLandscapeLocked=false;
+    syncControlSurface();viewportChanged();
+  };
   window.addEventListener('orientationchange',orientationChanged);
   window.screen.orientation?.addEventListener('change',orientationChanged);
   portraitMedia.addEventListener('change',orientationChanged);
@@ -2781,10 +3156,11 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
   $('fullscreen-button').addEventListener('click',async()=>{
     clearCombatInput();
     if(document.fullscreenElement||$('arcade').classList.contains('expanded')||landscapeRequested){
-      landscapeRequested=false;landscapeAttempt++;$('arcade').classList.remove('expanded');
+      landscapeRequested=false;landscapeAttempt++;nativeLandscapePending=false;nativeLandscapeLocked=false;$('arcade').classList.remove('expanded');
       try{window.screen.orientation?.unlock?.();}catch{}
       try{if(document.fullscreenElement)await document.exitFullscreen();}catch{}
     }else{
+      if(touchPreference??touchDetected){openLandscape();return;}
       const attempt=++landscapeAttempt;
       $('arcade').classList.add('expanded');
       try{await $('game-shell').requestFullscreen?.();}catch{/* The cabinet still fills the available browser viewport. */}
@@ -2794,23 +3170,40 @@ body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;ga
     }
     syncFullscreenButton();syncControlSurface();
   });
-  document.addEventListener('fullscreenchange',()=>{clearCombatInput();syncFullscreenButton();syncControlSurface();});
+  document.addEventListener('fullscreenchange',()=>{
+    if(!document.fullscreenElement){
+      nativeLandscapeLocked=false;
+      if(nativeLandscapePending){landscapeAttempt++;nativeLandscapePending=false;}
+      try{window.screen.orientation?.unlock?.();}catch{}
+    }
+    clearCombatInput();syncFullscreenButton();syncControlSurface();viewportChanged();
+  });
   async function openLandscape(){
     clearCombatInput();
     const attempt=++landscapeAttempt;
-    // Start native fullscreen while the button's user activation is still live.
+    
+    nativeLandscapePending=true;nativeLandscapeLocked=false;
+    // Only native fullscreen is started in the gesture. CSS rotation waits until
+    // native orientation settles, so the two systems never rotate together.
     let fullscreen;
     try{if(!document.fullscreenElement)fullscreen=$('game-shell').requestFullscreen?.();}catch{}
     landscapeRequested=true;$('arcade').classList.add('expanded');
     syncFullscreenButton();syncControlSurface();
-    try{await fullscreen;}catch{/* iPhone/embedded browsers retain the virtual landscape fallback. */}
+    try{await fullscreen;}catch{/* Continue with the same game when fullscreen is unavailable. */}
     if(attempt!==landscapeAttempt){
-      try{if(!landscapeRequested&&document.fullscreenElement===$('game-shell'))await document.exitFullscreen();}catch{}
+      try{if(!landscapeRequested&&!$('arcade').classList.contains('expanded')&&document.fullscreenElement===$('game-shell'))await document.exitFullscreen();}catch{}
       return;
     }
-    try{await window.screen.orientation?.lock?.('landscape');}catch{/* The same cabinet stays rotated in CSS when native rotation is denied. */}
-    if(attempt!==landscapeAttempt){try{if(!landscapeRequested)window.screen.orientation?.unlock?.();}catch{}return;}
-    syncFullscreenButton();syncControlSurface();
+    const orientation=window.screen.orientation;
+    try{
+      if(typeof orientation?.lock==='function'){
+        await orientation.lock('landscape');
+        if(attempt===landscapeAttempt)nativeLandscapeLocked=true;
+      }
+    }catch{/* CSS fallback is considered only after the native attempt ends. */}
+    if(attempt!==landscapeAttempt){try{if(!landscapeRequested||!document.fullscreenElement)orientation?.unlock?.();}catch{}return;}
+    nativeLandscapePending=false;
+    syncFullscreenButton();syncControlSurface();viewportChanged();
   }
   $('rotate-fullscreen-button')?.addEventListener('click',openLandscape);
   function showDialog(id){if(active&&!paused&&!resultShown)togglePause(true);sound.effect('menuMove');$('game-shell').append($(id));$(id).showModal();}
