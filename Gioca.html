@@ -587,7 +587,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
     <footer><span>CREATO PER IL DOJO. MOSSO DALLO SPIRITO.</span><span>KYOKUSHIN SPIRIT <b>© 2026</b> <button id="credits-button">Il dojo & i crediti ↗</button></span></footer>
   </main>
 
-  <dialog id="help-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">KYOKUSHIN / COMANDI</span><h2>IL TUO ARSENALE.</h2><p>Vince chi conquista due round. Porta a zero l’energia dell’avversario o conserva più vita allo scadere dei 60 secondi.</p><div class="mobile-help-note"><b>DUE POLLICI. TUTTO LO SPIRITO.</b><p>Tieni una freccia per muoverti, toccala due volte per scattare. Con l’altro pollice premi e collega gli attacchi. Le parate funzionano finché tieni premuto il tasto. Ruota il telefono per un’arena più ampia.</p><small>Il touch controlla il giocatore 1. Per giocare in due serve una tastiera.</small></div><div class="controls-columns"><div><h3>GIOCATORE 1</h3><p><kbd>A</kbd> <kbd>D</kbd> Muoviti · <kbd>W</kbd> Salta</p><p><kbd>A A</kbd> / <kbd>D D</kbd> Dash nella direzione scelta</p><p><kbd>SPAZIO</kbd> Braccia · <kbd>F</kbd> Ginocchio · <kbd>ESC</kbd> Pausa</p></div><div><h3>GIOCATORE 2</h3><p><kbd>←</kbd> <kbd>→</kbd> Muoviti · <kbd>↑</kbd> Salta</p><p><kbd>← ←</kbd> / <kbd>→ →</kbd> Dash nella direzione scelta</p><p><kbd>SHIFT</kbd> Braccia · <kbd>0</kbd> Ginocchio · <kbd>1–6</kbd> Colpi</p></div></div><div class="defense-guide">
+  <dialog id="help-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">KYOKUSHIN / COMANDI</span><h2>IL TUO ARSENALE.</h2><p>Vince chi conquista due round. Porta a zero l’energia dell’avversario o conserva più vita allo scadere dei 60 secondi.</p><div class="mobile-help-note"><b>DUE POLLICI. TUTTO LO SPIRITO.</b><p>Tieni una freccia per muoverti, toccala due volte per scattare. Con l’altro pollice premi e collega gli attacchi. Le parate funzionano finché tieni premuto il tasto. Su telefono si gioca sempre in orizzontale.</p><small>Il touch controlla il giocatore 1. Per giocare in due serve una tastiera.</small></div><div class="controls-columns"><div><h3>GIOCATORE 1</h3><p><kbd>A</kbd> <kbd>D</kbd> Muoviti · <kbd>W</kbd> Salta</p><p><kbd>A A</kbd> / <kbd>D D</kbd> Dash nella direzione scelta</p><p><kbd>SPAZIO</kbd> Braccia · <kbd>F</kbd> Ginocchio · <kbd>ESC</kbd> Pausa</p></div><div><h3>GIOCATORE 2</h3><p><kbd>←</kbd> <kbd>→</kbd> Muoviti · <kbd>↑</kbd> Salta</p><p><kbd>← ←</kbd> / <kbd>→ →</kbd> Dash nella direzione scelta</p><p><kbd>SHIFT</kbd> Braccia · <kbd>0</kbd> Ginocchio · <kbd>1–6</kbd> Colpi</p></div></div><div class="defense-guide">
   <article><span class="field-label">PARATA DI BRACCIA</span><canvas id="arms-demo" width="400" height="260" aria-label="Dimostrazione della guardia di braccia"></canvas><h3>ARRETRA E COPRITI</h3><p>Tieni la direzione opposta all’avversario: proteggi corpo e testa mentre arretri. Da fermo, tieni <kbd>SPAZIO</kbd>.</p><small>I low kick passano sotto la guardia.</small></article>
   <article><span class="field-label">PARATA DI GAMBA</span><canvas id="leg-demo" width="400" height="260" aria-label="Dimostrazione della parata con ginocchio alzato"></canvas><h3>ALZA IL GINOCCHIO</h3><p>Tieni <kbd>F</kbd> per intercettare i low kick con la tibia. Rilascia il tasto per tornare in guardia.</p><small>Protegge le gambe; corpo e testa restano vulnerabili.</small></article>
 </div><div class="defense-guide motion-guide">
@@ -2384,9 +2384,20 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
     canPlay: ()=>screen==='game'&&active&&!paused&&!resultShown&&!document.body.classList.contains('orientation-blocked')&&!document.querySelector('dialog[open]'),
     onTouch: ()=>{if(!touchDetected){touchDetected=true;syncControlSurface();}}
   });
+  function needsRotation(){
+    if(!(touchPreference??touchDetected))return false;
+    // In an iframe, viewport shape is the widget's shape, not the phone's.
+    // Real touch devices use the physical screen; desktop previews use their viewport.
+    if(touchMedia.matches||navigator.maxTouchPoints>0){
+      if(typeof window.orientation==='number')return Math.abs(window.orientation)%180===0;
+      const type=window.screen.orientation?.type;
+      if(type)return type.startsWith('portrait');
+    }
+    return portraitMedia.matches;
+  }
   function syncControlSurface(){
     const enabled=touchPreference??touchDetected;
-    const rotate=enabled&&portraitMedia.matches;
+    const rotate=needsRotation();
     const wasBlocked=document.body.classList.contains('orientation-blocked');
     document.body.classList.toggle('orientation-blocked',rotate);
     document.body.classList.toggle('touch-active',enabled);
@@ -2675,12 +2686,10 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
   window.addEventListener('keydown',e=>keyboard(e,true));window.addEventListener('keyup',e=>keyboard(e,false));
   window.addEventListener('blur',()=>{if(active&&!paused&&!resultShown)togglePause(true);clearCombatInput();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){if(active&&!paused&&!resultShown)togglePause(true);clearCombatInput();}sound.update(audioState());});
-  window.addEventListener('orientationchange',clearCombatInput);
-  portraitMedia.addEventListener('change',()=>{
-    clearCombatInput();
-    if(portraitMedia.matches&&(touchPreference??touchDetected)&&active&&!paused&&!resultShown)togglePause(true);
-    syncControlSurface();
-  });
+  const orientationChanged=()=>{clearCombatInput();syncControlSurface();};
+  window.addEventListener('orientationchange',orientationChanged);
+  window.screen.orientation?.addEventListener('change',orientationChanged);
+  portraitMedia.addEventListener('change',orientationChanged);
   touchMedia.addEventListener('change',()=>{touchDetected=touchMedia.matches||navigator.maxTouchPoints>0;clearCombatInput();syncControlSurface();});
   $('touch-toggle-button')?.addEventListener('click',()=>{touchPreference=!(touchPreference??touchDetected);clearCombatInput();syncControlSurface();});
   $('title-start-button').addEventListener('click',showSelection);
