@@ -11,8 +11,10 @@ Picchiaduro 2D arcade per browser, con Angelo Pierino e Samuel Villani, ambienta
 ## Comandi
 
 - **Joystick:** trascina per muoverti, spingi verso l’alto per saltare. Per scattare, esegui due spinte rapide nella stessa direzione, tornando al centro tra le due.
-- **Quattro cerchi:** scegli il banco **PUGNI** (Tsuki, Shita, Kagi, Mae), **CALCI** (Mae, Mawashi, Gedan, Ushiro) o **SPECIALI** (Kaiten, Braccia, Ginocchio, Ushiro). Tieni premute le parate per mantenerle attive.
+- **Quattro cerchi con icone:** un unico tasto **↻** cambia gruppo a ogni tocco: pugni → calci → speciale/difese → pugni. I tre puntini indicano il gruppo attivo. Il primo gruppo contiene Tsuki, Shita, Kagi e Mae; il secondo Mae, Mawashi, Gedan e Ushiro; il terzo Kaiten, Braccia, Ginocchio e Ushiro. Tieni premute le icone delle parate per mantenerle attive.
 - **Tastiera:** P1 usa **A/D** per muoversi e **W** per saltare; P2 usa le frecce. **Shita: H / 7**, **Kagi: N / 8**, **Ushiro: U / 4**. **Esc** apre la pausa; gli altri comandi sono nella guida del gioco.
+
+I quattro pugni hanno animazioni continue di caricamento, contatto e ritorno in guardia, con spalla e gomito collegati.
 
 Combo verificate a distanza ravvicinata: **J → H → N → U**, **J → J → H → N → L → O** e **H → N → K → U**. Il kaiten finale richiede **45 Spirit**; puoi inserire in anticipo fino a tre attacchi successivi.
 

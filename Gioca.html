@@ -501,23 +501,29 @@ body.landscape-short .title-motto{margin:8px 0!important}
 #touch-controls .joystick-caption{display:block;margin:9px 0 0;color:#b8c7cd;font-size:6px;font-weight:700;letter-spacing:.7px;text-shadow:0 1px 4px #0b1723}
 #touch-controls .joystick-caption b{color:#edcc8e;margin-left:4px}
 #touch-controls .touch-deck{display:grid;grid-template-rows:46px var(--orbit-height);gap:7px;width:var(--orbit-width);min-width:0;align-self:end;pointer-events:auto;filter:drop-shadow(0 3px 7px #06101d66)}
-#touch-controls .touch-bank-switch{display:grid;grid-template-columns:repeat(3,1fr);width:100%;height:46px;align-items:stretch;background:#101e2bc9;border:1px solid #d4dfdd2e;border-radius:7px;padding:0;overflow:hidden;box-shadow:0 2px 8px #06121b33}
-#touch-controls .touch-bank-switch button{display:flex;flex-direction:row;min-height:44px;min-width:44px;width:100%;height:44px;gap:0;padding:0 3px;margin:0;border:0;border-radius:0;background:transparent;color:#c3cfd3;font-size:7px;font-weight:800;letter-spacing:.45px;opacity:1;box-shadow:none;transform:none;transition:background .1s,color .1s}
-#touch-controls .touch-bank-switch button+button{border-left:1px solid #8c9eab24}
-#touch-controls .touch-bank-switch button[aria-pressed="true"]{color:#ffe5b0;background:linear-gradient(#f2c06f1a,#f2c06f0b);box-shadow:inset 0 -2px #efc577}
-#touch-controls .touch-bank-switch button:active{background:#f2c06f33;color:#ffedc9;transform:none}
+#touch-controls .touch-bank-switch{display:flex;justify-content:flex-end;align-items:center;width:100%;height:46px;padding-right:2px}
+#touch-controls .touch-bank-cycle{position:relative;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;width:86px;height:46px;min-width:44px;min-height:44px;margin:0;padding:2px 9px 9px;border:1px solid #e3cf9f70;border-radius:24px;background:linear-gradient(135deg,#253c4ee6,#101e2beb);color:#f6dfb1;opacity:.95;box-shadow:inset 0 1px 2px #f7f2d61a,0 2px 8px #06121b55;transform:none;touch-action:manipulation;transition:background .1s,color .1s}
+#touch-controls [data-bank-icon]{display:block;width:29px;height:29px;pointer-events:none}
+#touch-controls [data-bank-icon] svg{display:block;width:100%;height:100%}
+#touch-controls .bank-cycle-arrow{width:17px;height:17px;flex:none;color:#f6dfb1b3;pointer-events:none}
+#touch-controls .bank-dots{position:absolute;bottom:5px;left:0;right:0;display:flex;gap:4px;justify-content:center;pointer-events:none}
+#touch-controls .bank-dots i{width:4px;height:4px;border-radius:50%;background:#b4c3ca40;transition:background .1s,box-shadow .1s}
+#touch-controls .bank-dots i.active{background:#ffe2a1;box-shadow:0 0 5px #ffd89155}
+#touch-controls .touch-bank-cycle:active{background:#dbc08b;color:#172b3d;transform:none}
+#touch-controls .touch-bank-cycle:focus-visible{outline:2px solid #ffe2a1;outline-offset:3px}
 #touch-controls .action-orbit{position:relative;width:var(--orbit-width);height:var(--orbit-height);pointer-events:none}
 #touch-controls .action-orbit button{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:44px;min-height:44px;width:var(--satellite-size);height:var(--satellite-size);padding:3px;border:1px solid #f2d6a280;border-bottom-width:2px;border-radius:50%;color:#fae8c8;background:radial-gradient(circle at 35% 20%,#55697aa8,#20394dd6 65%,#182d42ea);box-shadow:inset 0 2px 3px #f7f2d614,0 3px 0 #091725b3,0 4px 12px #0917254d;font-size:8px;font-weight:900;letter-spacing:.15px;opacity:.93;pointer-events:auto;transform:none;transition:background .07s,box-shadow .07s}
-#touch-controls .action-orbit button>small{font-size:4px;letter-spacing:.5px;color:#b9c3c7;font-weight:600}
 #touch-controls .action-orbit button.action-primary{left:29.4%;bottom:0;width:var(--primary-size);height:var(--primary-size);font-size:14px;letter-spacing:.6px;border-color:#ffd49cb3;background:radial-gradient(circle at 35% 20%,#d4a767bb,#976a43eb 65%,#80502ee8);box-shadow:inset 0 2px 5px #ffe8c136,0 4px 0 #36271ed1,0 6px 18px #08131b66;color:#fff1d0;gap:7px}
-#touch-controls .action-orbit button.action-primary>small{font-size:6px;color:#f9dfb4;letter-spacing:.8px}
+#touch-controls [data-action-icon]{display:block;width:70%;height:70%;pointer-events:none;filter:drop-shadow(0 1px 1px #07121b50)}
+#touch-controls [data-action-icon] svg{display:block;width:100%;height:100%;overflow:visible}
+#touch-controls .action-primary [data-action-icon]{width:62%;height:62%}
+#touch-controls .action-orbit button:focus-visible{outline:2px solid #ffe2a1;outline-offset:3px}
 #touch-controls .action-orbit .satellite-left{left:0;bottom:14px}
 #touch-controls .action-orbit .satellite-top{left:31.4%;top:0}
 #touch-controls .action-orbit .satellite-right{right:0;top:30%}
 #touch-controls[data-active-bank="special"] .action-primary{background:radial-gradient(circle at 35% 20%,#f5945acd,#ae472ede 65%,#762b23f0);border-color:#ffc792}
 #touch-controls .action-orbit button[data-action="block"],#touch-controls .action-orbit button[data-action="legBlock"]{border-color:#b9e8e9b3;color:#d2f3f3;background:radial-gradient(circle at 35% 20%,#547b83b3,#284650de 65%,#17313aef)}
 #touch-controls .action-orbit button:is(:active,.pressed){opacity:1;background:#edc887;color:#223347;border-color:#ffedc5;box-shadow:inset 0 2px 7px #5e4a364d,0 1px #142431,0 0 22px #ffe4a347;transform:none}
-#touch-controls .action-orbit button:is(:active,.pressed)>small{color:#705731}
 body.landscape-layout #touch-controls{position:absolute;inset:auto 0 0;z-index:11;grid-template-columns:var(--stick-size) var(--orbit-width);grid-template-rows:auto;column-gap:0;row-gap:0;width:100%;max-width:none;height:auto;min-height:0;flex:none;align-items:end;justify-content:space-between;margin:0;padding:0 max(15px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));border:0;background:transparent;pointer-events:none}
 body.landscape-layout #touch-controls .touch-console-meta,body.landscape-layout #touch-controls .touch-console-note{display:none}
 body.landscape-layout #touch-controls .joystick-area{padding-bottom:4px}
@@ -710,19 +716,21 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
           <span class="joystick-caption">DOPPIO FLICK <b>SCATTO</b></span>
         </div>
         <div class="touch-deck">
-          <div class="touch-bank-switch" role="group" aria-label="Banco delle tecniche">
-            <button type="button" data-bank="punches" aria-pressed="true">PUGNI</button>
-            <button type="button" data-bank="kicks" aria-pressed="false">CALCI</button>
-            <button type="button" data-bank="special" aria-pressed="false">SPECIALI</button>
+          <div class="touch-bank-switch">
+            <button type="button" class="touch-bank-cycle" data-bank-cycle aria-label="Cambia gruppo di tecniche">
+              <span data-bank-icon aria-hidden="true"></span>
+              <svg class="bank-cycle-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 8a8 8 0 0 0-14-2L3 9m0-6v6h6M4 16a8 8 0 0 0 14 2l3-3m0 6v-6h-6"/></svg>
+              <span class="bank-dots" aria-hidden="true"><i class="active"></i><i></i><i></i></span>
+            </button>
           </div>
           <div class="action-orbit" role="group" aria-label="Quattro tecniche del banco selezionato">
-            <button type="button" class="action-primary" data-action-slot="0" data-action="tsuki" aria-label="Tsuki, pugno diretto al corpo"><span data-action-name>TSUKI</span><small data-action-hint>DIRETTO</small></button>
-            <button type="button" class="action-satellite satellite-left" data-action-slot="1" data-action="shita" aria-label="Shita tsuki, montante al corpo"><span data-action-name>SHITA</span><small data-action-hint>MONTANTE</small></button>
-            <button type="button" class="action-satellite satellite-top" data-action-slot="2" data-action="kagi" aria-label="Kagi tsuki, gancio al corpo"><span data-action-name>KAGI</span><small data-action-hint>GANCIO</small></button>
-            <button type="button" class="action-satellite satellite-right" data-action-slot="3" data-action="mae" aria-label="Mae geri, calcio frontale"><span data-action-name>MAE</span><small data-action-hint>FRONTALE</small></button>
+            <button type="button" class="action-primary" data-action-slot="0" data-action="tsuki" aria-label="Tsuki, pugno diretto al corpo"><span data-action-icon aria-hidden="true"></span></button>
+            <button type="button" class="action-satellite satellite-left" data-action-slot="1" data-action="shita" aria-label="Shita tsuki, montante al corpo"><span data-action-icon aria-hidden="true"></span></button>
+            <button type="button" class="action-satellite satellite-top" data-action-slot="2" data-action="kagi" aria-label="Kagi tsuki, gancio al corpo"><span data-action-icon aria-hidden="true"></span></button>
+            <button type="button" class="action-satellite satellite-right" data-action-slot="3" data-action="mae" aria-label="Mae geri, calcio frontale"><span data-action-icon aria-hidden="true"></span></button>
           </div>
         </div>
-        <p class="touch-console-note"><span aria-hidden="true">●</span> PARATE NEL BANCO SPECIALI · TIENI PREMUTO BRACCIA O GINOCCHIO.</p>
+        <p class="touch-console-note"><span aria-hidden="true">●</span> TOCCA ↻ PER CAMBIARE TECNICHE · TRE GRUPPI, UN SOLO TASTO.</p>
       </div>
       <section id="rotate-screen" class="rotate-screen" role="dialog" aria-modal="true" aria-labelledby="rotate-title" aria-describedby="rotate-description" aria-hidden="true" inert>
         <div class="rotate-screen-content">
@@ -742,7 +750,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     <footer><span>CREATO PER IL DOJO. MOSSO DALLO SPIRITO.</span><span>KYOKUSHIN SPIRIT <b>© 2026</b> <button id="credits-button">Il dojo & i crediti ↗</button></span></footer>
   </main>
 
-  <dialog id="help-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">KYOKUSHIN / COMANDI</span><h2>IL TUO ARSENALE.</h2><p>Vince chi conquista due round. Porta a zero l’energia dell’avversario o conserva più vita allo scadere dei 60 secondi.</p><div class="mobile-help-note"><b>DUE POLLICI. TUTTO LO SPIRITO.</b><p>Trascina il joystick per muoverti; spingilo in alto per saltare. Torna al centro e spingi di nuovo nella stessa direzione per scattare. Con l’altro pollice collega i quattro attacchi: cambia banco fra PUGNI, CALCI e SPECIALI. Le parate BRACCIA e GINOCCHIO sono nel banco SPECIALI e si tengono premute. Su telefono si gioca sempre in orizzontale.</p><small>Il touch controlla il giocatore 1. Per giocare in due serve una tastiera.</small></div><div class="controls-columns"><div><h3>GIOCATORE 1</h3><p><kbd>A</kbd> <kbd>D</kbd> Muoviti · <kbd>W</kbd> Salta</p><p><kbd>A A</kbd> / <kbd>D D</kbd> Dash nella direzione scelta</p><p><kbd>SPAZIO</kbd> Braccia · <kbd>F</kbd> Ginocchio · <kbd>ESC</kbd> Pausa</p><p><kbd>J</kbd> Diretto · <kbd>H</kbd> Shita · <kbd>N</kbd> Kagi</p><p><kbd>K L U I O</kbd> Mae · Mawashi · Ushiro · Gedan · Kaiten</p></div><div><h3>GIOCATORE 2</h3><p><kbd>←</kbd> <kbd>→</kbd> Muoviti · <kbd>↑</kbd> Salta</p><p><kbd>← ←</kbd> / <kbd>→ →</kbd> Dash nella direzione scelta</p><p><kbd>SHIFT</kbd> Braccia · <kbd>0</kbd> Ginocchio</p><p><kbd>1</kbd> Diretto · <kbd>7</kbd> Shita · <kbd>8</kbd> Kagi</p><p><kbd>2–6</kbd> Mae · Mawashi · Ushiro · Gedan · Kaiten</p></div></div><div class="defense-guide">
+  <dialog id="help-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">KYOKUSHIN / COMANDI</span><h2>IL TUO ARSENALE.</h2><p>Vince chi conquista due round. Porta a zero l’energia dell’avversario o conserva più vita allo scadere dei 60 secondi.</p><div class="mobile-help-note"><b>DUE POLLICI. TUTTO LO SPIRITO.</b><p>Trascina il joystick per muoverti; spingilo in alto per saltare. Torna al centro e spingi di nuovo nella stessa direzione per scattare. Con l’altro pollice usa le quattro icone: il pulsante ↻ passa al gruppo successivo a ogni tocco. I tre puntini indicano il gruppo attivo: pugni, calci, poi speciale e difese. Nel terzo gruppo tieni premute le icone della guardia o del ginocchio alzato per parare. Su telefono si gioca sempre in orizzontale.</p><small>Il touch controlla il giocatore 1. Per giocare in due serve una tastiera.</small></div><div class="controls-columns"><div><h3>GIOCATORE 1</h3><p><kbd>A</kbd> <kbd>D</kbd> Muoviti · <kbd>W</kbd> Salta</p><p><kbd>A A</kbd> / <kbd>D D</kbd> Dash nella direzione scelta</p><p><kbd>SPAZIO</kbd> Braccia · <kbd>F</kbd> Ginocchio · <kbd>ESC</kbd> Pausa</p><p><kbd>J</kbd> Diretto · <kbd>H</kbd> Shita · <kbd>N</kbd> Kagi</p><p><kbd>K L U I O</kbd> Mae · Mawashi · Ushiro · Gedan · Kaiten</p></div><div><h3>GIOCATORE 2</h3><p><kbd>←</kbd> <kbd>→</kbd> Muoviti · <kbd>↑</kbd> Salta</p><p><kbd>← ←</kbd> / <kbd>→ →</kbd> Dash nella direzione scelta</p><p><kbd>SHIFT</kbd> Braccia · <kbd>0</kbd> Ginocchio</p><p><kbd>1</kbd> Diretto · <kbd>7</kbd> Shita · <kbd>8</kbd> Kagi</p><p><kbd>2–6</kbd> Mae · Mawashi · Ushiro · Gedan · Kaiten</p></div></div><div class="defense-guide">
   <article><span class="field-label">PARATA DI BRACCIA</span><canvas id="arms-demo" width="400" height="260" aria-label="Dimostrazione della guardia di braccia"></canvas><h3>ARRETRA E COPRITI</h3><p>Tieni la direzione opposta all’avversario: proteggi corpo e testa mentre arretri. Da fermo, tieni <kbd>SPAZIO</kbd>.</p><small>I low kick passano sotto la guardia.</small></article>
   <article><span class="field-label">PARATA DI GAMBA</span><canvas id="leg-demo" width="400" height="260" aria-label="Dimostrazione della parata con ginocchio alzato"></canvas><h3>ALZA IL GINOCCHIO</h3><p>Tieni <kbd>F</kbd> per bloccare tutti i calci in arrivo da davanti: gedan, mae, mawashi, ushiro e kaiten. Rilascia il tasto per tornare in guardia.</p><small>Para i calci a ogni altezza; i pugni superano questa guardia.</small></article>
 </div><div class="defense-guide motion-guide">
@@ -1477,11 +1485,12 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     ],
   };
 
-  // Reuse the painted gi, skin and fist as an articulated arm. The torso,
-  // guard hand, face and belt remain the original character artwork.
+  // A single connected two-joint arm is reused for all four punches. Its
+  // original shoulder cap remains on the torso; the sleeve overlaps the
+  // forearm at the elbow so rotation never exposes a square cutout or a gap.
   const punchRegions = {
-    angelo: { shoulder: [956, 95], elbow: [1028, 96], sleeve: [942, 65, 88, 73], forearm: [1025, 74, 87, 45], erase: [950, 60, 171, 89] },
-    samuel: { shoulder: [930, 94], elbow: [997, 95], sleeve: [918, 65, 84, 68], forearm: [994, 73, 86, 45], erase: [924, 59, 162, 90] },
+    angelo: { shoulder: [956, 95], elbow: [1027, 96], sleeve: [934, 66, 100, 72], forearm: [1022, 74, 90, 45], erase: [950, 60, 171, 89] },
+    samuel: { shoulder: [930, 94], elbow: [997, 95], sleeve: [908, 65, 95, 68], forearm: [992, 73, 94, 45], erase: [924, 59, 162, 90] },
   };
 
   function buildPunchRig(id) {
@@ -1497,19 +1506,23 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       return canvas;
     };
     const sleeve = part(config.sleeve), forearm = part(config.forearm);
-    // Round the shoulder cap so rotating the cropped cloth never exposes a
-    // rectangular patch of the original chest above the articulated sleeve.
-    const sc = sleeve.getContext('2d'), [cx, cy] = config.sleeve;
     const [px, py] = config.shoulder, [ex, ey] = config.elbow;
+    const capRect = [px - 26, py - 29, 54, 58], cap = part(capRect);
+    const cc = cap.getContext('2d');
+    cc.globalCompositeOperation = 'destination-in';
+    cc.beginPath(); cc.ellipse(26, 29, 26, 28, 0, 0, Math.PI * 2); cc.fill();
+    // Retain cloth texture, but round the shoulder end of the moving sleeve.
+    const sc = sleeve.getContext('2d'), [cx, cy] = config.sleeve;
     sc.globalCompositeOperation = 'destination-in';
-    sc.beginPath(); sc.moveTo(px - cx - 12, py - cy);
-    sc.quadraticCurveTo(px - cx - 12, py - cy - 23, px - cx + 14, py - cy - 23);
-    sc.lineTo(ex - cx + 3, ey - cy - 22); sc.lineTo(ex - cx + 3, ey - cy + 29);
-    sc.lineTo(px - cx + 14, py - cy + 26);
-    sc.quadraticCurveTo(px - cx - 12, py - cy + 20, px - cx - 12, py - cy);
+    sc.beginPath(); sc.moveTo(px - cx - 17, py - cy);
+    sc.quadraticCurveTo(px - cx - 17, py - cy - 25, px - cx + 13, py - cy - 25);
+    sc.lineTo(ex - cx + 5, ey - cy - 22); sc.lineTo(ex - cx + 5, ey - cy + 29);
+    sc.lineTo(px - cx + 13, py - cy + 27);
+    sc.quadraticCurveTo(px - cx - 17, py - cy + 25, px - cx - 17, py - cy);
     sc.closePath(); sc.fill(); sc.globalCompositeOperation = 'source-over';
     const [x, y, width, height] = config.erase;
     c.clearRect(x - sx, y - sy, width, height);
+    c.drawImage(cap, capRect[0] - sx, capRect[1] - sy);
     punchRigs[id] = { base, sleeveImage: sleeve, forearmImage: forearm, ...config };
   }
 
@@ -1771,53 +1784,79 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     ctx.restore();
   }
 
-  function punchMotion(move, p) {
-    const uppercut = move === 'shita';
-    const begin = uppercut ? .13 : .18, impact = uppercut ? .30 : .355, release = uppercut ? .55 : .57;
-    const drive = p < impact ? ease(clamp((p - begin) / (impact - begin), 0, 1)) : 1 - ease(clamp((p - release) / (.92 - release), 0, 1));
-    const windup = ease(clamp(p / begin, 0, 1));
+  // Times are normalized from game.js: the fist arrives at the beginning
+  // of the active window and retracts immediately after it. Angles describe
+  // anatomical shoulder/elbow motion, never scaling a limb to gain reach.
+  const punchTiming = {
+    tsuki: { contact: .095 / .34, release: .17 / .34, chamber: [.99, -1.43], strike: [.32, -.04], turn: .025 },
+    gyaku: { contact: .13 / .43, release: .22 / .43, chamber: [1.60, -.80], strike: [.37, -.06], turn: .065 },
+    shita: { contact: .135 / .46, release: .235 / .46, chamber: [1.50, .03], strike: [1.16, -.82], turn: .045 },
+    kagi: { contact: .19 / .54, release: .29 / .54, chamber: [1.65, -.83], strike: [.93, -.34], turn: .075 },
+  };
+
+  function punchMotion(move, progress) {
+    const timing = punchTiming[move] || punchTiming.tsuki;
+    const p = clamp(progress, 0, 1), guard = [1.08, -1.47];
+    const chamberAt = timing.contact * .38, recoverAt = .94;
+    let a, b, mix, drive = 0;
+    if (p < chamberAt) {
+      a = guard; b = timing.chamber; mix = ease(p / chamberAt);
+    } else if (p < timing.contact) {
+      a = timing.chamber; b = timing.strike;
+      mix = ease((p - chamberAt) / (timing.contact - chamberAt)); drive = mix;
+    } else if (p < timing.release) {
+      a = b = timing.strike; mix = 0; drive = 1;
+    } else {
+      a = timing.strike; b = guard;
+      mix = ease(clamp((p - timing.release) / (recoverAt - timing.release), 0, 1)); drive = 1 - mix;
+    }
+    const load = Math.sin(Math.PI * clamp(p / timing.contact, 0, 1));
     return {
+      upper: a[0] + (b[0] - a[0]) * mix,
+      forearm: a[1] + (b[1] - a[1]) * mix,
       drive,
-      upper: uppercut ? 1.60 - drive * .60 : 2.40 - drive * 2.85,
-      forearm: uppercut ? 1.05 - drive * 1.78 : -.20 + drive * 1.20,
-      offset: drive * (uppercut ? 25 : 23) - (1 - drive) * windup * 3,
-      dip: uppercut ? 8 * (1 - drive) - drive * 2 : 2 * (1 - drive),
-      twist: uppercut ? 1 : .91 + drive * .11,
-      alpha: ease(clamp(Math.min(p / .12, (1 - p) / .13), 0, 1)),
+      // Small weight transfer at the hips; both feet stay planted.
+      lean: timing.turn * drive - .015 * load,
+      dip: (move === 'shita' ? 3.5 : 1.4) * load,
+      contact: timing.contact,
+      release: timing.release,
     };
   }
 
-  function drawPunch(ctx, id, f, p) {
+  function drawPunch(ctx, id, f, p, t = 0) {
     const rig = punchRigs[id];
     if (!rig) return;
     const size = f.scale ?? 1, base = HEIGHT / (id === 'angelo' ? 359 : 348);
     const [sx, sy, sw, sh, ax, ay] = regions[id][2], pose = punchMotion(f.move, p);
+    if (f.state === 'idle') {
+      // The neutral guard is the exact entry/exit pose of every punch.
+      // Breathing stays below half a pixel at the shoulder.
+      pose.lean += Math.sin(t * 3.2) * .003;
+      pose.dip += Math.sin(t * 3.2) * .22;
+    }
     const shoulder = [(rig.shoulder[0] - ax) * base, (rig.shoulder[1] - ay) * base];
-    const armLength = (rig.elbow[0] - rig.shoulder[0]) * base;
+    const armLength = Math.hypot(rig.elbow[0] - rig.shoulder[0], rig.elbow[1] - rig.shoulder[1]) * base;
     const elbow = [shoulder[0] + Math.cos(pose.upper) * armLength, shoulder[1] + Math.sin(pose.upper) * armLength];
     ctx.save(); ctx.translate(f.x, f.y); ctx.scale((f.facing === -1 ? -1 : 1) * size, size);
     ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-    if (pose.alpha < 1) { ctx.save(); paint(ctx, id, 0, base, 1 - pose.alpha); ctx.restore(); }
-    ctx.translate(pose.offset, pose.dip); ctx.scale(pose.twist, 1);
-    ctx.globalAlpha *= pose.alpha;
-    // Short, contact-bound trails describe the rising or circular fist path.
-    if (p > .17 && p < .57) {
-      ctx.save(); ctx.globalAlpha *= Math.sin(clamp((p - .17) / .40, 0, 1) * Math.PI) * .57;
-      ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.strokeStyle = '#ffdb9a';
-      ctx.beginPath();
-      if (f.move === 'shita') { ctx.moveTo(76, -90); ctx.quadraticCurveTo(145, -120, 110, -181); }
-      else { ctx.moveTo(19, -173); ctx.bezierCurveTo(80, -193, 142, -181, 149, -156); }
-      ctx.stroke(); ctx.restore();
-    }
+    // Keep the legs on their original floor anchor. Rotation is restricted to
+    // the upper body, around the belt, instead of sliding/stretching the sprite.
+    const beltY = -115;
+    ctx.save(); ctx.beginPath(); ctx.rect(-240, beltY, 480, 240); ctx.clip();
+    ctx.drawImage(rig.base, (sx - ax) * base, (sy - ay) * base, sw * base, sh * base);
+    ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.rect(-240, -330, 480, 330 + beltY + 1); ctx.clip();
+    ctx.translate(0, beltY + pose.dip); ctx.rotate(pose.lean); ctx.translate(0, -beltY);
     ctx.drawImage(rig.base, (sx - ax) * base, (sy - ay) * base, sw * base, sh * base);
     const limb = (image, rect, pivot, position, angle) => {
       ctx.save(); ctx.translate(position[0], position[1]); ctx.rotate(angle);
       ctx.drawImage(image, (rect[0] - pivot[0]) * base, (rect[1] - pivot[1]) * base, rect[2] * base, rect[3] * base);
       ctx.restore();
     };
+    // The forearm passes in front of the sleeve as the elbow folds back.
     limb(rig.sleeveImage, rig.sleeve, rig.shoulder, shoulder, pose.upper);
     limb(rig.forearmImage, rig.forearm, rig.elbow, elbow, pose.forearm);
-    ctx.restore();
+    ctx.restore(); ctx.restore();
   }
 
   function drawUshiro(ctx, id, f, p) {
@@ -1880,8 +1919,12 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       drawKaiten(ctx, id, f, p);
       return;
     }
-    if (f.state === 'attack' && (f.move === 'shita' || f.move === 'kagi')) {
-      drawPunch(ctx, id, f, p);
+    if (f.state === 'attack' && punchTiming[f.move]) {
+      drawPunch(ctx, id, f, p, t);
+      return;
+    }
+    if (f.state === 'idle' && !guardKind) {
+      drawPunch(ctx, id, f, 0, t);
       return;
     }
     if (f.state === 'attack' && f.move === 'ushiro') {
@@ -2479,24 +2522,45 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   const ACTIONS = new Set(['left', 'right', 'jump', 'block', 'legBlock', 'tsuki', 'shita', 'kagi', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten']);
   const BANKS = {
     punches: [
-      ['tsuki', 'TSUKI', 'DIRETTO', 'Tsuki, pugno diretto al corpo'],
-      ['shita', 'SHITA', 'MONTANTE', 'Shita tsuki, montante al corpo'],
-      ['kagi', 'KAGI', 'GANCIO', 'Kagi tsuki, gancio al corpo'],
-      ['mae', 'MAE', 'FRONTALE', 'Mae geri, calcio frontale']
+      ['tsuki', 'Tsuki, pugno diretto al corpo'],
+      ['shita', 'Shita tsuki, montante al corpo'],
+      ['kagi', 'Kagi tsuki, gancio al corpo'],
+      ['mae', 'Mae geri, calcio frontale']
     ],
     kicks: [
-      ['mae', 'MAE', 'FRONTALE', 'Mae geri, calcio frontale'],
-      ['mawashi', 'MAWASHI', 'CIRCOLARE', 'Mawashi geri, calcio circolare alto'],
-      ['gedan', 'GEDAN', 'LOW KICK', 'Gedan, calcio basso'],
-      ['ushiro', 'USHIRO', 'POSTERIORE', 'Ushiro geri, calcio posteriore']
+      ['mae', 'Mae geri, calcio frontale'],
+      ['mawashi', 'Mawashi geri, calcio circolare alto'],
+      ['gedan', 'Gedan, calcio basso'],
+      ['ushiro', 'Ushiro geri, calcio posteriore']
     ],
     special: [
-      ['kaiten', 'KAITEN', '45 SPIRIT', 'Kaiten geri, tecnica speciale da 45 Spirit'],
-      ['block', 'BRACCIA', 'TIENI', 'Tieni premuto per parare con le braccia'],
-      ['legBlock', 'GINOCCHIO', 'TIENI', 'Tieni premuto per parare i calci con il ginocchio'],
-      ['ushiro', 'USHIRO', 'POSTERIORE', 'Ushiro geri, calcio posteriore']
+      ['kaiten', 'Kaiten geri, tecnica speciale da 45 Spirit'],
+      ['block', 'Tieni premuto per parare con le braccia'],
+      ['legBlock', 'Tieni premuto per parare i calci con il ginocchio'],
+      ['ushiro', 'Ushiro geri, calcio posteriore']
     ]
   };
+  const BANK_ORDER = ['punches', 'kicks', 'special'];
+  const BANK_LABELS = ['pugni', 'calci', 'speciali e parate'];
+  // Small, consistent karate silhouettes remain legible without names. Motion
+  // strokes distinguish the straight, rising and hooked punches at a glance.
+  const svg = content => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">${content}</svg>`;
+  const head = (x, y) => `<circle cx="${x}" cy="${y}" r="5" fill="currentColor" stroke="none"/>`;
+  const motion = path => `<path d="${path}" stroke-width="2.4" opacity=".65"/>`;
+  const punchBase = head(23, 17) + '<path d="M19 24 28 24 31 40 19 40Z" fill="currentColor" stroke="none"/><path d="M20 27 12 33 19 35M22 40 16 49 10 58M28 40 34 50 43 57"/>';
+  const ICONS = {
+    tsuki: svg(punchBase + '<path d="M27 27 39 27 53 27"/><path d="M52 25h5v5h-5Z" fill="currentColor" stroke="none"/>' + motion('M36 14H56m-5-4 5 4-5 4')),
+    shita: svg(punchBase + '<path d="M28 28 42 37 49 23"/><path d="m47 21 5 1-1 5-5-1Z" fill="currentColor" stroke="none"/>' + motion('M57 36V15m-4 5 4-5 4 5')),
+    kagi: svg(punchBase + '<path d="M28 27 48 30 48 19 39 19"/><path d="M36 16h5v6h-5Z" fill="currentColor" stroke="none"/>' + motion('M57 29Q62 7 39 8m4-4-5 4 5 4')),
+    mae: svg(head(21, 13) + '<path d="m18 21 10-1 3 18-12 1Z" fill="currentColor" stroke="none"/><path d="M20 23 12 31 20 34M27 23 34 26 38 20M24 39 18 49 15 59M28 39 39 31 54 32"/>' + motion('M40 42h18m-4-4 4 4-4 4')),
+    mawashi: svg(head(18, 18) + '<path d="m16 26 9-3 9 17-11 5Z" fill="currentColor" stroke="none"/><path d="M18 27 10 36 17 39M25 26 32 29 35 23M27 43 20 50 17 59M31 40 43 27 56 20"/>' + motion('M43 12Q59 9 60 28m-4-4 4 5 3-5')),
+    gedan: svg(head(22, 13) + '<path d="M18 21h10l3 19H18Z" fill="currentColor" stroke="none"/><path d="M19 24 12 32 20 34M27 24 34 29 38 22M22 40 16 51 14 59M29 40 41 48 55 52"/>' + motion('M39 58h20m-4-4 4 4-4 3')),
+    ushiro: svg(head(19, 24) + '<path d="m25 27 16 5-4 10-17-7Z" fill="currentColor" stroke="none"/><path d="M25 29 16 39 10 36M28 34 23 43 17 43M36 40 33 50 34 59M39 35 48 32 57 31"/>' + motion('M40 17h19m-5-4 5 4-5 4')),
+    kaiten: svg(head(23, 43) + '<path d="m25 35 10-11 8 8-12 11Z" fill="currentColor" stroke="none"/><path d="M27 37 15 33 12 26M32 38 41 45 46 39M36 27 29 17 20 20M40 28 48 17 52 8"/>' + motion('M11 17A23 23 0 1 0 55 40m-5 3 6-3 2 6')),
+    block: svg(head(32, 15) + '<path d="M26 24h12l3 17H24Z" fill="currentColor" stroke="none"/><path d="M26 26 18 30 21 16M38 26 46 30 43 16M28 41 22 50 18 59M36 41 42 50 46 59"/>' + motion('M15 9 9 23m40-14 6 14')),
+    legBlock: svg(head(27, 13) + '<path d="M22 22h11l2 19H22Z" fill="currentColor" stroke="none"/><path d="M23 25 16 31 19 19M32 25 39 29 42 19M25 41 23 51 25 59M32 40 44 32 47 48"/>' + motion('M53 28v22m-3-17 3-5 3 5'))
+  };
+  const BANK_ICONS = { punches: ICONS.tsuki, kicks: ICONS.mawashi, special: ICONS.kaiten };
 
   class DojoControls {
     constructor({ element, setInput, canPlay = () => true, onTouch = () => {} } = {}) {
@@ -2526,11 +2590,11 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       this._listen(element, 'keydown', event => this._keyDown(event));
       this._listen(element, 'keyup', event => this._keyUp(event));
       this._listen(element, 'click', event => {
-        const tab = this._within(event.target, '[data-bank]');
-        if (!tab) return;
+        const cycle = this._within(event.target, '[data-bank-cycle]');
+        if (!cycle) return;
         event.preventDefault();event.stopPropagation();
-        if (!this.canPlay() || tab.disabled) return;
-        this.setBank(tab.dataset.bank);
+        if (!this.canPlay() || cycle.disabled) return;
+        this.cycleBank();
         this.onTouch(event);
       });
       this._listen(element, 'focusout', event => {
@@ -2586,16 +2650,29 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       for (const button of buttons) {
         const spec = BANKS[bank][Number(button.dataset.actionSlot)];
         if (!spec) continue;
-        const [action, label, hint, description] = spec;
+        const [action, description] = spec;
         button.dataset.action = action;
         button.setAttribute('aria-label', description);
-        const name = button.querySelector('[data-action-name]'), subtitle = button.querySelector('[data-action-hint]');
-        if (name) name.textContent = label;
-        if (subtitle) subtitle.textContent = hint;
+        const icon = button.querySelector('[data-action-icon]');
+        if (icon) icon.innerHTML = ICONS[action];
       }
-      for (const tab of this.element.querySelectorAll('[data-bank]')) tab.setAttribute('aria-pressed', String(tab.dataset.bank === bank));
+      const index = BANK_ORDER.indexOf(bank), next = (index + 1) % BANK_ORDER.length;
+      for (const cycle of this.element.querySelectorAll('[data-bank-cycle]')) {
+        cycle.dataset.bankIndex = String(index);
+        cycle.setAttribute('aria-label', `Cambia tecniche. Gruppo ${index + 1} di 3: ${BANK_LABELS[index]}. Prossimo gruppo: ${BANK_LABELS[next]}.`);
+        const icon = cycle.querySelector('[data-bank-icon]');
+        if (icon) icon.innerHTML = BANK_ICONS[bank];
+        const dots = cycle.querySelector('.bank-dots')?.children || [];
+        for (let i = 0; i < dots.length; i++) dots[i].classList.toggle('active', i === index);
+      }
       this._syncButtons();
       return true;
+    }
+
+    /** One native click/tap advances one group; pointer events never duplicate it. */
+    cycleBank() {
+      if (this.destroyed || !this.canPlay()) return false;
+      return this.setBank(BANK_ORDER[(BANK_ORDER.indexOf(this.bank) + 1) % BANK_ORDER.length]);
     }
 
     _binding(button) {
@@ -2666,6 +2743,13 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     }
 
     _keyDown(event) {
+      if (this._activationKey(event) && this._within(event.target, '[data-bank-cycle]')) {
+        // Keep the button's native Enter/Space click, but not game shortcuts or
+        // repeated Enter clicks while a keyboard button is held down.
+        event.stopPropagation();
+        if (event.repeat) event.preventDefault();
+        return;
+      }
       const code = this._activationKey(event), button = this._button(event.target), binding = this._binding(button);
       if (!code || !binding || this.destroyed) return;
       // Preserve a held guard and suppress the browser's synthetic click as well
@@ -2679,6 +2763,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     }
 
     _keyUp(event) {
+      if (this._activationKey(event) && this._within(event.target, '[data-bank-cycle]')) { event.stopPropagation();return; }
       const code = this._activationKey(event);
       if (!code || (!this.padKeys.has(code) && !this._button(event.target))) return;
       event.preventDefault();event.stopPropagation();
