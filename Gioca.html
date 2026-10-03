@@ -474,9 +474,6 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
 body.landscape-requested{overflow:hidden!important;overscroll-behavior:none;background:#101820}
 body.landscape-requested>.masthead,body.landscape-requested .title-row,body.landscape-requested .play-guide,body.landscape-requested main>footer{display:none!important}
 body.landscape-requested main{max-width:none;width:100%;margin:0;padding:0}
-body.virtual-landscape #arcade{position:fixed!important;inset:auto!important;left:calc(var(--view-left,0px) + var(--view-width))!important;top:var(--view-top,0px)!important;width:var(--layout-width)!important;height:var(--layout-height)!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;transform:rotate(90deg)!important;transform-origin:0 0!important;overflow:hidden;z-index:50}
-body.virtual-landscape .arena-topline{padding-left:max(10px,env(safe-area-inset-top))!important;padding-right:max(10px,env(safe-area-inset-bottom))!important}
-body.virtual-landscape .touch-controls{padding-left:max(12px,env(safe-area-inset-top))!important;padding-right:max(12px,env(safe-area-inset-bottom))!important;padding-bottom:max(9px,env(safe-area-inset-left))!important}
 body.landscape-layout .fighter-hud strong{font-size:clamp(14px,calc(var(--layout-width)*.022),24px)}
 body.landscape-layout .timer-box>b{font-size:clamp(34px,calc(var(--layout-width)*.045),55px)}
 body.landscape-layout .selection-panel{overflow-x:hidden}
@@ -487,11 +484,8 @@ body.landscape-short .title-dojo span,body.landscape-short .title-instruction{di
 body.landscape-short .title-emblem{width:36px!important;height:36px!important;margin:5px 0 6px!important}
 body.landscape-short .title-motto{margin:8px 0!important}
 #game-shell>dialog{overflow:auto;overscroll-behavior:contain}
-body.virtual-landscape dialog{position:fixed;inset:auto!important;left:calc(var(--view-left,0px) + var(--view-width)/2)!important;top:calc(var(--view-top,0px) + var(--view-height)/2)!important;width:min(760px,calc(var(--layout-width) - 24px))!important;max-width:none!important;max-height:calc(var(--layout-height) - 24px)!important;margin:0!important;padding:24px 28px!important;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center;overflow:auto;overscroll-behavior:contain}
-body.virtual-landscape dialog .close-dialog{position:sticky;float:right;top:0;right:0;min-width:44px;min-height:44px;margin:-12px -15px 0 8px;background:#f0ede2;z-index:2}
-body.virtual-landscape dialog .controls-columns{grid-template-columns:1fr 1fr;gap:16px}
 
-/* Four-button mobile fighter HUD. Logical dimensions follow the rotated cabinet. */
+/* Four-button mobile fighter HUD. Dimensions follow the native viewport. */
 #touch-controls{--stick-size:148px;--orbit-width:204px;--orbit-height:150px;--primary-size:84px;--satellite-size:54px;grid-template-columns:var(--stick-size) var(--orbit-width);grid-template-rows:auto 1fr auto;min-height:0;column-gap:30px;row-gap:12px}
 #touch-controls .joystick-area{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;align-self:end;pointer-events:auto;filter:drop-shadow(0 3px 8px #06101d66)}
 #touch-controls .touch-joystick{position:relative;width:var(--stick-size);height:var(--stick-size);border:1px solid #dae8e843;border-radius:50%;background:radial-gradient(circle,#091b294a 0 22%,#82969e0e 23% 54%,#152b384a 55% 67%,#91a6aa16 68%);box-shadow:inset 0 0 24px #07142233,0 3px 18px #07121d22;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -548,6 +542,28 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
 body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .timer-box>small{display:none}
 @media(prefers-reduced-motion:reduce){#touch-controls .joystick-knob{transition:none}}
 
+/* Visible before the portable image bundle has even finished downloading. */
+body.boot-loading{overflow:hidden;background:#080e16}
+body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
+.boot-screen{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;min-height:100%;padding:22px max(22px,env(safe-area-inset-right)) 22px max(22px,env(safe-area-inset-left));color:#f5e4b9;background:radial-gradient(ellipse at 50% 35%,#4c3a2050,transparent 60%),#080e16;text-align:center;overflow:auto}
+.boot-screen[hidden]{display:none}
+.boot-content{width:min(440px,100%);margin:auto}
+.boot-brand{font-size:9px;letter-spacing:3px;font-weight:800;color:#b8a887}
+.boot-emblem{width:61px;height:61px;display:grid;place-items:center;margin:25px auto 20px;border:1px solid #c7a35c;color:#efc979;border-radius:50%;font-size:37px;font-family:serif;box-shadow:0 0 35px #c7a35c12}
+.boot-wordmark{font-family:Impact,Dojo,'Arial Narrow',Arial,sans-serif;font-size:clamp(30px,6vw,46px);font-style:italic;line-height:.95;letter-spacing:1px;margin:0}
+.boot-wordmark span{display:block;color:#edca83;font-size:1.4em;margin-top:6px;letter-spacing:4px}
+.boot-progress{height:3px;margin:27px auto 23px;width:min(260px,78%);background:#e4c17a24;overflow:hidden;border-radius:3px}
+.boot-progress span{height:100%;display:block;width:42%;background:#edca83;box-shadow:0 0 12px #edca8380;animation:dojo-boot-progress 1.35s ease-in-out infinite alternate}
+.boot-content h2{font:800 12px Arial,Helvetica,sans-serif;letter-spacing:2px;margin:0 0 10px}
+.boot-content p{font:12px/1.6 Arial,Helvetica,sans-serif;color:#bfc3ca;margin:0 auto;max-width:340px}
+.boot-content>small{display:block;margin-top:25px;font-size:8px;letter-spacing:1.6px;color:#817c72}
+#boot-retry{display:block;margin:18px auto 0;padding:13px 25px;min-height:44px;border:1px solid #ffe2a6;background:#e4c17a;color:#121821;font:800 11px Arial,Helvetica,sans-serif;letter-spacing:1px}
+#boot-retry[hidden]{display:none}
+.boot-screen[data-state=error] .boot-progress span{animation:none;width:100%;background:#df7c5b}
+@keyframes dojo-boot-progress{from{transform:translateX(-60%)}to{transform:translateX(200%)}}
+@media(max-height:450px){.boot-screen{padding-top:14px;padding-bottom:14px}.boot-emblem{width:39px;height:39px;font-size:25px;margin:12px auto}.boot-wordmark{font-size:25px}.boot-progress{margin:17px auto}.boot-content>small{margin-top:16px}}
+@media(prefers-reduced-motion:reduce){.boot-progress span{animation:none;width:100%;opacity:.75}}
+
 </style>
   
   
@@ -556,7 +572,66 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
   
   
 </head>
-<body class="front-title" data-screen="title">
+<body class="front-title boot-loading" data-screen="title" data-boot-state="loading">
+  <section id="boot-screen" class="boot-screen" aria-label="Caricamento del gioco" aria-busy="true">
+    <div class="boot-content">
+      <span class="boot-brand">BODYPLANET DOJO · CATANIA</span>
+      <div class="boot-emblem" aria-hidden="true">極</div>
+      <h1 class="boot-wordmark">KYOKUSHIN <span>SPIRIT</span></h1>
+      <div class="boot-progress" aria-hidden="true"><span></span></div>
+      <div role="status" aria-live="polite"><h2 id="boot-heading">CARICAMENTO DEL DOJO…</h2><p id="boot-detail">Preparo il tatami, i karateka e le tecniche.</p></div>
+      <button id="boot-retry" type="button" hidden>RIPROVA</button>
+      <small>IL PROSSIMO KUMITE STA PER INIZIARE.</small>
+    </div>
+  </section>
+  <script id="dojo-loading-bootstrap">
+  // This small bootstrap precedes the offline asset bundle, so it can paint
+  // while the large portable document is still downloading.
+  (function () {
+    'use strict';
+    var state = 'loading', message = '', delay;
+    var panel = document.getElementById('boot-screen');
+    var heading = document.getElementById('boot-heading');
+    var detail = document.getElementById('boot-detail');
+    var retry = document.getElementById('boot-retry');
+    function notify() {
+      if (window.parent !== window) window.parent.postMessage({type:'kyokushin:boot', state:state, message:message}, '*');
+    }
+    function report(next, text) {
+      if (state === 'ready' || !['loading', 'ready', 'error'].includes(next)) return;
+      state = next; message = text || '';
+      document.body.dataset.bootState = state;
+      panel.dataset.state = state;
+      if (state === 'ready') {
+        clearTimeout(delay); panel.hidden = true;
+        panel.setAttribute('aria-busy', 'false');
+        document.body.classList.remove('boot-loading');
+      } else if (state === 'error') {
+        clearTimeout(delay); panel.setAttribute('aria-busy', 'false');
+        heading.textContent = 'IL DOJO NON SI È CARICATO';
+        detail.textContent = message || 'Controlla la connessione e riprova.';
+        retry.hidden = false;
+      } else if (message) detail.textContent = message;
+      notify();
+    }
+    delay = setTimeout(function () {
+      if (state !== 'loading') return;
+      detail.textContent = 'Il caricamento sta impiegando più tempo. Puoi attendere oppure riprovare.';
+      retry.hidden = false;
+    }, 25000);
+    retry.addEventListener('click', function () { window.location.reload(); });
+    window.addEventListener('message', function (event) {
+      if (window.parent !== window && event.source === window.parent && event.data && event.data.type === 'kyokushin:boot-request') notify();
+    });
+    window.addEventListener('error', function (event) {
+      if (state !== 'loading') return;
+      if (event.target && event.target.tagName === 'SCRIPT') report('error', 'Non riesco a caricare il gioco. Controlla la connessione e riprova.');
+      else if (event.target === window) report('error', 'Il gioco non riesce ad avviarsi. Riprova.');
+    }, true);
+    window.DojoLoading = { report: report };
+    notify();
+  })();
+  </script>
   <header class="masthead">
     <a class="brand" href="#" aria-label="Kyokushin Spirit, inizio"><img data-portable-src="assets/kyokushin-logo.png" alt="Logo Kyokushin"><span>BODYPLANET<span>DOJO · CATANIA</span></span></a>
     <span class="edition">FULL CONTACT. FULL SPIRIT.</span>
@@ -654,9 +729,9 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
           <span class="rotate-eyebrow">BODYPLANET DOJO <i>·</i> MOBILE ARCADE</span>
           <div class="rotate-illustration" aria-hidden="true"><span class="rotate-orbit">↻</span><div class="rotate-device"><span class="rotate-device-arena"></span><span class="rotate-device-controls"></span></div><span class="rotate-landscape-line"></span></div>
           <h2 id="rotate-title">RUOTA IL<br><em>TELEFONO.</em></h2>
-          <p id="rotate-description">Ruota il telefono oppure premi il pulsante: il dojo si adatta subito in orizzontale.</p>
-          <button id="rotate-fullscreen-button" type="button"><span aria-hidden="true">⛶</span> APRI IN ORIZZONTALE</button>
-          <small>Il gioco resta aperto anche quando ruoti il dispositivo.</small>
+          <p id="rotate-description">Gira il telefono in orizzontale. Se lo schermo resta verticale, disattiva il blocco rotazione del telefono.</p>
+          <button id="rotate-fullscreen-button" type="button"><span aria-hidden="true">⛶</span> SCHERMO INTERO</button>
+          <small>La partita resta aperta. Tocca ♪ per attivare musica ed effetti.</small>
           <span class="rotate-signature">FULL CONTACT. FULL SPIRIT.</span>
         </div>
       </section>
@@ -1986,16 +2061,20 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
       this.step = 0;
       this.suspendTimer = null;
       this.resumePromise = null;
+      this.unlockSource = null;
+      this.audioSession = null;
+      this.previousSessionType = null;
       this.outputOpen = false;
       this.cooldowns = new Map();
       this.destroyed = false;
       this.stats = { musicSteps: 0, effects: 0, peakVoices: 0, droppedVoices: 0 };
     }
 
-    init() {
+    init({ gesture = true } = {}) {
       // Calling init after a mute must never undo the user's choice.
       if (this.destroyed || !this.enabled || !this.visible) return Promise.resolve(false);
       this._cancelSuspend();
+      if (gesture) this._configureSession();
       if (this.ctx?.state === 'running' && this.outputOpen) return Promise.resolve(true);
       if (!this.ctx) {
         const AudioContext = global.AudioContext || global.webkitAudioContext;
@@ -2023,22 +2102,94 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
           const data = this.noiseBuffer.getChannelData(0);
           for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
           this.nextStep = c.currentTime + .025;
+          c.onstatechange = () => this._contextChanged(c);
         } catch (_) {
           this.ctx = null;
           return Promise.resolve(false);
         }
       }
-      this._ramp(this.master.gain, .78, .035);
-      this.outputOpen = true;
-      if (this.nextStep < this.ctx.currentTime) this.nextStep = this.ctx.currentTime + .025;
-      if (this.ctx.state === 'running') return Promise.resolve(true);
-      if (this.resumePromise) return this.resumePromise;
+      if (this.ctx.state === 'running') return Promise.resolve(this._openOutput());
+      // A blocked mobile resume can remain pending indefinitely. Each new user
+      // gesture must call resume synchronously, even if an older call is pending.
+      if (!gesture && this.resumePromise) return this.resumePromise;
       try {
-        this.resumePromise = Promise.resolve(this.ctx.resume())
-          .then(() => this.enabled && this.visible).catch(() => false)
-          .finally(() => { this.resumePromise = null; });
-        return this.resumePromise;
+        const context = this.ctx;
+        const resumed = context.resume();
+        if (gesture && context.state !== 'running') this._primeOutput();
+        if (context.state === 'running') this._openOutput();
+        const pending = Promise.resolve(resumed)
+          .then(() => this._contextChanged(context)).catch(() => false)
+          .finally(() => { if (this.resumePromise === pending) this.resumePromise = null; });
+        this.resumePromise = pending;
+        return pending;
       } catch (_) { return Promise.resolve(false); }
+    }
+
+    _configureSession() {
+      // iOS defaults Web Audio to the ringer/ambient route. This game has a music
+      // soundtrack: use the media route when Audio Session is available.
+      try {
+        const session = global.navigator?.audioSession;
+        if (!session) return;
+        if (!this.audioSession) {
+          this.audioSession = session;
+          this.previousSessionType = session.type;
+        }
+        if (session.type !== 'playback') session.type = 'playback';
+      } catch (_) { /* Older browsers or restricted embeds can omit this API. */ }
+    }
+
+    _primeOutput() {
+      this._clearUnlockSource();
+      const context = this.ctx;
+      try {
+        const source = context.createBufferSource();
+        source.buffer = context.createBuffer(1, 1, context.sampleRate);
+        source.connect(this.master);
+        this.unlockSource = source;
+        source.onended = () => {
+          source.disconnect();source.onended = null;
+          if (this.unlockSource === source) this.unlockSource = null;
+        };
+        // start() runs inside the same gesture as resume(), never in a promise.
+        source.start(0);source.stop(context.currentTime + .01);
+      } catch (_) { this._clearUnlockSource(); }
+    }
+
+    _clearUnlockSource() {
+      const source = this.unlockSource;
+      if (!source) return;
+      this.unlockSource = null;source.onended = null;
+      try { source.stop(); } catch (_) {}
+      try { source.disconnect(); } catch (_) {}
+    }
+
+    _openOutput() {
+      if (this.destroyed || !this.enabled || !this.visible || this.ctx?.state !== 'running') return false;
+      if (!this.outputOpen) {
+        this._ramp(this.master.gain, .78, .035);
+        this.outputOpen = true;
+        this.nextStep = this.ctx.currentTime + .025;
+      }
+      return true;
+    }
+
+    _contextChanged(context) {
+      if (context !== this.ctx || this.destroyed) return false;
+      if (!this.enabled || !this.visible) {
+        // A late successful resume must not restart audio behind a hidden page
+        // or undo a mute that happened while permission was still pending.
+        this.outputOpen = false;
+        this.master.gain.setValueAtTime(0, context.currentTime);
+        if (context.state === 'running') Promise.resolve(context.suspend()).catch(() => {});
+        return false;
+      }
+      if (context.state === 'running') return this._openOutput();
+      this.outputOpen = false;
+      this._ramp(this.master.gain, 0, .01);
+      this._stopVoices();
+      this.cooldowns.clear();
+      return false;
     }
 
     toggle() {
@@ -2068,9 +2219,9 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
         return;
       }
       if (!this.enabled || !this.ctx) return;
-      if (!wasVisible) this.init();
+      if (!wasVisible) this.init({ gesture: false });
       if (wasPaused !== this.paused || !wasVisible) this._ramp(this.musicBus.gain, this.paused ? .085 : .42, .10);
-      if (this.ctx.state !== 'running') return;
+      if (this.ctx.state !== 'running' || !this.outputOpen) return;
       const now = this.ctx.currentTime;
       if (this.nextStep < now - .08) this.nextStep = now + .015;
       const interval = 60 / TRACKS[this.track].bpm / 4;
@@ -2083,7 +2234,7 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
     }
 
     effect(name, options = {}) {
-      if (!this.enabled || !this.visible || !this.ctx || this.destroyed) return false;
+      if (!this.enabled || !this.visible || !this.ctx || this.destroyed || this.ctx.state !== 'running' || !this.outputOpen) return false;
       const now = this.ctx.currentTime;
       const spacing = { menuMove: .055, footstep: .10, dash: .08, attack: .035, hit: .025, block: .035 }[name] || 0;
       const key = name + ':' + (options.player ?? 'ui');
@@ -2201,7 +2352,7 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
     }
 
     _canVoice() {
-      if (!this.ctx || !this.enabled || !this.visible || this.destroyed) return false;
+      if (!this.ctx || !this.enabled || !this.visible || this.destroyed || this.ctx.state !== 'running' || !this.outputOpen) return false;
       if (this.voices.size >= 80) { this.stats.droppedVoices++; return false; }
       return true;
     }
@@ -2265,6 +2416,7 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
     _silence() {
       this._cancelSuspend();
       this.outputOpen = false;
+      this._clearUnlockSource();
       if (!this.ctx) return;
       this._ramp(this.master.gain, 0, .025);
       this._stopVoices();
@@ -2289,19 +2441,28 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
 
     get status() {
       return { enabled: this.enabled, initialized: !!this.ctx, contextState: this.ctx?.state || 'uninitialized',
+        ready: this.enabled && this.visible && this.outputOpen && this.ctx?.state === 'running',
+        needsGesture: this.enabled && this.visible && !this.destroyed && (!this.outputOpen || this.ctx?.state !== 'running'),
         scene: this.scene, track: this.track, bpm: TRACKS[this.track].bpm, paused: this.paused,
         visible: this.visible, voices: this.voices.size, pendingSuspend: this.suspendTimer !== null, ...this.stats };
     }
 
     destroy() {
-      this.enabled = false;this.destroyed = true;this._cancelSuspend();
+      this.enabled = false;this.destroyed = true;this.outputOpen = false;this._cancelSuspend();this._clearUnlockSource();
       for (const voice of this.voices) {
         try { voice.source.stop(); } catch (_) {}
         for (const node of voice.nodes) { try { node.disconnect(); } catch (_) {} }
         voice.source.onended = null;
       }
       this.voices.clear();
-      if (this.ctx && this.ctx.state !== 'closed') Promise.resolve(this.ctx.close()).catch(() => {});
+      if (this.ctx) {
+        this.ctx.onstatechange = null;
+        if (this.ctx.state !== 'closed') Promise.resolve(this.ctx.close()).catch(() => {});
+      }
+      try {
+        if (this.audioSession?.type === 'playback') this.audioSession.type = this.previousSessionType;
+      } catch (_) {}
+      this.audioSession = null;this.resumePromise = null;
     }
   }
 
@@ -2567,10 +2728,7 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
 
     _joystickMove(event, record) {
       const rect = record.joystick.getBoundingClientRect();
-      let dx = event.clientX - rect.left - rect.width / 2, dy = event.clientY - rect.top - rect.height / 2;
-      // The cabinet's CSS fallback rotates clockwise. Convert physical screen
-      // deltas back to the game's own horizontal/up axes before interpreting input.
-      if (this.document?.body?.classList.contains('virtual-landscape')) [dx, dy] = [dy, -dx];
+      const dx = event.clientX - rect.left - rect.width / 2, dy = event.clientY - rect.top - rect.height / 2;
       const radius = Math.max(1, Math.min(rect.width, rect.height) / 2);
       const x = dx / radius, y = dy / radius;
       const old = record.horizontal;
@@ -2672,7 +2830,7 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
 </script>
 <script>
 /* orientation.js */
-/* Resolve native and virtual landscape without reading or changing the browser. */
+/* Follow the browser viewport; the game never applies a second screen rotation. */
 (function (global) {
   'use strict';
 
@@ -2702,14 +2860,14 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
       top = clampOffset(input.offsetTop, layoutHeight - height);
     }
 
-    const physicalLandscape = input.physicalLandscape === true;
-    const virtual = !!input.requested && !input.nativePending && !input.nativeLocked
-      && portrait && !physicalLandscape;
-    const blocked = !!input.touchEnabled && !input.requested && portrait && !physicalLandscape;
+    // Native orientation notifications and fullscreen promises may settle before
+    // the iframe is resized. Only the actual layout can make the arena playable.
+    // A denied or unsupported native request must not rotate it with CSS instead.
+    const blocked = !!input.touchEnabled && portrait;
     return {
-      width, height, left, top, virtual,
-      logicalWidth: virtual ? height : width,
-      logicalHeight: virtual ? width : height,
+      width, height, left, top, virtual: false,
+      logicalWidth: width,
+      logicalHeight: height,
       blocked
     };
   }
@@ -2757,15 +2915,21 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const sound = new window.DojoAudio();
+  let lastAudioButtonState = '';
   function audioState() { return {scene:screen,paused:paused||!!document.querySelector('dialog[open]'),phase:game.getState().phase,visible:!document.hidden}; }
   function syncAudioButton() {
+    const on=sound.enabled&&sound.status.ready;
+    const state=on?'playing':sound.enabled?'waiting':'muted';
+    if(state===lastAudioButtonState)return;
+    lastAudioButtonState=state;
     for(const id of ['sound-button','mobile-sound-button']){
-      const on=sound.enabled,button=$(id);if(!button)continue;
-      const label=button.querySelector('span');if(label)label.textContent=on?'AUDIO ON':'AUDIO OFF';
+      const button=$(id);if(!button)continue;
+      const label=button.querySelector('span');if(label)label.textContent=on?'AUDIO ON':sound.enabled?'ATTIVA AUDIO':'AUDIO OFF';
       button.setAttribute('aria-label',on?'Disattiva musica ed effetti':'Attiva musica ed effetti');
       button.title=on?'Disattiva musica ed effetti':'Attiva musica ed effetti';
       button.setAttribute('aria-pressed',String(on));
       button.classList.toggle('muted',!on);
+      button.dataset.audioState=state;
     }
   }
   function toast(text, player=0) { $('move-toast').textContent=text;$('move-toast').style.left=player===0?'4%':'auto';$('move-toast').style.right=player===1?'4%':'auto';$('move-toast').classList.add('show');toastTime=1.05; }
@@ -2795,37 +2959,23 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
     canPlay: ()=>screen==='game'&&active&&!paused&&!resultShown&&!document.body.classList.contains('orientation-blocked')&&!document.querySelector('dialog[open]'),
     onTouch: ()=>{if(!touchDetected){touchDetected=true;syncControlSurface();}}
   });
-  function physicalLandscape(){
-    // Desktop responsive previews must use their viewport, not the monitor.
-    if(!touchMedia.matches && navigator.maxTouchPoints===0)return null;
-    const type=window.screen.orientation?.type;
-    if(type?.startsWith('landscape'))return true;
-    if(type?.startsWith('portrait'))return false;
-    if(typeof window.orientation==='number')return Math.abs(window.orientation)%180===90;
-    return null;
-  }
   function syncLandscapeLayout(){
     const viewport=window.visualViewport;
     const layout=window.DojoOrientation.resolve({
-      requested:landscapeRequested,touchEnabled:touchPreference??touchDetected,
-      nativePending:nativeLandscapePending,nativeLocked:nativeLandscapeLocked,
+      touchEnabled:touchPreference??touchDetected,
       width:window.innerWidth,height:window.innerHeight,
       visualWidth:viewport?.width,visualHeight:viewport?.height,
-      offsetLeft:viewport?.offsetLeft,offsetTop:viewport?.offsetTop,
-      physicalLandscape:physicalLandscape()
+      offsetLeft:viewport?.offsetLeft,offsetTop:viewport?.offsetTop
     });
-    const wasVirtual=document.body.classList.contains('virtual-landscape');
     const root=document.documentElement;
     for(const [name,value] of Object.entries({
       'view-width':layout.width,'view-height':layout.height,'view-left':layout.left,'view-top':layout.top,
       'layout-width':layout.logicalWidth,'layout-height':layout.logicalHeight
     }))root.style.setProperty('--'+name,value+'px');
     document.body.classList.toggle('landscape-requested',landscapeRequested);
-    document.body.classList.toggle('virtual-landscape',layout.virtual);
-    document.body.classList.toggle('landscape-layout',layout.logicalWidth>layout.logicalHeight&&(layout.logicalHeight<=650||layout.virtual));
+    document.body.classList.toggle('landscape-layout',layout.logicalWidth>layout.logicalHeight&&layout.logicalHeight<=650);
     document.body.classList.toggle('landscape-short',layout.logicalWidth>layout.logicalHeight&&layout.logicalHeight<=380);
-    document.body.dataset.orientationMode=layout.virtual?'virtual':nativeLandscapePending?'native-pending':'native';
-    if(wasVirtual!==layout.virtual)clearCombatInput();
+    document.body.dataset.orientationMode=layout.blocked?'portrait':nativeLandscapePending?'native-pending':'native';
     return layout;
   }
   function syncControlSurface(){
@@ -3073,7 +3223,7 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
     drawEffects(paused?0:dt);ctx.restore();
     if(flash>0){if(!reducedMotion){ctx.globalAlpha=flash;ctx.fillStyle='#fff7ca';ctx.fillRect(0,0,1280,720);ctx.globalAlpha=1;}flash=Math.max(0,flash-dt*.8);}
     if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('move-toast').classList.remove('show');}
-    updateHud(dt);drawDefenseGuide(clock);drawMotionGuide(clock);sound.update(audioState());requestAnimationFrame(frame);
+    updateHud(dt);drawDefenseGuide(clock);drawMotionGuide(clock);sound.update(audioState());syncAudioButton();requestAnimationFrame(frame);
   }
 
   const p1={KeyA:'left',KeyD:'right',KeyW:'jump',Space:'block',KeyF:'legBlock',KeyJ:'tsuki',KeyH:'shita',KeyN:'kagi',KeyK:'mae',KeyL:'mawashi',KeyU:'ushiro',KeyI:'gedan',KeyO:'kaiten'};
@@ -3127,7 +3277,7 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
   };
   const orientationChanged=()=>{
     clearCombatInput();
-    if(!nativeLandscapePending&&physicalLandscape()===false)nativeLandscapeLocked=false;
+    if(!nativeLandscapePending&&window.innerHeight>window.innerWidth)nativeLandscapeLocked=false;
     syncControlSurface();viewportChanged();
   };
   window.addEventListener('orientationchange',orientationChanged);
@@ -3148,10 +3298,25 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
     if(screen!=='select')return;config.mode=button.dataset.mode;game.start(config);game.pause(true);setNames();updateSelection();sound.effect('menuMove');
   }));
   $('difficulty').addEventListener('change',()=>{config.difficulty=$('difficulty').value;if(screen==='select')updateSelection();sound.effect('menuMove');});
-  for(const id of ['sound-button','mobile-sound-button'])$(id)?.addEventListener('click',()=>{sound.toggle();syncAudioButton();sound.update(audioState());});
-  const unlockAudio=()=>{sound.init();sound.update(audioState());};
-  window.addEventListener('pointerdown',e=>{unlockAudio();if(e.pointerType==='touch'&&!touchDetected){touchDetected=true;syncControlSurface();}},{capture:true});
-  window.addEventListener('keydown',e=>{if(!e.repeat)unlockAudio();},{capture:true});
+  const unlockAudio=()=>{
+    // Call resume synchronously inside the gesture, before fullscreen can consume it.
+    const pending=sound.init();sound.update(audioState());syncAudioButton();
+    pending.then(syncAudioButton);
+  };
+  const audioButtonTarget=e=>!!e.target?.closest?.('#sound-button, #mobile-sound-button');
+  for(const id of ['sound-button','mobile-sound-button'])$(id)?.addEventListener('click',()=>{
+    if(sound.enabled&&!sound.status.ready)unlockAudio();
+    else {sound.toggle();sound.update(audioState());syncAudioButton();}
+  });
+  window.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse'&&!audioButtonTarget(e))unlockAudio();
+    if(e.pointerType==='touch'&&!touchDetected){touchDetected=true;syncControlSurface();}
+  },{capture:true});
+  window.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse'&&!audioButtonTarget(e))unlockAudio();},{capture:true});
+  // iOS grants touch activation on release; pointerdown alone can leave resume pending.
+  window.addEventListener('touchend',e=>{if(!audioButtonTarget(e))unlockAudio();},{capture:true,passive:true});
+  window.addEventListener('click',e=>{if(!audioButtonTarget(e))unlockAudio();},{capture:true});
+  window.addEventListener('keydown',e=>{if(!e.repeat&&!audioButtonTarget(e))unlockAudio();},{capture:true});
   function syncFullscreenButton(){const expanded=!!document.fullscreenElement||$('arcade').classList.contains('expanded')||landscapeRequested;$('fullscreen-button').setAttribute('aria-label',expanded?'Esci da schermo intero':'Schermo intero');$('fullscreen-button').title=expanded?'Esci da schermo intero':'Schermo intero';}
   $('fullscreen-button').addEventListener('click',async()=>{
     clearCombatInput();
@@ -3183,8 +3348,8 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
     const attempt=++landscapeAttempt;
     
     nativeLandscapePending=true;nativeLandscapeLocked=false;
-    // Only native fullscreen is started in the gesture. CSS rotation waits until
-    // native orientation settles, so the two systems never rotate together.
+    // Only the device/browser may rotate the screen. The portrait gate stays
+    // visible until the actual viewport is landscape, even if a native API fails.
     let fullscreen;
     try{if(!document.fullscreenElement)fullscreen=$('game-shell').requestFullscreen?.();}catch{}
     landscapeRequested=true;$('arcade').classList.add('expanded');
@@ -3200,7 +3365,7 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
         await orientation.lock('landscape');
         if(attempt===landscapeAttempt)nativeLandscapeLocked=true;
       }
-    }catch{/* CSS fallback is considered only after the native attempt ends. */}
+    }catch{/* Rotate the phone physically when the browser cannot lock landscape. */}
     if(attempt!==landscapeAttempt){try{if(!landscapeRequested||!document.fullscreenElement)orientation?.unlock?.();}catch{}return;}
     nativeLandscapePending=false;
     syncFullscreenButton();syncControlSurface();viewportChanged();
@@ -3218,13 +3383,18 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
       await Promise.all([bg.decode(),window.FighterArt.load()]);ready=true;
       $('title-start-button').disabled=false;$('title-load-label').textContent='INIZIA';
       $('start-button').disabled=false;$('start-label').textContent='COMBATTI';
-      updateSelection();showTitle();
+      updateSelection();showTitle(false);
+      // Prepare the first arena frame before revealing it. A hidden loading
+      // iframe may not receive animation frames, so readiness must not await one.
+      drawBackground(clock);
+      window.DojoLoading?.report('ready');
+      (document.body.classList.contains('orientation-blocked')?$('rotate-fullscreen-button'):$('title-start-button'))?.focus({preventScroll:true});
     }
     catch(err){
-      console.error('Asset loading failed',err);loadFailed=true;
+      console.error('Asset loading failed',err);loadFailed=true;ready=false;
       $('title-load-label').textContent='RICARICA IL DOJO';$('title-start-button').disabled=false;
       $('status-label').textContent='Non riesco a caricare le immagini. Ricarica la pagina.';
-      $('title-start-button').focus({preventScroll:true});
+      window.DojoLoading?.report('error', 'Non riesco a caricare le immagini del dojo. Controlla la connessione e riprova.');
     }
   }
   boot();requestAnimationFrame(frame);

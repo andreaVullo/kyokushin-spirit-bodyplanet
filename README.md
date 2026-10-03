@@ -3,9 +3,9 @@
 Picchiaduro 2D arcade per browser, con Angelo Pierino e Samuel Villani, ambientato nel dojo Bodyplanet di Catania.
 
 - Tastiera e comandi touch simultanei.
-- Su mobile, **Apri in orizzontale** adatta il gioco allo schermo; ruotare il telefono conserva la partita.
+- Su mobile, ruota fisicamente il telefono in orizzontale; la partita resta aperta e il gioco non applica una seconda rotazione.
 - Pugni, calci Kyokushin, parate, dash e kaiten.
-- Musica ed effetti originali, attivati dal primo gesto.
+- Musica ed effetti originali, attivati dopo un clic, un tasto o un tocco completo nel gioco.
 - Due personaggi, VS CPU, allenamento e sfida a due con tastiera condivisa.
 
 ## Comandi
@@ -18,10 +18,19 @@ Combo verificate a distanza ravvicinata: **J → H → N → U**, **J → J → 
 
 ## Gioco e incorporamento
 
-Apri `Gioca.html` oppure la home del sito GitHub Pages. Il gioco è completo in un solo file e funziona anche offline.
+Apri `Gioca.html` oppure la home del sito GitHub Pages. Il gioco è completo in un solo file e funziona anche offline. All’avvio compare **Caricamento del dojo…**; titolo e comandi diventano disponibili quando grafica e gioco sono pronti. Se l’attesa supera 25 secondi, compare **Riprova**. La barra animata segnala l’attesa senza percentuali stimate.
 
-La versione portatile incorpora sei script, incluso `orientation.js`. Nei sorgenti di sviluppo, `orientation.test.cjs` e `main-orientation.test.cjs` verificano layout, rotazioni e richieste native con risposte tardive.
+La versione portatile incorpora gli script del gioco, incluso `orientation.js`, e la schermata iniziale di caricamento. Nei sorgenti di sviluppo, `orientation.test.cjs` e `main-orientation.test.cjs` verificano il layout durante la rotazione del telefono, il gate verticale e le richieste fullscreen con risposte tardive.
+
+Il launcher Flazio mostra il loading appena premi **Entra nel dojo**, tenendo nascosto il gioco fino alla conferma di avvio completo. **Torna al sito** resta disponibile durante l’attesa. **Riprova** sostituisce il tentativo precedente: rimane una sola partita aperta. Il gioco scambia soltanto lo stato di caricamento con il launcher, senza dati personali; il launcher verifica dominio e iframe mittente.
+
+| Test nei sorgenti di sviluppo | Contenuto |
+| --- | --- |
+| `loading.test.cjs` | Caricamento iniziale, immagini e conferma di gioco pronto |
+| `launcher-loading.test.cjs` | Loading Flazio, messaggi validati, attesa lunga, tentativi e chiusura |
 
 Per incorporarlo, aggiungi `?embed=1` all’indirizzo di `Gioca.html`. `Incorpora.html` contiene il generatore di iframe con anteprima e copia del codice.
 
-Il pulsante **Apri in orizzontale** richiede schermo intero e blocco dell’orientamento dopo il tocco. Se il browser non li consente, l’interfaccia ruota nella stessa pagina, senza riavviare la partita. Puoi anche ruotare fisicamente il telefono. Nessun account richiesto per giocare.
+Su telefono, ruota fisicamente il dispositivo in orizzontale. Se la pagina resta verticale, disattiva il blocco rotazione del telefono. Il gioco segue il viewport senza rotazioni CSS. **Schermo intero** richiede il fullscreen quando il browser lo offre; altrimenti apre una vista espansa nella stessa pagina. La partita resta aperta durante i cambi di orientamento.
+
+Per attivare l’audio, tocca e rilascia un comando dentro il gioco. Il pulsante **♪** controlla musica ed effetti e ne ritenta l’attivazione se il browser li ha interrotti. Nessun account richiesto per giocare.

@@ -2,7 +2,9 @@ KYOKUSHIN SPIRIT — INCORPORA IL GIOCO NEL TUO SITO
 
 1. CARICA IL GIOCO
 Carica Gioca.html sul tuo hosting HTTPS. Il file contiene già grafica,
-musica ed effetti: non occorrono librerie esterne.
+musica ed effetti: non occorrono librerie esterne. All’avvio appare
+“Caricamento del dojo…”; il titolo compare quando grafica e gioco sono pronti.
+La barra animata indica l’attesa senza percentuali stimate.
 
 2. PREPARA IL CODICE
 Apri Incorpora.html, inserisci l'URL pubblico di Gioca.html e premi
@@ -12,7 +14,29 @@ Se la copia automatica non è disponibile, usa Cmd+C o Ctrl+C sul testo selezion
 3. INCOLLA NEL SITO
 Incolla il codice in un blocco HTML/iframe e salva la pagina del tuo sito.
 Il server che ospita il gioco deve permettere l'incorporamento tramite iframe.
-Musica ed effetti partono al primo clic o tasto dentro il gioco.
+Per attivare musica ed effetti, clicca, premi un tasto oppure tocca e rilascia
+un comando dentro il gioco. Se il browser interrompe l’audio, premi ♪ per
+ritentarne l’attivazione.
+
+SU FLAZIO — CONFIGURAZIONE CONSIGLIATA
+Apri il componente Codice/Script, passa alla modalità HTML e incolla tutto
+il contenuto di iframe-flazio-html.html. È la configurazione verificata su
+https://kyokushinkaicataniadojo.it/play: il pulsante apre una sola partita
+a tutta finestra nella stessa pagina. Il loading appare subito al clic e
+il gioco resta nascosto e non interattivo fino alla conferma di avvio completo.
+Dopo 25 secondi compare un avviso con Riprova; non viene ricaricato da solo.
+Riprova sostituisce il tentativo precedente, senza duplicare le partite.
+Torna al sito resta disponibile durante l’attesa e chiude partita e audio.
+Il gioco comunica al launcher solo lo stato di caricamento, senza dati
+personali. Il launcher verifica dominio e iframe mittente dei messaggi.
+Il file iframe-flazio.html è l’alternativa per la sola modalità Script.
+Non scambiare i due frammenti tra le modalità.
+
+Su telefono, ruota fisicamente il dispositivo in orizzontale. Se la pagina
+resta verticale, disattiva il blocco rotazione del telefono. Il gioco segue
+il browser senza applicare rotazioni CSS; la partita resta aperta.
+Schermo intero richiede il fullscreen quando il browser lo offre; altrimenti
+il gioco occupa una vista espansa nella stessa pagina.
 
 Il parametro embed=1 attiva la presentazione per iframe.
 Un indirizzo localhost o 127.0.0.1 non è raggiungibile dai visitatori.
@@ -44,3 +68,6 @@ Per un hosting diverso, sostituisci src con l'URL pubblico completo del gioco.
 
 Conserva anche i sorgenti del progetto. Dopo una modifica, ricrea Gioca.html
 con build_portable.py e sostituisci sul tuo hosting il file pubblicato.
+
+Il pacchetto Kyokushin-Spirit-Mobile-Web.zip contiene Gioca.html,
+Incorpora.html, INCORPORA.txt, iframe-flazio-html.html e iframe-flazio.html.
