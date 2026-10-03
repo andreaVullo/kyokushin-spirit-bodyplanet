@@ -557,7 +557,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
         <div class="touch-deck">
           <div class="touch-defenses" role="group" aria-label="Difese">
             <button data-action="block" aria-label="Tieni premuto per la parata di braccia"><span class="touch-button-icon" aria-hidden="true">▰</span><span>BRACCIA</span></button>
-            <button data-action="legBlock" aria-label="Tieni premuto per la parata di gamba, alza il ginocchio"><span class="touch-button-icon" aria-hidden="true">⌁</span><span>GINOCCHIO</span></button>
+            <button data-action="legBlock" aria-label="Tieni premuto per parare i calci alzando il ginocchio"><span class="touch-button-icon" aria-hidden="true">⌁</span><span>GINOCCHIO</span></button>
           </div>
           <div class="touch-attacks" role="group" aria-label="Tecniche d’attacco">
             <button data-action="tsuki" aria-label="Tsuki, pugno al corpo"><span>TSUKI</span><small>PUGNO</small></button>
@@ -589,9 +589,9 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
 
   <dialog id="help-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">KYOKUSHIN / COMANDI</span><h2>IL TUO ARSENALE.</h2><p>Vince chi conquista due round. Porta a zero l’energia dell’avversario o conserva più vita allo scadere dei 60 secondi.</p><div class="mobile-help-note"><b>DUE POLLICI. TUTTO LO SPIRITO.</b><p>Tieni una freccia per muoverti, toccala due volte per scattare. Con l’altro pollice premi e collega gli attacchi. Le parate funzionano finché tieni premuto il tasto. Su telefono si gioca sempre in orizzontale.</p><small>Il touch controlla il giocatore 1. Per giocare in due serve una tastiera.</small></div><div class="controls-columns"><div><h3>GIOCATORE 1</h3><p><kbd>A</kbd> <kbd>D</kbd> Muoviti · <kbd>W</kbd> Salta</p><p><kbd>A A</kbd> / <kbd>D D</kbd> Dash nella direzione scelta</p><p><kbd>SPAZIO</kbd> Braccia · <kbd>F</kbd> Ginocchio · <kbd>ESC</kbd> Pausa</p></div><div><h3>GIOCATORE 2</h3><p><kbd>←</kbd> <kbd>→</kbd> Muoviti · <kbd>↑</kbd> Salta</p><p><kbd>← ←</kbd> / <kbd>→ →</kbd> Dash nella direzione scelta</p><p><kbd>SHIFT</kbd> Braccia · <kbd>0</kbd> Ginocchio · <kbd>1–6</kbd> Colpi</p></div></div><div class="defense-guide">
   <article><span class="field-label">PARATA DI BRACCIA</span><canvas id="arms-demo" width="400" height="260" aria-label="Dimostrazione della guardia di braccia"></canvas><h3>ARRETRA E COPRITI</h3><p>Tieni la direzione opposta all’avversario: proteggi corpo e testa mentre arretri. Da fermo, tieni <kbd>SPAZIO</kbd>.</p><small>I low kick passano sotto la guardia.</small></article>
-  <article><span class="field-label">PARATA DI GAMBA</span><canvas id="leg-demo" width="400" height="260" aria-label="Dimostrazione della parata con ginocchio alzato"></canvas><h3>ALZA IL GINOCCHIO</h3><p>Tieni <kbd>F</kbd> per intercettare i low kick con la tibia. Rilascia il tasto per tornare in guardia.</p><small>Protegge le gambe; corpo e testa restano vulnerabili.</small></article>
+  <article><span class="field-label">PARATA DI GAMBA</span><canvas id="leg-demo" width="400" height="260" aria-label="Dimostrazione della parata con ginocchio alzato"></canvas><h3>ALZA IL GINOCCHIO</h3><p>Tieni <kbd>F</kbd> per bloccare tutti i calci in arrivo da davanti: gedan, mae, mawashi, ushiro e kaiten. Rilascia il tasto per tornare in guardia.</p><small>Para i calci a ogni altezza; i pugni superano questa guardia.</small></article>
 </div><div class="defense-guide motion-guide">
-  <article><span class="field-label">PASSI &amp; DASH</span><canvas id="walk-demo" width="400" height="280" aria-label="Dimostrazione animata di camminata e scatti avanti e indietro"></canvas><strong class="motion-caption" id="walk-demo-caption">PASSO AVANTI</strong><h3>ACCORCIA LA DISTANZA</h3><p>Premi due volte <kbd>D</kbd> o <kbd>A</kbd> rapidamente per scattare nella direzione scelta. Su touch, tocca due volte la freccia.</p><small>Durante lo scatto sei esposto ai colpi. La parata di ginocchio resta su F. Non è prevista l’accovacciata.</small></article>
+  <article><span class="field-label">PASSI &amp; DASH</span><canvas id="walk-demo" width="400" height="280" aria-label="Dimostrazione animata di camminata e scatti avanti e indietro"></canvas><strong class="motion-caption" id="walk-demo-caption">PASSO AVANTI</strong><h3>ACCORCIA LA DISTANZA</h3><p>Premi due volte <kbd>D</kbd> o <kbd>A</kbd> rapidamente per scattare nella direzione scelta. Su touch, tocca due volte la freccia. Da vicino puoi attraversare l’avversario e passare alle sue spalle.</p><small>Durante lo scatto sei esposto ai colpi. La parata di ginocchio resta su F. Non è prevista l’accovacciata.</small></article>
   <article><span class="field-label">TECNICA SPECIALE</span><canvas id="kaiten-demo" width="400" height="280" aria-label="Dimostrazione animata del kaiten geri"></canvas><strong class="motion-caption" id="kaiten-demo-caption">O · 45 SPIRIT</strong><h3>KAITEN GERI</h3><p>Preparazione, tuffo, calcio in rotazione e ritorno sul tatami. Chiudi la combinazione con <kbd>O</kbd>.</p><small>La rotazione colpisce in alto: scegli il momento per sorprendere l’avversario.</small></article>
 </div><div class="move-table"><div><b>TECNICA</b><b>P1 / P2</b><b>QUANDO USARLA</b></div><div><strong>Seiken tsuki</strong><span><kbd>J</kbd> / <kbd>1</kbd></span><span>Pugno al corpo. Ripeti J per il gyaku tsuki.</span></div><div><strong>Mae geri</strong><span><kbd>K</kbd> / <kbd>2</kbd></span><span>Calcio frontale per tenere la distanza.</span></div><div><strong>Mawashi geri</strong><span><kbd>L</kbd> / <kbd>3</kbd></span><span>Calcio circolare alto, potente ma più lento.</span></div><div><strong>Ushiro geri</strong><span><kbd>U</kbd> / <kbd>4</kbd></span><span>Calcio all’indietro con rotazione e spinta.</span></div><div><strong>Gedan mawashi</strong><span><kbd>I</kbd> / <kbd>5</kbd></span><span>Calcio basso: si blocca alzando il ginocchio.</span></div><div><strong>Kaiten geri</strong><span><kbd>O</kbd> / <kbd>6</kbd></span><span>Calcio in rotolamento. Richiede 45 Spirit.</span></div></div><div class="combo-note"><b>COMBO PIÙ FLUIDE</b><span>J → J → K → L</span><p>Puoi inserire in anticipo fino a tre colpi: partono in sequenza, appena il precedente va a segno. Avvicinati prima di iniziare.</p><div class="combo-routes"><div><b>CAMBIA LIVELLO</b><span>J → J → I → K → L → O</span></div><div><b>GIRA E CHIUDI</b><span>I → K → U</span></div></div><p>Massimo sei colpi collegati, poi atterramento. Il finale con kaiten richiede 45 Spirit.</p></div><p class="small-note">Ritmo Turbo: azioni e spostamenti al 130%, round sempre di 60 secondi reali. In allenamento la vita si rigenera. Le tecniche sono interpretate in chiave arcade.</p></dialog>
   <dialog id="credits-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">STAGE 01 / LE NOSTRE RADICI</span><h2>IL DOJO BODYPLANET.</h2><p>Un omaggio arcade al karate Kyokushinkai e al dojo presso Fitness & Wellness BodyPlanet, a Catania.</p><p>I personaggi illustrati sono ispirati alle fotografie fornite: <b>Sensei Angelo Pierino, III Dan</b> e <b>Senpai Samuel Villani, 1 Kyu</b>. Angelo ha la testa rasata e la cintura nera con tre strisce; Samuel ha i capelli scuri e la cintura marrone con una striscia nera.</p><div id="source-links"></div><p class="small-note">Illustrazioni originali generate per questo progetto. Logo fornito dall’utente. Musica originale ed effetti sintetizzati nel browser, attivi dal primo tocco. Il pulsante ♪ controlla tutto l’audio. Il combattimento è un’interpretazione videoludica; nessuna affiliazione con Street Fighter o MUGEN.</p></dialog>
@@ -628,6 +628,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
   const DASH_TAP_WINDOW = .25;
   const ACTIONS = ['left', 'right', 'jump', 'block', 'legBlock', 'tsuki', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten'];
   const ATTACKS = ['tsuki', 'gyaku', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten'];
+  const KICKS = new Set(['mae', 'mawashi', 'ushiro', 'gedan', 'kaiten']);
   const BASE_MOVES = {
     tsuki:  { name: 'Chūdan tsuki', shortName: 'TSUKI', duration: .34, start: .095, end: .17, damage: 65, reach: 142, height: 149, radius: 37, level: 'body', stun: .25, push: 140, lunge: 52, ki: 7 },
     gyaku:  { name: 'Gyaku tsuki', shortName: 'GYAKU TSUKI', duration: .43, start: .13, end: .22, damage: 95, reach: 161, height: 143, radius: 36, level: 'body', stun: .29, push: 185, lunge: 105, ki: 9 },
@@ -667,7 +668,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
         lastDamage: 0, comboDamage: 0, comboTimer: 0, comboMoves: [], comboActive: false, comboTarget: null, lastHitBy: null, attackSerial: 0,
         attack: null, buffer: null, inputQueue: [], crouching: false, blocking: false,
         guardType: null, legBlocking: false, stunType: null, movement: 0, retreating: false,
-        dashProgress: 0, dashDirection: 0, dashBack: false, dashRemaining: 0, dashDuration: 0, dashDistance: 0, dashCooldown: 0,
+        dashProgress: 0, dashDirection: 0, dashBack: false, dashRemaining: 0, dashDuration: 0, dashDistance: 0, dashCooldown: 0, dashSettling: false,
         airborne: false, knockdown: false, recovery: 0,
       };
     }
@@ -781,6 +782,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
       if (s.mode !== 'versus') this.updateAI(dt);
       for (let i = 0; i < 2; i++) this.updateFighter(s.fighters[i], s.fighters[1 - i], this.inputs[i], dt);
       this.separateFighters();
+      this.finishDashes();
 
       // Determine both contacts before applying either, allowing honest trades.
       const contacts = [];
@@ -790,6 +792,12 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
         if (this.intersects(a, target)) contacts.push([a, target, a.attack]);
       }
       for (const [a, target, attack] of contacts) this.applyHit(a, target, attack);
+      // A hit can stop a dash while the fighters overlap. Resolve that contact
+      // immediately, before hitstop freezes the interrupted pose.
+      if (s.fighters.some(f => f.dashSettling && f.dashRemaining <= 0)) {
+        this.separateFighters();
+        this.finishDashes();
+      }
 
       if (s.mode === 'training') {
         for (const fighter of s.fighters) {
@@ -930,7 +938,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
       f.dashBack = f.dashDirection !== f.facing;
       f.dashDuration = f.dashBack ? .20 : .18;
       f.dashDistance = f.dashBack ? 115 : 150;
-      f.dashRemaining = f.dashDuration; f.dashProgress = 0;
+      f.dashRemaining = f.dashDuration; f.dashProgress = 0; f.dashSettling = true;
       f.dashCooldown = f.dashDuration + .24;
       f.state = 'dash'; f.guardType = null; f.blocking = false; f.legBlocking = false;
       f.crouching = false; f.vx = 0;
@@ -950,11 +958,9 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
       const ease = t => 1 - (1 - t) * (1 - t);
       const distance = f.dashDistance * (ease(f.dashProgress) - ease(previous));
       const desired = f.x + f.dashDirection * distance;
-      let next = clamp(desired, LEFT, RIGHT);
-      // A dash never passes through the other karateka, including at the wall.
-      if (f.dashDirection > 0 && opponent.x >= f.x) next = Math.max(f.x, Math.min(next, opponent.x - 82));
-      if (f.dashDirection < 0 && opponent.x <= f.x) next = Math.min(f.x, Math.max(next, opponent.x + 82));
-      f.x = clamp(next, LEFT, RIGHT);
+      const next = clamp(desired, LEFT, RIGHT);
+      // Dashes may cross the opponent's body; their strike hurtboxes stay live.
+      f.x = next;
       if (Math.abs(next - desired) > .01) {
         this.stopDash(f); f.dashProgress = 1;
         f.dashCooldown = Math.min(f.dashCooldown, .24);
@@ -987,7 +993,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
       // Resolve punches against the queued predecessor, not just the current pose.
       const preceding = f.inputQueue.at(-1)?.move || f.move || (f.comboTimer > 0 ? f.previousMove : null);
       if (action === 'tsuki' && preceding === 'tsuki') move = 'gyaku';
-      if (f.attack || f.dashRemaining > 0 || f.stun > 0 || f.inputQueue.length) {
+      if (f.attack || f.dashRemaining > 0 || f.dashSettling || f.stun > 0 || f.inputQueue.length) {
         if (f.inputQueue.length < 3) f.inputQueue.push({ move, ttl: QUEUE_WINDOW });
         this.syncBuffer(f);
         return;
@@ -1001,7 +1007,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
 
     beginAttack(f, move, linked = false) {
       const def = MOVES[move];
-      if (!def || f.hp <= 0 || f.knockdown || f.stun > 0 || f.dashRemaining > 0) return false;
+      if (!def || f.hp <= 0 || f.knockdown || f.stun > 0 || f.dashRemaining > 0 || f.dashSettling) return false;
       if (def.cost && f.ki < def.cost) { this.emit('noKi', { player: f.player, move, required: def.cost }); return false; }
       f.ki -= def.cost || 0;
       f.attack = { def, linked, hitApplied: false, hitConfirmed: false, hitTime: Infinity, whiffEmitted: false, landingEmitted: false, serial: ++f.attackSerial, move };
@@ -1036,11 +1042,11 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
       const facingAttacker = (attacker.x - target.x) * target.facing >= -25;
       const guardType = target.guardType;
       const blocked = target.blocking && !target.airborne && target.dashRemaining <= 0 && target.state !== 'dash' && facingAttacker &&
-        (guardType === 'leg' ? def.level === 'low' : guardType === 'arms' && def.level !== 'low');
+        (guardType === 'leg' ? KICKS.has(attack.move) : guardType === 'arms' && def.level !== 'low');
       const x = mix(attacker.x, target.x, .77);
       const y = clamp(attacker.y - def.height, target.y - 215, target.y - 30);
       if (blocked) {
-        const chip = def.cost ? 12 : 0;
+        const chip = def.cost && guardType !== 'leg' ? 12 : 0;
         target.hp = Math.max(1, target.hp - chip);
         target.stun = Math.max(target.stun, def.stun * .48);
         target.stunType = 'block'; target.guardFlash = .17;
@@ -1087,13 +1093,30 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
 
     separateFighters() {
       const [a, b] = this.state.fighters;
-      if (Math.abs(a.y - b.y) > 145 || a.knockdown || b.knockdown) return;
+      if (a.dashRemaining > 0 || b.dashRemaining > 0) return;
+      const dashEnded = a.dashSettling || b.dashSettling;
+      if (Math.abs(a.y - b.y) > 145 || ((a.knockdown || b.knockdown) && !dashEnded)) return;
       const distance = Math.abs(a.x - b.x);
       if (distance >= 82) return;
-      const direction = a.x <= b.x ? -1 : 1;
-      const amount = (82 - distance) * .5;
-      a.x = clamp(a.x + direction * amount, LEFT, RIGHT);
-      b.x = clamp(b.x - direction * amount, LEFT, RIGHT);
+      // At an exact meeting point, the dash directions choose the crossed side
+      // deterministically, including simultaneous opposite dashes at a wall.
+      const crossingDirection = (a.dashSettling ? a.dashDirection : 0) - (b.dashSettling ? b.dashDirection : 0);
+      const direction = distance < 1e-6 && crossingDirection ? Math.sign(crossingDirection) : a.x <= b.x ? -1 : 1;
+      const middle = clamp((a.x + b.x) * .5, LEFT + 41, RIGHT - 41);
+      a.x = middle + direction * 41;
+      b.x = middle - direction * 41;
+    }
+
+    finishDashes() {
+      let ended = false;
+      for (const f of this.state.fighters) {
+        if (f.dashSettling && f.dashRemaining <= 0) { f.dashSettling = false; ended = true; }
+      }
+      if (!ended) return;
+      for (const f of this.state.fighters) {
+        const opponent = this.state.fighters[1 - f.player];
+        if (!f.attack && f.dashRemaining <= 0 && !f.knockdown) f.facing = opponent.x >= f.x ? 1 : -1;
+      }
     }
 
     updateAI(dt) {
@@ -1122,7 +1145,7 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
         ai.decision = [.23, .15, .105][skill] + this.random() * .07;
         if (opponent.attack && ai.reaction > [.15, .105, .075][skill] && distance < 275 && this.random() < [.23, .48, .72][skill]) {
           ai.guard = .18 + this.random() * .20;
-          ai.guardLow = opponent.move === 'gedan' && this.random() < .8;
+          ai.guardLow = KICKS.has(opponent.move) && this.random() < .8;
         }
         if (!f.attack && f.stun <= 0 && !f.knockdown && ai.attackCooldown <= 0 && ai.guard <= 0) {
           if (distance < 252 && this.random() < [.50, .72, .86][skill]) {
@@ -1173,6 +1196,8 @@ body.orientation-blocked #touch-controls{visibility:hidden;pointer-events:none}
         f.state = winner === i ? 'victory' : f.hp <= 0 ? 'ko' : 'idle';
         if (f.hp <= 0) { f.knockdown = true; f.vy = -170 * PACE; f.airborne = true; }
       }
+      this.separateFighters();
+      this.finishDashes();
       s.phase = 'roundOver';
       this.emit(reason === 'ko' ? 'ko' : 'time', { winner, round: s.round, x: winner === null ? 640 : s.fighters[1 - winner].x, y: FLOOR - 130 });
       if (winner !== null && s.fighters[winner].wins >= 2) {
