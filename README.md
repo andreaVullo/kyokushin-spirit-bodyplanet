@@ -14,7 +14,7 @@ Picchiaduro 2D arcade per browser, con Angelo Pierino e Samuel Villani, ambienta
 - **Quattro cerchi con icone:** un unico tasto **↻** cambia gruppo a ogni tocco: pugni → calci → speciale/difese → pugni. I tre puntini indicano il gruppo attivo. Il primo gruppo contiene Tsuki, Shita, Kagi e Mae; il secondo Mae, Mawashi, Gedan e Ushiro; il terzo Kaiten, Braccia, Ginocchio e Ushiro. Tieni premute le icone delle parate per mantenerle attive.
 - **Tastiera:** P1 usa **A/D** per muoversi e **W** per saltare; P2 usa le frecce. **Shita: H / 7**, **Kagi: N / 8**, **Ushiro: U / 4**. **Esc** apre la pausa; gli altri comandi sono nella guida del gioco.
 
-I quattro pugni hanno animazioni continue di caricamento, contatto e ritorno in guardia, con spalla e gomito collegati.
+I pugni mantengono il gomito dentro la manica e il polsino unito all’avambraccio. Il gyaku usa il braccio posteriore e la rotazione originale del busto; le transizioni mostrano una sola posa, senza braccia duplicate. La guardia conserva il disegno originale.
 
 Combo verificate a distanza ravvicinata: **J → H → N → U**, **J → J → H → N → L → O** e **H → N → K → U**. Il kaiten finale richiede **45 Spirit**; puoi inserire in anticipo fino a tre attacchi successivi.
 
@@ -24,7 +24,11 @@ Apri `Gioca.html` oppure la home del sito GitHub Pages. Il gioco è completo in 
 
 La versione portatile incorpora gli script del gioco, incluso `orientation.js`, e la schermata iniziale di caricamento. Nei sorgenti di sviluppo, `orientation.test.cjs` e `main-orientation.test.cjs` verificano il layout durante la rotazione del telefono, il gate verticale e le richieste fullscreen con risposte tardive.
 
-Il launcher Flazio mostra il loading appena premi **Entra nel dojo**, tenendo nascosto il gioco fino alla conferma di avvio completo. **Torna al sito** resta disponibile durante l’attesa. **Riprova** sostituisce il tentativo precedente: rimane una sola partita aperta. Il gioco scambia soltanto lo stato di caricamento con il launcher, senza dati personali; il launcher verifica dominio e iframe mittente.
+Su telefono e tablet, il pulsante **Entra nel dojo** di Flazio apre il gioco come pagina autonoma **nella stessa scheda**. La partita usa il proprio viewport e non dipende dalle istanze adaptive verticale/orizzontale del sito. La scelta usa le capacità touch del dispositivo, anche quando il sito dichiara una larghezza fissa di 1024 px. **Torna al sito** è disponibile nel loading, nell’avviso verticale e durante la partita.
+
+Se il telefono è già orizzontale, Flazio mostra **Apri a schermo intero** al centro dell’area visibile, sopra il layout adaptive. **Non ora** nasconde l’invito fino al prossimo passaggio verticale → orizzontale. Il gioco parte soltanto al tocco.
+
+Su desktop resta l’overlay Flazio: loading immediato, conferma di avvio, un solo iframe. **Riprova** sostituisce il tentativo precedente. Il protocollo di caricamento verifica dominio e iframe mittente.
 
 | Test nei sorgenti di sviluppo | Contenuto |
 | --- | --- |

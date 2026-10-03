@@ -21,14 +21,23 @@ ritentarne l’attivazione.
 SU FLAZIO — CONFIGURAZIONE CONSIGLIATA
 Apri il componente Codice/Script, passa alla modalità HTML e incolla tutto
 il contenuto di iframe-flazio-html.html. È la configurazione verificata su
-https://kyokushinkaicataniadojo.it/play: il pulsante apre una sola partita
-a tutta finestra nella stessa pagina. Il loading appare subito al clic e
-il gioco resta nascosto e non interattivo fino alla conferma di avvio completo.
-Dopo 25 secondi compare un avviso con Riprova; non viene ricaricato da solo.
-Riprova sostituisce il tentativo precedente, senza duplicare le partite.
-Torna al sito resta disponibile durante l’attesa e chiude partita e audio.
-Il gioco comunica al launcher solo lo stato di caricamento, senza dati
-personali. Il launcher verifica dominio e iframe mittente dei messaggi.
+https://kyokushinkaicataniadojo.it/play. Su telefono e tablet, ENTRA NEL DOJO
+apre il gioco come pagina autonoma nella stessa scheda: la partita non è
+contenuta nelle versioni adaptive Flazio verticale/orizzontale. La scelta
+usa il dispositivo touch, non la larghezza della pagina. Il gioco ha un
+viewport device-width e segue le dimensioni effettive del browser.
+Se il telefono è già orizzontale, appare un invito centrato sopra il sito:
+APRI A SCHERMO INTERO. Non ora lo nasconde fino alla prossima rotazione
+verticale → orizzontale. Nessuna partita viene aperta senza un tocco.
+Torna al sito è disponibile nel loading, nell’avviso di rotazione e durante
+la partita. Il suo indirizzo è fisso: https://kyokushinkaicataniadojo.it/play.
+
+Su desktop resta una sola partita in overlay a tutta finestra. Il loading
+appare subito al clic e il gioco è disponibile dopo la conferma di avvio.
+Dopo 25 secondi compare Riprova, senza ricaricamenti automatici. Riprova
+sostituisce il tentativo precedente e Torna al sito chiude partita e audio.
+Il gioco comunica al launcher solo lo stato di caricamento. I messaggi
+sono verificati per dominio e iframe mittente.
 Il file iframe-flazio.html è l’alternativa per la sola modalità Script.
 Non scambiare i due frammenti tra le modalità.
 
@@ -38,7 +47,9 @@ il browser senza applicare rotazioni CSS; la partita resta aperta.
 Schermo intero richiede il fullscreen quando il browser lo offre; altrimenti
 il gioco occupa una vista espansa nella stessa pagina.
 
-Il parametro embed=1 attiva la presentazione per iframe.
+Il parametro embed=1 attiva la presentazione compatta per iframe.
+standalone=1, solo in una pagina principale, mostra Torna al sito e la vista
+compatta; touch=1 abilita esplicitamente joystick e comandi touch.
 Un indirizzo localhost o 127.0.0.1 non è raggiungibile dai visitatori.
 Per un sito esterno usa un vero URL HTTPS pubblico, per esempio:
 https://tuo-dominio.it/Gioca.html?embed=1

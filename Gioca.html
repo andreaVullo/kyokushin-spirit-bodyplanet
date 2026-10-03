@@ -266,6 +266,12 @@ body:is(.touch-active,.force-touch) .mobile-help-note{display:block;background:#
 
 /* A self-contained cabinet can occupy the full iframe or fullscreen surface. */
 body.embedded{background:#101820;overflow:hidden;overscroll-behavior:none}
+.standalone-return{display:none;align-items:center;min-height:44px;padding:0 8px;font:700 11px/1.2 Arial,Helvetica,sans-serif;letter-spacing:.1px;color:#f5ddb0;text-decoration:none;white-space:nowrap;touch-action:manipulation}
+body.standalone-game .standalone-return{display:inline-flex}
+body.standalone-game .arena-title{display:none}
+.arena-site-return{flex-shrink:0;margin-left:-8px}
+.screen-site-return{position:absolute;z-index:1;top:max(8px,env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left))}
+.standalone-return:hover{color:#fff3d6;background:#ffe5a60a}
 body.embedded>.masthead,body.embedded .title-row,body.embedded .play-guide,body.embedded main>footer{display:none!important}
 body.embedded main{width:100%;max-width:none;height:100dvh;margin:0;padding:0}
 body.embedded #arcade,#arcade:fullscreen,#arcade.expanded{position:relative;display:flex;flex-direction:column;justify-content:center;width:100%;height:100dvh;max-height:none;margin:0!important;padding:0;overflow:hidden;background:#101820;box-shadow:none}
@@ -580,6 +586,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 </head>
 <body class="front-title boot-loading" data-screen="title" data-boot-state="loading">
   <section id="boot-screen" class="boot-screen" aria-label="Caricamento del gioco" aria-busy="true">
+    <a class="standalone-return screen-site-return" href="https://kyokushinkaicataniadojo.it/play">← Torna al sito</a>
     <div class="boot-content">
       <span class="boot-brand">BODYPLANET DOJO · CATANIA</span>
       <div class="boot-emblem" aria-hidden="true">極</div>
@@ -595,6 +602,11 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   // while the large portable document is still downloading.
   (function () {
     'use strict';
+    // On phones the launcher opens this document outside Flazio's adaptive
+    // page. Only a top-level entry may expose navigation back to the site.
+    if (new URLSearchParams(window.location.search).get('standalone') === '1' && window.self === window.top) {
+      document.body.classList.add('standalone-game', 'embedded');
+    }
     var state = 'loading', message = '', delay;
     var panel = document.getElementById('boot-screen');
     var heading = document.getElementById('boot-heading');
@@ -651,7 +663,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 
     <div id="game-shell">
     <section class="arcade" id="arcade" aria-label="Arena di combattimento">
-      <div class="arena-topline"><span><i></i> BODYPLANET ARENA</span><span id="mode-label">TURBO EDITION / 02</span><div class="arena-utilities"><button id="mobile-sound-button" class="mobile-utility" title="Musica ed effetti" aria-label="Disattiva musica ed effetti" aria-pressed="true">♪</button><button id="mobile-help-button" class="mobile-utility" title="Come si gioca" aria-label="Apri la guida ai comandi">?</button><button id="touch-toggle-button" title="Mostra o nascondi i comandi touch" aria-label="Mostra i comandi touch" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M6 7h12c2 0 3 2 3 4v6c0 2-2 3-3.5 1.5L15 16H9l-2.5 2.5C5 20 3 19 3 17v-6c0-2 1-4 3-4Z" stroke="currentColor" stroke-width="1.6"/><path d="M8 10v5m-2.5-2.5h5" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="11" r="1" fill="currentColor"/><circle cx="18" cy="14" r="1" fill="currentColor"/></svg></button><button id="pause-button" title="Pausa (Esc)" aria-label="Pausa" disabled>Ⅱ</button><button id="fullscreen-button" title="Schermo intero" aria-label="Schermo intero">⛶</button></div></div>
+      <div class="arena-topline"><span class="arena-title"><i></i> BODYPLANET ARENA</span><a class="standalone-return arena-site-return" href="https://kyokushinkaicataniadojo.it/play">← Torna al sito</a><span id="mode-label">TURBO EDITION / 02</span><div class="arena-utilities"><button id="mobile-sound-button" class="mobile-utility" title="Musica ed effetti" aria-label="Disattiva musica ed effetti" aria-pressed="true">♪</button><button id="mobile-help-button" class="mobile-utility" title="Come si gioca" aria-label="Apri la guida ai comandi">?</button><button id="touch-toggle-button" title="Mostra o nascondi i comandi touch" aria-label="Mostra i comandi touch" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M6 7h12c2 0 3 2 3 4v6c0 2-2 3-3.5 1.5L15 16H9l-2.5 2.5C5 20 3 19 3 17v-6c0-2 1-4 3-4Z" stroke="currentColor" stroke-width="1.6"/><path d="M8 10v5m-2.5-2.5h5" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="11" r="1" fill="currentColor"/><circle cx="18" cy="14" r="1" fill="currentColor"/></svg></button><button id="pause-button" title="Pausa (Esc)" aria-label="Pausa" disabled>Ⅱ</button><button id="fullscreen-button" title="Schermo intero" aria-label="Schermo intero">⛶</button></div></div>
       <div class="viewport" id="viewport">
         <canvas id="game" width="1280" height="720" tabindex="0" aria-label="Gioco Kyokushin. Usa A D per muoverti, doppio A o D per scattare, W per saltare, J H N per i pugni, K L U I O per i calci. Arretra per parare di braccia, F per alzare il ginocchio. Premi Esc per mettere in pausa."></canvas>
         <div class="arena-shade"></div>
@@ -733,6 +745,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
         <p class="touch-console-note"><span aria-hidden="true">●</span> TOCCA ↻ PER CAMBIARE TECNICHE · TRE GRUPPI, UN SOLO TASTO.</p>
       </div>
       <section id="rotate-screen" class="rotate-screen" role="dialog" aria-modal="true" aria-labelledby="rotate-title" aria-describedby="rotate-description" aria-hidden="true" inert>
+        <a class="standalone-return screen-site-return" href="https://kyokushinkaicataniadojo.it/play">← Torna al sito</a>
         <div class="rotate-screen-content">
           <span class="rotate-eyebrow">BODYPLANET DOJO <i>·</i> MOBILE ARCADE</span>
           <div class="rotate-illustration" aria-hidden="true"><span class="rotate-orbit">↻</span><div class="rotate-device"><span class="rotate-device-arena"></span><span class="rotate-device-controls"></span></div><span class="rotate-landscape-line"></span></div>
@@ -1485,17 +1498,18 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     ],
   };
 
-  // A single connected two-joint arm is reused for all four punches. Its
-  // original shoulder cap remains on the torso; the sleeve overlaps the
-  // forearm at the elbow so rotation never exposes a square cutout or a gap.
+  // The elbow is inside the gi sleeve, not at its cuff. The distal sleeve,
+  // exposed forearm and fist are one rigid piece: the wrist never flips.
+  // The rear punch uses its intact authored pose (see drawRearPunch).
   const punchRegions = {
-    angelo: { shoulder: [956, 95], elbow: [1027, 96], sleeve: [934, 66, 100, 72], forearm: [1022, 74, 90, 45], erase: [950, 60, 171, 89] },
-    samuel: { shoulder: [930, 94], elbow: [997, 95], sleeve: [908, 65, 95, 68], forearm: [992, 73, 94, 45], erase: [924, 59, 162, 90] },
+    angelo: { frame: 2, shoulder: [956, 95], elbow: [1007, 96], cuff: [1027, 96], sleeve: [934, 66, 94, 72], forearm: [989, 65, 123, 73], erase: [950, 60, 171, 89] },
+    samuel: { frame: 2, shoulder: [930, 94], elbow: [978, 95], cuff: [997, 95], sleeve: [908, 65, 90, 68], forearm: [960, 64, 125, 73], erase: [924, 59, 162, 90] },
   };
 
   function buildPunchRig(id) {
-    const [sx, sy, sw, sh] = regions[id][2];
-    const config = punchRegions[id], original = textures[id]?.[2];
+    const config = punchRegions[id];
+    const [sx, sy, sw, sh] = regions[id][config.frame];
+    const original = textures[id]?.[config.frame];
     const makeCanvas = (width, height) => { const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; return canvas; };
     const base = makeCanvas(sw, sh), c = base.getContext('2d');
     if (original) c.drawImage(original, 0, 0);
@@ -1516,10 +1530,17 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     sc.globalCompositeOperation = 'destination-in';
     sc.beginPath(); sc.moveTo(px - cx - 17, py - cy);
     sc.quadraticCurveTo(px - cx - 17, py - cy - 25, px - cx + 13, py - cy - 25);
-    sc.lineTo(ex - cx + 5, ey - cy - 22); sc.lineTo(ex - cx + 5, ey - cy + 29);
+    sc.lineTo(ex - cx - 2, ey - cy - 23);
+    sc.quadraticCurveTo(ex - cx + 17, ey - cy - 22, ex - cx + 17, ey - cy + 2);
+    sc.quadraticCurveTo(ex - cx + 17, ey - cy + 27, ex - cx - 2, ey - cy + 27);
     sc.lineTo(px - cx + 13, py - cy + 27);
     sc.quadraticCurveTo(px - cx - 17, py - cy + 25, px - cx - 17, py - cy);
     sc.closePath(); sc.fill(); sc.globalCompositeOperation = 'source-over';
+    const fc = forearm.getContext('2d'), [fx, fy, fw, fh] = config.forearm;
+    fc.globalCompositeOperation = 'destination-in';
+    fc.beginPath(); fc.moveTo(ex - fx, 0); fc.lineTo(fw, 0); fc.lineTo(fw, fh);
+    fc.lineTo(ex - fx, fh); fc.quadraticCurveTo(ex - fx - 19, ey - fy + 20, ex - fx - 19, ey - fy);
+    fc.quadraticCurveTo(ex - fx - 19, ey - fy - 23, ex - fx, 0); fc.closePath(); fc.fill();
     const [x, y, width, height] = config.erase;
     c.clearRect(x - sx, y - sy, width, height);
     c.drawImage(cap, capRect[0] - sx, capRect[1] - sy);
@@ -1788,15 +1809,15 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   // of the active window and retracts immediately after it. Angles describe
   // anatomical shoulder/elbow motion, never scaling a limb to gain reach.
   const punchTiming = {
-    tsuki: { contact: .095 / .34, release: .17 / .34, chamber: [.99, -1.43], strike: [.32, -.04], turn: .025 },
-    gyaku: { contact: .13 / .43, release: .22 / .43, chamber: [1.60, -.80], strike: [.37, -.06], turn: .065 },
-    shita: { contact: .135 / .46, release: .235 / .46, chamber: [1.50, .03], strike: [1.16, -.82], turn: .045 },
-    kagi: { contact: .19 / .54, release: .29 / .54, chamber: [1.65, -.83], strike: [.93, -.34], turn: .075 },
+    tsuki: { contact: .095 / .34, release: .17 / .34, chamber: [1.20, -1.05], strike: [.14, -.03], turn: .025 },
+    gyaku: { contact: .13 / .43, release: .22 / .43, chamber: [1.35, -.90], strike: [.12, -.05], turn: .045 },
+    shita: { contact: .135 / .46, release: .235 / .46, chamber: [1.45, -.05], strike: [.95, -1.03], turn: .025 },
+    kagi: { contact: .19 / .54, release: .29 / .54, chamber: [1.40, -.83], strike: [.55, -.48], turn: .045 },
   };
 
   function punchMotion(move, progress) {
     const timing = punchTiming[move] || punchTiming.tsuki;
-    const p = clamp(progress, 0, 1), guard = [1.08, -1.47];
+    const p = clamp(progress, 0, 1), guard = [1.24, -1.14];
     const chamberAt = timing.contact * .38, recoverAt = .94;
     let a, b, mix, drive = 0;
     if (p < chamberAt) {
@@ -1824,21 +1845,19 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   }
 
   function drawPunch(ctx, id, f, p, t = 0) {
+    if (f.move === 'gyaku') { drawRearPunch(ctx, id, f, p); return; }
     const rig = punchRigs[id];
     if (!rig) return;
     const size = f.scale ?? 1, base = HEIGHT / (id === 'angelo' ? 359 : 348);
-    const [sx, sy, sw, sh, ax, ay] = regions[id][2], pose = punchMotion(f.move, p);
-    if (f.state === 'idle') {
-      // The neutral guard is the exact entry/exit pose of every punch.
-      // Breathing stays below half a pixel at the shoulder.
-      pose.lean += Math.sin(t * 3.2) * .003;
-      pose.dip += Math.sin(t * 3.2) * .22;
-    }
+    const [sx, sy, sw, sh, ax, ay] = regions[id][rig.frame], pose = punchMotion(f.move, p);
+    // Authored guard hands retain their correct palm orientation. Do not fold
+    // the extended-fist texture into idle, walking or a different arm's guard.
     const shoulder = [(rig.shoulder[0] - ax) * base, (rig.shoulder[1] - ay) * base];
     const armLength = Math.hypot(rig.elbow[0] - rig.shoulder[0], rig.elbow[1] - rig.shoulder[1]) * base;
     const elbow = [shoulder[0] + Math.cos(pose.upper) * armLength, shoulder[1] + Math.sin(pose.upper) * armLength];
     ctx.save(); ctx.translate(f.x, f.y); ctx.scale((f.facing === -1 ? -1 : 1) * size, size);
     ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    if (p < .045 || p > .955) { paint(ctx, id, 0, base); ctx.restore(); return; }
     // Keep the legs on their original floor anchor. Rotation is restricted to
     // the upper body, around the belt, instead of sliding/stretching the sprite.
     const beltY = -115;
@@ -1853,10 +1872,27 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       ctx.drawImage(image, (rect[0] - pivot[0]) * base, (rect[1] - pivot[1]) * base, rect[2] * base, rect[3] * base);
       ctx.restore();
     };
-    // The forearm passes in front of the sleeve as the elbow folds back.
-    limb(rig.sleeveImage, rig.sleeve, rig.shoulder, shoulder, pose.upper);
+    // The proximal sleeve covers the elbow seam. The cuff belongs to the
+    // forearm and cannot turn against the exposed skin below it.
     limb(rig.forearmImage, rig.forearm, rig.elbow, elbow, pose.forearm);
+    limb(rig.sleeveImage, rig.sleeve, rig.shoulder, shoulder, pose.upper);
     ctx.restore(); ctx.restore();
+  }
+
+  function drawRearPunch(ctx, id, f, p) {
+    // The rear shoulder crosses in front of the torso in this authored pose.
+    // Preserve that overlap and its connected arm instead of transplanting
+    // the lead arm or slicing through the beard and shoulder.
+    const pose = punchMotion('gyaku', p), size = f.scale ?? 1;
+    const base = HEIGHT / (id === 'angelo' ? 359 : 348) * size;
+    const frame = p < .06 || p > .94 ? 0 : p < .22 || p > .67 ? 1 : 3;
+    ctx.save(); ctx.translate(f.x, f.y); ctx.scale(f.facing === -1 ? -1 : 1, 1);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    // One solid pose per frame. Crossfading torso views makes extra arms and
+    // heads appear during fast combinations, even with correct joint angles.
+    ctx.translate((frame === 3 ? pose.drive * 5 : frame === 1 ? -2 * Math.sin(Math.PI * p) : 0) * size, frame ? -Math.sin(Math.PI * p) * size : 0);
+    paint(ctx, id, frame, base);
+    ctx.restore();
   }
 
   function drawUshiro(ctx, id, f, p) {
@@ -1921,10 +1957,6 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     }
     if (f.state === 'attack' && punchTiming[f.move]) {
       drawPunch(ctx, id, f, p, t);
-      return;
-    }
-    if (f.state === 'idle' && !guardKind) {
-      drawPunch(ctx, id, f, 0, t);
       return;
     }
     if (f.state === 'attack' && f.move === 'ushiro') {
@@ -2969,13 +3001,15 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   'use strict';
   const $ = id => document.getElementById(id);
   const pageOptions = new URLSearchParams(location.search);
+  const standaloneGame = pageOptions.get('standalone') === '1' && window.self === window.top;
   const touchMedia = window.matchMedia('(any-pointer: coarse)');
   const portraitMedia = window.matchMedia('(orientation: portrait)');
   let touchPreference = pageOptions.get('touch') === '1' ? true : null;
   let touchDetected = touchMedia.matches || navigator.maxTouchPoints > 0;
   let landscapeRequested = false, landscapeAttempt = 0, viewportFrame = 0;
   let nativeLandscapePending = false, nativeLandscapeLocked = false, viewportSettleTimer = 0;
-  document.body.classList.toggle('embedded', pageOptions.get('embed') === '1' || window.self !== window.top);
+  document.body.classList.toggle('standalone-game', standaloneGame);
+  document.body.classList.toggle('embedded', standaloneGame || pageOptions.get('embed') === '1' || window.self !== window.top);
   const canvas = $('game'), ctx = canvas.getContext('2d', { alpha: false });
   const characters = {
     angelo: { name: 'ANGELO PIERINO', rank: 'SENSEI · III DAN', short: 'ANGELO', belt: 'CINTURA NERA · 3 STRISCE', beltColor: 'black' },
