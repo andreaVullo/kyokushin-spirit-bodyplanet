@@ -14,7 +14,7 @@ All’apertura compare **Caricamento del dojo…**: il titolo e i comandi divent
 
 Nella selezione, **Esc** o la freccia **Titolo** riportano alla schermata iniziale. Durante il combattimento, **Esc** apre la pausa: puoi riprendere, ricominciare o tornare alla scelta del personaggio. Al termine dell’incontro, scegli **Rivincita** per rigiocare. L’audio si attiva dopo un clic, un tasto o un tocco completo dentro il gioco. Il pulsante **Audio** in alto permette di silenziarlo, riattivarlo o ritentarne l’avvio dopo un’interruzione.
 
-**`index.html`** resta l’ingresso della versione sorgente modificabile e usa gli altri file della cartella. Puoi aprirlo direttamente oppure usare il server locale descritto sotto.
+**`index.html` nella cartella principale** è l’ingresso della versione sorgente modificabile e usa gli altri file del progetto: avvialo con il server locale descritto sotto. **`github-pages/index.html` è invece un piccolo reindirizzamento a `Gioca.html`**: non sostituirlo con l’index dei sorgenti quando aggiorni il repository pubblico.
 
 Su macOS puoi anche fare doppio clic su **`launch.command`**: avvia il gioco all’indirizzo [http://127.0.0.1:8765](http://127.0.0.1:8765) e apre il browser. Richiede Python 3; per fermare il server premi **Ctrl+C** nella finestra del Terminale. Se la porta è occupata, il programma avvisa senza interrompere altri processi.
 
@@ -35,8 +35,8 @@ I comandi touch compaiono automaticamente sui dispositivi touch. Il pulsante del
 - **Pollice sinistro:** trascina il joystick per muoverti e spingilo verso l’alto per saltare. Due spinte rapide nella stessa direzione, tornando al centro tra i due movimenti, eseguono il dash.
 - **Pollice destro:** quattro pulsanti circolari mostrano solo icone delle tecniche. Il singolo tasto **↻** passa ciclicamente fra tre gruppi: pugni → calci → speciale/difese → pugni. I tre puntini indicano il gruppo attivo. **Ushiro** si trova nel secondo e nel terzo gruppo; tieni premuta l’icona delle braccia o del ginocchio nel terzo gruppo per parare.
 - Si possono tenere premuti più comandi contemporaneamente, per esempio movimento e attacco. È possibile scorrere il dito tra i pulsanti per collegare le tecniche.
-- **Su mobile si gioca in orizzontale.** Ruota fisicamente il telefono; se la pagina resta verticale, disattiva il blocco rotazione del dispositivo. Il gioco segue le dimensioni del browser e non applica una seconda rotazione. La partita resta aperta; tornando in verticale, il combattimento va in pausa finché non torni in orizzontale e premi **Riprendi**.
-- **Schermo intero** ingrandisce il gioco; sui browser che non offrono lo schermo intero nativo, viene usata una vista espansa nella pagina.
+- **Su mobile si gioca in orizzontale.** Sul sito del dojo, dopo **Entra nel dojo**, ruota il telefono oppure premi **Gioca in orizzontale**. Il contenitore adatta la stessa partita anche con la rotazione bloccata; rimuove l’adattamento quando il browser è già orizzontale, evitando la doppia rotazione.
+- **Aprendo `Gioca.html` direttamente o in un iframe generico**, ruota fisicamente il telefono. In verticale compare l’avviso e il combattimento va in pausa: torna in orizzontale e premi **Riprendi**. Il comando **Schermo intero** richiede il fullscreen nativo se disponibile, altrimenti usa la vista espansa nella pagina. Le barre del browser possono restare visibili anche sul sito del dojo.
 - Pausa, cambio app, cambio orientamento e rilascio/interruzione del tocco azzerano i comandi: nessuna direzione rimane bloccata.
 - **VS CPU** e **Allenamento** sono giocabili interamente su touch. La modalità **2 giocatori** richiede una tastiera per il secondo giocatore.
 
@@ -79,7 +79,7 @@ Per attivare musica ed effetti, tocca e rilascia un comando dentro il gioco. Il 
 
 Il **kaiten costa 45 punti Spirit**: la barra parte da 45, aumenta colpendo e si rigenera gradualmente. Mantieni la distanza e aggiungi i comandi durante la sequenza: la coda contiene al massimo tre attacchi futuri. Sono disponibili anche pulsanti touch.
 
-I pugni piegano il braccio al gomito, sotto la manica, mantenendo polsino e avambraccio uniti. Il gyaku usa la posa originale del braccio posteriore, senza sovrapporre braccia durante le transizioni. La guardia resta quella illustrata. `renderer-punch.test.cjs` verifica articolazione, guardia, contatto, specchiatura e assenza di duplicazioni.
+I pugni usano nuove sequenze illustrate a corpo intero per ciascun karateka: preparazione, estensione, contatto e ritorno. Queste sostituiscono l’animazione che ritagliava e ruotava singole parti delle braccia. Il gyaku mantiene il pugno posteriore: il fotogramma intermedio che cambiava braccio è escluso dalla sequenza. Anche gedan, mae, mawashi e ushiro hanno fasi distinte di caricamento del ginocchio, contatto e richiamo, senza schiacciare orizzontalmente il corpo. I fotogrammi di contatto seguono le finestre dei colpi nel motore; `renderer-punch.test.cjs` verifica sequenze, tempi, specchiatura e assenza del vecchio montaggio delle braccia.
 
 Il kaiten ha nuove fasi illustrate di preparazione, rotazione, calcio e atterraggio; la camminata alterna appoggi reali, anche arretrando in guardia. Nella guida **Come si gioca** trovi le dimostrazioni animate di passi, scatti e kaiten.
 
@@ -96,6 +96,10 @@ Nelle sfide vince chi conquista **due round**. Ogni round dura **60 secondi real
 La colonna sonora cambia tra **titolo, selezione, presentazione VS, combattimento e risultato**. Arrangiamenti originali con basso, melodia pentatonica, accordi, arpeggi e percussioni accompagnano ogni fase. Menu, pugni, calci, parate, kaiten, scatti, passi, salti, atterraggi e vittorie hanno effetti dedicati.
 
 Tutto l’audio è sintetizzato nel browser e funziona offline. Il primo clic, tasto o tocco completo ne richiede l’attivazione; sui dispositivi mobili conta anche il rilascio del dito. In pausa la musica si abbassa; passando a un’altra scheda, l’audio si sospende. Se resta interrotto quando torni, premi **♪** per ritentarne l’avvio. La scelta di silenziare il gioco rimane attiva durante i cambi di schermata.
+
+Su iPhone e iPad, lo stesso gesto avvia anche un elemento audio con un secondo di silenzio generato in memoria: serve ad aprire il canale multimediale nei browser in cui Web Audio resta sul canale della suoneria. Non richiede download o microfono e non duplica la colonna sonora. **ATTIVA AUDIO** resta disponibile finché l’avvio dei due sistemi non riesce; un nuovo tocco ritenta le richieste bloccate. Se il tempo del sintetizzatore si ferma pur risultando attivo, il gioco rileva il blocco e ricrea il contesto al gesto successivo. Silenziamento, cambio scheda e chiusura fermano anche l’elemento ausiliario.
+
+Lo stato **AUDIO ON** conferma l’avvio segnalato dalle API, non il volume o l’effettiva uscita dagli altoparlanti del dispositivo. Le verifiche automatiche coprono rifiuti di riproduzione, richieste pendenti, interruzioni e recupero; non sostituiscono una prova su iPhone fisico.
 
 ## Personaggi e scenario
 
@@ -119,25 +123,29 @@ Lo scenario riprende la palestra fornita come riferimento: tatami rosso, insegna
 | `renderer.js` | Disegno del dojo, personaggi, animazioni ed effetti |
 | `audio.js` | Colonna sonora originale, effetti, volume e gestione dell’audio |
 | `mobile-controls.js` | Joystick multitouch, quattro pulsanti con banchi di tecniche e tastiera |
-| `orientation.js` | Layout secondo il browser e avviso in verticale, senza rotazioni CSS |
+| `orientation.js` | Layout e avviso verticale in base alla viewport del gioco; la rotazione dell’iframe Flazio è gestita dal launcher esterno |
 | `main.js` | Comandi, interfaccia, collegamento degli effetti e avvio del gioco |
 | `assets/` | Scenario, illustrazioni dei karateka e logo |
+| `assets/attacks-angelo.png` / `assets/attacks-samuel.png` | Sequenze a corpo intero per tsuki, gyaku, shita e kagi |
 | `assets/guards.png` | Pose originali di Angelo e Samuel per guardia con le braccia e parata con il ginocchio |
 | `assets/motion-angelo.png` / `assets/motion-samuel.png` | Fasi illustrate dei passi e del kaiten per ciascun karateka |
 | `assets/portraits.png` | Ritratti illustrati per titolo, selezione personaggio e presentazione VS |
 | `art-prompts.txt` | Istruzioni creative usate per generare i personaggi |
+| `attack-art-prompts.txt` | Istruzioni creative per le nuove sequenze dei pugni |
 | `guard-art-prompts.txt` | Istruzioni creative per le quattro pose difensive, generate con ImageGen integrato |
 | `motion-art-prompts.txt` | Istruzioni creative per i nuovi passi e il kaiten |
 | `portrait-art-prompts.txt` | Istruzioni creative per i ritratti delle schermate iniziali |
 | `background-prompts.txt` | Istruzioni creative e correzioni dello scenario |
 | `research.json` | Fonti verificate, riferimenti tecnici e note di ricerca |
 | `game.test.cjs` | Verifiche automatiche del motore di combattimento |
-| `audio.test.cjs` | Verifiche di avvio, mute, scene musicali e gestione delle risorse audio |
+| `audio.test.cjs` | Avvio e mute, risorse audio, canale multimediale iOS, interruzioni e recupero del tempo audio bloccato |
+| `renderer-punch.test.cjs` | Sequenze illustrate di pugni e calci, contatto, specchiatura e assenza del precedente montaggio delle braccia |
 | `mobile-controls.test.cjs` | Verifiche simultaneità, rilascio, interruzioni e scorrimento dei comandi touch |
 | `orientation.test.cjs` | Verifiche del gate verticale, dimensioni, zoom e valori della viewport in ritardo |
 | `main-orientation.test.cjs` | Verifiche delle richieste asincrone di fullscreen, incluse cancellazioni e risposte tardive |
 | `main-audio.test.cjs` | Verifiche dei gesti touch, del pulsante audio e del recupero dopo interruzioni |
 | `loading.test.cjs` | Verifiche del caricamento iniziale, dell’attesa delle immagini e della conferma di gioco pronto |
+| `landscape-launcher.test.cjs` / `adaptive-launcher.test.cjs` | Launcher sul sito, viewport mobile, rotazione singola, istanza persistente e ripristino alla chiusura |
 | `launcher-loading.test.cjs` | Verifiche del loading Flazio, dei messaggi validati, dell’attesa lunga, dei tentativi e della chiusura |
 | `Incorpora.html` | Generatore di iframe responsive con anteprima giocabile e copia del codice |
 | `INCORPORA.txt` | Istruzioni e codice di esempio per il proprio hosting |
@@ -155,27 +163,35 @@ Il file generato incorpora il foglio di stile, gli script del gioco e ogni immag
 
 ## Inserire il gioco in un sito web
 
-Il gioco è disponibile nella pagina [Gioca del dojo](https://kyokushinkaicataniadojo.it/play): l’ingresso e l’apertura a tutta finestra sono stati verificati sul sito pubblico. Il file completo è ospitato su GitHub Pages: [apri il gioco direttamente](https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html?embed=1). La versione pubblicata è nel repository [kyokushin-spirit-bodyplanet](https://github.com/andreaVullo/kyokushin-spirit-bodyplanet).
+La pagina di gioco è [Gioca del dojo](https://kyokushinkaicataniadojo.it/play). Il file completo è ospitato su [GitHub Pages](https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html?embed=1), nel repository [kyokushin-spirit-bodyplanet](https://github.com/andreaVullo/kyokushin-spirit-bodyplanet).
 
-Per Flazio, usa **`iframe-flazio-html.html`**: apri il componente Codice/Script, passa alla modalità **HTML** e incolla tutto il frammento. È la configurazione verificata nella pagina pubblica `/play`; sostituisce il precedente wrapper Script rimasto in cache. **`iframe-flazio.html`** resta disponibile come alternativa da usare soltanto in modalità **Script**.
+### Flazio adaptive
 
-Su telefono, tablet e desktop, il componente apre il gioco sopra il sito, mantenendo l’indirizzo `/play`. La finestra è indipendente dal componente adaptive di Flazio. Se il telefono è già orizzontale, compare al centro dello schermo **Apri a schermo intero**, sopra il layout del sito. L’invito segue l’area effettivamente visibile anche con viewport fisso e zoom; **Non ora** lo nasconde fino al prossimo passaggio verticale → orizzontale. Non viene avviata una partita prima del tocco.
+Usa **`iframe-flazio-html.html`**, launcher **`onsite-dialog-v5`**: apri il componente Codice/Script, seleziona la modalità **HTML** e incolla tutto il frammento. **`iframe-flazio.html`** contiene la variante per la sola modalità **Script**. Non scambiare i due frammenti tra le modalità.
 
-**Entra nel dojo** apre subito **Caricamento del dojo…** in un pannello a tutta finestra su `/play`. Il gioco resta nascosto e non interattivo fino alla conferma che grafica e avvio sono completi. Dopo 25 secondi compare **Riprova**; nessun ricaricamento è automatico. Ogni tentativo sostituisce il precedente, mantenendo una sola istanza. **Torna al sito** chiude la partita. Se il documento del sito non è accessibile, viene mostrato un messaggio nel componente; non viene aperta una pagina esterna.
+**Entra nel dojo** mostra subito **Caricamento del dojo…** in un pannello sopra il sito, mantenendo l’indirizzo `/play`. Il gioco diventa visibile e interattivo dopo la conferma che grafica e avvio sono completi. Dopo 25 secondi compare **Riprova**, senza ricaricamenti automatici. Un nuovo tentativo sostituisce il precedente: resta una sola istanza. Il pannello è indipendente dal componente adaptive e conserva la stessa partita quando Flazio ricrea i propri elementi durante un cambio di orientamento.
 
-Apri **`Incorpora.html`**: contiene una vera anteprima del gioco in iframe, un campo per il suo indirizzo pubblico e il pulsante per copiare il codice responsive. Le istruzioni essenziali sono anche in **`INCORPORA.txt`**.
+Mentre il gioco è aperto su un dispositivo touch, il launcher usa temporaneamente `width=device-width, initial-scale=1, viewport-fit=cover` sulla pagina ospitante, neutralizza lo zoom del documento e applica uno sfondo scuro alla pagina. Misura nuovamente lo spazio dopo l’aggiornamento della viewport. Questo evita che la larghezza fissa del sito adaptive riduca o sposti il pannello e che le aree laterali dell’iPhone mostrino lo sfondo bianco del sito. Il gioco mantiene le proprie proporzioni nell’area disponibile.
 
-Il pacchetto **`Kyokushin-Spirit-Mobile-Web.zip`** contiene **`Gioca.html`**, **`Incorpora.html`**, **`INCORPORA.txt`**, **`iframe-flazio-html.html`** e **`iframe-flazio.html`**. Per aggiornarlo dopo altre modifiche, esegui `python3 build_web_package.py`.
+Se il telefono è già orizzontale, l’invito **Apri a schermo intero** compare al centro dell’area visibile sopra il sito. **Non ora** lo nasconde fino al successivo passaggio verticale → orizzontale. Non viene avviata una partita prima del tocco.
 
-1. Usa il [file già pubblico su GitHub Pages](https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html?embed=1), oppure carica **`Gioca.html`** sul tuo hosting: è completo e non richiede gli altri file.
-2. Inserisci il suo URL HTTPS pubblico nel generatore. Il parametro **`embed=1`** attiva la vista dedicata al gioco, con audio, aiuto, pausa e schermo intero integrati.
-3. Copia il codice generato nel blocco HTML/embed del sito. Il file può essere ospitato sullo stesso dominio o su un altro dominio che consenta l’incorporamento in iframe.
+Dopo l’ingresso, **Gioca in orizzontale** mantiene il comportamento introdotto dal launcher V4: se la pagina è verticale, ruota una sola volta il solo iframe, scambiandone larghezza e altezza. Quando il telefono/browser diventa realmente orizzontale, rimuove la trasformazione. Il gioco interno usa le dimensioni dell’iframe e non applica un’altra rotazione. L’adattamento mantiene la stessa sessione e non apre una pagina GitHub. Il fullscreen nativo dipende dal browser: le sue barre possono restare visibili.
 
-Per un’installazione sullo stesso sito, puoi usare il percorso `/Gioca.html?embed=1` se hai caricato il file nella sua cartella principale. L’indirizzo `127.0.0.1` serve solo all’anteprima sul computer: i visitatori devono ricevere l’URL pubblico del file. Dopo modifiche locali, ricostruisci il gioco e aggiorna anche il file pubblicato nel repository.
+**Torna al sito** chiude partita e audio e ripristina viewport, zoom, sfondo e scorrimento della pagina sottostante. Una nuova apertura riparte dal titolo. Se il documento ospitante non è accessibile, il componente mostra un messaggio senza aprire un sito esterno.
 
-Su telefono, ruota fisicamente il dispositivo in orizzontale e disattiva il blocco rotazione se la pagina rimane verticale. Il pulsante **Schermo intero** richiede il fullscreen quando il browser lo offre; altrimenti il gioco occupa una vista espansa nella stessa pagina. Non viene applicata alcuna rotazione CSS al gioco e la sessione resta aperta. **Torna al sito** chiude la finestra del gioco e libera l’audio; una nuova apertura riparte dal titolo.
+Il parametro `hostdisplay=1` abilita il protocollo di visualizzazione solo con gli host riconosciuti dal gioco. I messaggi di caricamento, richiesta di adattamento e stato della vista sono controllati per origine e finestra mittente; non contengono dati personali. `landscape-launcher.test.cjs`, `adaptive-launcher.test.cjs` e `launcher-loading.test.cjs` coprono apertura, caricamento, dimensioni, rotazione e pulizia. Le prove nel browser non certificano da sole il comportamento su un iPhone fisico.
 
-Il gioco non usa cookie e, una volta caricato, non richiede risorse esterne. Scambia con il launcher soltanto messaggi sullo stato di caricamento (in corso, pronto o errore), senza dati personali. Il launcher verifica che i messaggi provengano dal proprio iframe sul dominio GitHub Pages prima di mostrare il gioco. Il permesso fullscreen è incluso nel codice; l’audio viene comunque avviato solo dopo un gesto dell’utente. Il parametro facoltativo **`touch=1`** mostra i comandi touch anche su desktop; usa una finestra più larga che alta per provarli.
+### Iframe generico e pubblicazione
+
+Apri **`Incorpora.html`** per provare un iframe, inserire l’indirizzo pubblico del gioco e copiare il codice. Le istruzioni essenziali sono anche in **`INCORPORA.txt`**. L’iframe generico non include la gestione della pagina adaptive e della rotazione del launcher Flazio: sul telefono richiede una viewport orizzontale del browser.
+
+1. Usa il [file pubblico su GitHub Pages](https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html?embed=1), oppure carica **`Gioca.html`** sul tuo hosting HTTPS. Il file è completo e non richiede gli altri sorgenti.
+2. Inserisci l’URL pubblico nel generatore. `embed=1` attiva la vista compatta con audio, aiuto, pausa e schermo intero; `touch=1` mostra esplicitamente i comandi touch anche sul computer. `standalone=1`, in una pagina principale, aggiunge il collegamento **Torna al sito**.
+3. Copia il codice nel blocco HTML/embed del sito. L’hosting deve consentire l’incorporamento in iframe. `127.0.0.1` e `localhost` sono utilizzabili solo sul computer di sviluppo.
+
+Il gioco non usa cookie e, una volta caricato, non richiede risorse esterne. Il permesso fullscreen è incluso nell’iframe; l’avvio dell’audio richiede comunque un gesto dell’utente.
+
+Dopo una modifica, ricostruisci il file portatile e aggiorna quello pubblicato. La cartella **`github-pages/`** contiene il materiale per il repository pubblico: il suo `index.html` è un reindirizzamento, diverso dall’index dei sorgenti. Non sostituirlo durante la copia. Il pacchetto **`Kyokushin-Spirit-Mobile-Web.zip`** contiene **`Gioca.html`**, **`Incorpora.html`**, **`INCORPORA.txt`**, **`iframe-flazio-html.html`** e **`iframe-flazio.html`**; per aggiornarlo esegui `python3 build_web_package.py`.
 
 ## Fonti
 
@@ -187,12 +203,3 @@ Il gioco non usa cookie e, una volta caricato, non richiede risorse esterne. Sca
 
 Ricerca effettuata il **3 ottobre 2026**. Il grado di Samuel e l’ordine dei riferimenti fotografici provengono dalle indicazioni dell’utente.
 
-## Flazio adaptive e rotazione mobile
-
-Il launcher riconosce telefoni e tablet dalle capacità touch, indipendentemente dalla larghezza e dall’orientamento del sito adaptive. I pulsanti aprono una sola partita in una finestra sopra il sito, senza navigare a GitHub Pages. Il gioco resta ospitato su GitHub e viene caricato dentro l’iframe.
-
-La finestra usa il livello modale del browser ed è esterna al corpo della pagina Flazio. Le sue dimensioni seguono l’area visibile e compensano la scala applicata dal viewport fisso del sito. Il cambio orientamento ridimensiona la stessa partita. In verticale il gioco si mette in pausa e attende la rotazione fisica. **Torna al sito** chiude partita e audio e ripristina la pagina sottostante.
-
-`landscape-launcher.test.cjs`, `adaptive-launcher.test.cjs` e `launcher-loading.test.cjs` verificano apertura sul sito, dimensioni, istanze duplicate, messaggi di caricamento e pulizia. `standalone-entry.test.cjs` continua a coprire l’ingresso diretto facoltativo nel gioco. Le prove responsive nel browser non sostituiscono una verifica su iPhone fisico.
-
-Aggiornamento 4 ottobre 2026 — Pulsante interno su Flazio: dopo Entra nel dojo, Gioca in orizzontale adatta la stessa partita anche se il browser non consente fullscreen o rotazione automatica. Il contenitore ruota il solo iframe quando la pagina è verticale; quando il telefono è già orizzontale rimuove questa trasformazione. Il gioco interno non applica altre rotazioni. Le barre del browser possono restare visibili. Il protocollo display è abilitato da hostdisplay=1 e verifica origine e iframe mittente.

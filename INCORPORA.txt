@@ -1,63 +1,87 @@
 KYOKUSHIN SPIRIT — INCORPORA IL GIOCO NEL TUO SITO
 
-1. CARICA IL GIOCO
-Carica Gioca.html sul tuo hosting HTTPS. Il file contiene già grafica,
-musica ed effetti: non occorrono librerie esterne. All’avvio appare
-“Caricamento del dojo…”; il titolo compare quando grafica e gioco sono pronti.
-La barra animata indica l’attesa senza percentuali stimate.
-
-2. PREPARA IL CODICE
-Apri Incorpora.html, inserisci l'URL pubblico di Gioca.html e premi
-"Aggiorna anteprima". Prova il gioco nell'iframe, poi premi "Copia codice".
-Se la copia automatica non è disponibile, usa Cmd+C o Ctrl+C sul testo selezionato.
-
-3. INCOLLA NEL SITO
-Incolla il codice in un blocco HTML/iframe e salva la pagina del tuo sito.
-Il server che ospita il gioco deve permettere l'incorporamento tramite iframe.
-Per attivare musica ed effetti, clicca, premi un tasto oppure tocca e rilascia
-un comando dentro il gioco. Se il browser interrompe l’audio, premi ♪ per
-ritentarne l’attivazione.
+INDIRIZZI PUBBLICI
+Pagina del dojo: https://kyokushinkaicataniadojo.it/play
+Gioco: https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html?embed=1
+Repository: https://github.com/andreaVullo/kyokushin-spirit-bodyplanet
 
 SU FLAZIO — CONFIGURAZIONE CONSIGLIATA
-Apri il componente Codice/Script, passa alla modalità HTML e incolla tutto
-il contenuto di iframe-flazio-html.html. È la configurazione verificata su
-https://kyokushinkaicataniadojo.it/play. ENTRA NEL DOJO apre il gioco sopra
-il sito, senza cambiare indirizzo o aprire una pagina GitHub. La finestra
-del gioco è indipendente dal componente adaptive di Flazio e resta aperta
-durante i cambi di orientamento. Su mobile le dimensioni e la scala seguono
-la parte effettivamente visibile dello schermo.
-Se il telefono è già orizzontale, appare un invito centrato sopra il sito:
-APRI A SCHERMO INTERO. Non ora lo nasconde fino alla prossima rotazione
-verticale → orizzontale. Nessuna partita viene aperta senza un tocco.
-Torna al sito chiude la finestra del gioco e riporta alla pagina sottostante.
-
-Su telefono e desktop resta una sola partita a tutta finestra. Il loading
-appare subito al clic e il gioco è disponibile dopo la conferma di avvio.
-Dopo 25 secondi compare Riprova, senza ricaricamenti automatici. Riprova
-sostituisce il tentativo precedente e Torna al sito chiude partita e audio.
-Il gioco comunica al launcher solo lo stato di caricamento. I messaggi
-sono verificati per dominio e iframe mittente.
-Il file iframe-flazio.html è l’alternativa per la sola modalità Script.
+Apri il componente Codice/Script, seleziona la modalità HTML e incolla
+l’intero contenuto di iframe-flazio-html.html (onsite-dialog-v5).
+iframe-flazio.html è la variante per la sola modalità Script.
 Non scambiare i due frammenti tra le modalità.
 
-Su telefono, ruota fisicamente il dispositivo in orizzontale. Se la pagina
-resta verticale, disattiva il blocco rotazione del telefono. Il gioco segue
-il browser senza applicare rotazioni CSS; la partita resta aperta.
-Schermo intero richiede il fullscreen quando il browser lo offre; altrimenti
-il gioco occupa una vista espansa nella stessa pagina.
+ENTRA NEL DOJO apre il gioco sopra il sito, mantenendo l’indirizzo /play.
+Compare subito “Caricamento del dojo…”; il gioco diventa disponibile dopo
+la conferma che grafica e avvio sono completi. La barra indica l’attesa,
+non una percentuale stimata. Dopo 25 secondi compare Riprova, senza
+ricaricamenti automatici. Riprova sostituisce il tentativo precedente:
+resta una sola istanza, anche se Flazio ricrea il componente adaptive.
 
-Il parametro embed=1 attiva la presentazione compatta per iframe.
-standalone=1, solo in una pagina principale, mostra Torna al sito e la vista
-compatta; touch=1 abilita esplicitamente joystick e comandi touch.
+Su telefono e tablet, mentre il gioco è aperto, il launcher imposta
+TEMPORANEAMENTE la viewport della pagina su width=device-width,
+initial-scale=1,viewport-fit=cover, neutralizza lo zoom del documento e
+applica uno sfondo scuro anche alla pagina ospitante. Le dimensioni vengono
+rilevate nuovamente dopo l’aggiornamento: la larghezza fissa di Flazio non
+deve ridurre o decentrare il pannello e le aree laterali non mostrano più
+lo sfondo bianco della pagina. Il gioco conserva le proprie proporzioni.
+
+Se il telefono è già orizzontale, compare al centro dell’area visibile
+l’invito APRI A SCHERMO INTERO. Non ora lo nasconde fino alla prossima
+rotazione verticale → orizzontale. Nessuna partita si avvia senza un tocco.
+
+Dopo l’ingresso, GIOCA IN ORIZZONTALE adatta la stessa partita anche quando
+il blocco rotazione del telefono è attivo. Come nel launcher V4, il
+contenitore ruota una sola volta il solo iframe se la pagina è verticale,
+scambiandone le dimensioni. Quando il browser è realmente orizzontale,
+rimuove la trasformazione. Il gioco interno non aggiunge altre rotazioni.
+La sessione resta aperta e non viene caricata una pagina GitHub separata.
+Il fullscreen nativo dipende dal browser: le sue barre possono restare visibili.
+
+TORNA AL SITO chiude partita e audio e ripristina viewport, zoom, sfondo e
+scorrimento della pagina sottostante. Una nuova apertura riparte dal titolo.
+Il parametro hostdisplay=1 abilita la gestione della vista per gli host
+riconosciuti. I messaggi di caricamento e visualizzazione sono verificati
+per dominio e iframe mittente; non contengono dati personali.
+
+AUDIO SU IPHONE E IPAD
+Tocca e rilascia un comando dentro il gioco, oppure premi ♪. Lo stesso gesto
+avvia il sintetizzatore e un elemento audio silenzioso generato in memoria,
+che apre il canale multimediale nei browser in cui Web Audio resta sul
+canale della suoneria. Non scarica file, non usa il microfono e non aggiunge
+una seconda copia della musica. Se l’avvio è bloccato, ATTIVA AUDIO resta
+disponibile e il tocco successivo ritenta. Il gioco rileva anche un tempo
+audio fermo e ricrea il contesto al gesto successivo. Mute, cambio scheda
+e chiusura fermano l’elemento ausiliario. AUDIO ON indica l’avvio segnalato
+dalle API: non misura il volume o l’uscita dagli altoparlanti del telefono.
+Le verifiche automatiche e nel browser non sostituiscono una prova su iPhone.
+
+SU ALTRI SITI — IFRAME GENERICO
+1. Carica Gioca.html sul tuo hosting HTTPS, oppure usa il file pubblico
+   su GitHub Pages indicato sopra. Contiene già grafica, musica ed effetti.
+2. Apri Incorpora.html, inserisci l’URL pubblico e premi Aggiorna anteprima.
+   Prova il gioco, poi premi Copia codice. Se la copia automatica non è
+   disponibile, usa Cmd+C o Ctrl+C sul testo selezionato.
+3. Incolla il codice in un blocco HTML/iframe e salva la pagina.
+   L’hosting deve permettere l’incorporamento tramite iframe.
+
+L’iframe generico non include la gestione della pagina e della rotazione
+fornita dal launcher Flazio. Aprendo Gioca.html direttamente o in questo
+iframe, ruota fisicamente il telefono in orizzontale; se necessario,
+disattiva il blocco rotazione. Il comando Schermo intero richiede il
+fullscreen nativo se disponibile, altrimenti usa la vista espansa.
+
+PARAMETRI
+embed=1: presentazione compatta per iframe.
+touch=1: joystick e comandi touch esplicitamente abilitati.
+standalone=1: vista compatta con Torna al sito, solo in una pagina principale.
+Usa hostdisplay=1 soltanto con il launcher Flazio previsto dal progetto.
 Un indirizzo localhost o 127.0.0.1 non è raggiungibile dai visitatori.
-Per un sito esterno usa un vero URL HTTPS pubblico, per esempio:
-https://tuo-dominio.it/Gioca.html?embed=1
-Questo indirizzo è SOLO UN SEGNAPOSTO: sostituiscilo con il tuo URL reale.
 
 ESEMPIO PER IL GIOCO NELLA RADICE DELLO STESSO SITO
-Il percorso /Gioca.html?embed=1 qui sotto funziona quando il file Gioca.html
-è nella cartella pubblica principale del sito in cui incolli il codice.
-Per un hosting diverso, sostituisci src con l'URL pubblico completo del gioco.
+Il percorso /Gioca.html?embed=1 funziona quando Gioca.html è nella cartella
+pubblica principale del sito in cui incolli il codice. Per un hosting
+diverso, sostituisci src con l’URL pubblico completo del gioco.
 
 <style>
   .kyokushin-embed { width: 100%; height: clamp(560px, 66vw, 900px); overflow: hidden; background: #101722; }
@@ -76,10 +100,18 @@ Per un hosting diverso, sostituisci src con l'URL pubblico completo del gioco.
     scrolling="no" loading="lazy"></iframe>
 </div>
 
-Conserva anche i sorgenti del progetto. Dopo una modifica, ricrea Gioca.html
-con build_portable.py e sostituisci sul tuo hosting il file pubblicato.
+AGGIORNARE I FILE
+Conserva i sorgenti. Dopo una modifica, ricrea Gioca.html con
+build_portable.py e sostituisci il file sul tuo hosting. Il gioco portatile
+incorpora anche i nuovi fogli attacks-angelo.png e attacks-samuel.png:
+le sequenze dei pugni usano pose a corpo intero, senza montare singole braccia.
+Il gyaku esclude il fotogramma intermedio che cambiava braccio; gedan, mae,
+mawashi e ushiro distinguono caricamento, contatto e richiamo.
+
+L’index.html nella cartella principale è l’ingresso dei SORGENTI e richiede
+i relativi file. github-pages/index.html è invece un REINDIRIZZAMENTO
+compatto a Gioca.html: preservalo quando aggiorni il repository pubblico.
 
 Il pacchetto Kyokushin-Spirit-Mobile-Web.zip contiene Gioca.html,
 Incorpora.html, INCORPORA.txt, iframe-flazio-html.html e iframe-flazio.html.
-
-Aggiornamento 4 ottobre 2026 — Pulsante interno su Flazio: dopo Entra nel dojo, Gioca in orizzontale adatta la stessa partita anche se il browser non consente fullscreen o rotazione automatica. Il contenitore ruota il solo iframe quando la pagina è verticale; quando il telefono è già orizzontale rimuove questa trasformazione. Il gioco interno non applica altre rotazioni. Le barre del browser possono restare visibili. Il protocollo display è abilitato da hostdisplay=1 e verifica origine e iframe mittente.
+Per ricostruirlo dopo le modifiche, usa build_web_package.py.
