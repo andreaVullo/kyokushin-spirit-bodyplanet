@@ -21,18 +21,17 @@ ritentarne l’attivazione.
 SU FLAZIO — CONFIGURAZIONE CONSIGLIATA
 Apri il componente Codice/Script, passa alla modalità HTML e incolla tutto
 il contenuto di iframe-flazio-html.html. È la configurazione verificata su
-https://kyokushinkaicataniadojo.it/play. Su telefono e tablet, ENTRA NEL DOJO
-apre il gioco come pagina autonoma nella stessa scheda: la partita non è
-contenuta nelle versioni adaptive Flazio verticale/orizzontale. La scelta
-usa il dispositivo touch, non la larghezza della pagina. Il gioco ha un
-viewport device-width e segue le dimensioni effettive del browser.
+https://kyokushinkaicataniadojo.it/play. ENTRA NEL DOJO apre il gioco sopra
+il sito, senza cambiare indirizzo o aprire una pagina GitHub. La finestra
+del gioco è indipendente dal componente adaptive di Flazio e resta aperta
+durante i cambi di orientamento. Su mobile le dimensioni e la scala seguono
+la parte effettivamente visibile dello schermo.
 Se il telefono è già orizzontale, appare un invito centrato sopra il sito:
 APRI A SCHERMO INTERO. Non ora lo nasconde fino alla prossima rotazione
 verticale → orizzontale. Nessuna partita viene aperta senza un tocco.
-Torna al sito è disponibile nel loading, nell’avviso di rotazione e durante
-la partita. Il suo indirizzo è fisso: https://kyokushinkaicataniadojo.it/play.
+Torna al sito chiude la finestra del gioco e riporta alla pagina sottostante.
 
-Su desktop resta una sola partita in overlay a tutta finestra. Il loading
+Su telefono e desktop resta una sola partita a tutta finestra. Il loading
 appare subito al clic e il gioco è disponibile dopo la conferma di avvio.
 Dopo 25 secondi compare Riprova, senza ricaricamenti automatici. Riprova
 sostituisce il tentativo precedente e Torna al sito chiude partita e audio.
@@ -82,3 +81,5 @@ con build_portable.py e sostituisci sul tuo hosting il file pubblicato.
 
 Il pacchetto Kyokushin-Spirit-Mobile-Web.zip contiene Gioca.html,
 Incorpora.html, INCORPORA.txt, iframe-flazio-html.html e iframe-flazio.html.
+
+Aggiornamento 4 ottobre 2026 — Pulsante interno su Flazio: dopo Entra nel dojo, Gioca in orizzontale adatta la stessa partita anche se il browser non consente fullscreen o rotazione automatica. Il contenitore ruota il solo iframe quando la pagina è verticale; quando il telefono è già orizzontale rimuove questa trasformazione. Il gioco interno non applica altre rotazioni. Le barre del browser possono restare visibili. Il protocollo display è abilitato da hostdisplay=1 e verifica origine e iframe mittente.

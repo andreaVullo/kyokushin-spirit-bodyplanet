@@ -751,7 +751,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
           <div class="rotate-illustration" aria-hidden="true"><span class="rotate-orbit">↻</span><div class="rotate-device"><span class="rotate-device-arena"></span><span class="rotate-device-controls"></span></div><span class="rotate-landscape-line"></span></div>
           <h2 id="rotate-title">RUOTA IL<br><em>TELEFONO.</em></h2>
           <p id="rotate-description">Gira il telefono in orizzontale. Se lo schermo resta verticale, disattiva il blocco rotazione del telefono.</p>
-          <button id="rotate-fullscreen-button" type="button"><span aria-hidden="true">⛶</span> SCHERMO INTERO</button>
+          <button id="rotate-fullscreen-button" type="button"><span aria-hidden="true">⛶</span> <span id="rotate-action-label">SCHERMO INTERO</span></button>
           <small>La partita resta aperta. Tocca ♪ per attivare musica ed effetti.</small>
           <span class="rotate-signature">FULL CONTACT. FULL SPIRIT.</span>
         </div>
@@ -3436,11 +3436,32 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   window.addEventListener('touchend',e=>{if(!audioButtonTarget(e))unlockAudio();},{capture:true,passive:true});
   window.addEventListener('click',e=>{if(!audioButtonTarget(e))unlockAudio();},{capture:true});
   window.addEventListener('keydown',e=>{if(!e.repeat&&!audioButtonTarget(e))unlockAudio();},{capture:true});
-  function syncFullscreenButton(){const expanded=!!document.fullscreenElement||$('arcade').classList.contains('expanded')||landscapeRequested;$('fullscreen-button').setAttribute('aria-label',expanded?'Esci da schermo intero':'Schermo intero');$('fullscreen-button').title=expanded?'Esci da schermo intero':'Schermo intero';}
+  function syncFullscreenButton(){
+    const expanded=!!document.fullscreenElement||$('arcade').classList.contains('expanded')||landscapeRequested;
+    const hosted=!!displayHostOrigin();
+    const label=hosted?(expanded?'Esci dalla vista orizzontale':'Gioca in orizzontale'):(expanded?'Esci da schermo intero':'Schermo intero');
+    $('fullscreen-button').setAttribute('aria-label',label);$('fullscreen-button').title=label;
+  }
+  function displayHostOrigin(){
+    if(!window.parent||window.parent===window||pageOptions.get('hostdisplay')!=='1')return null;
+    try{
+      const origin=new URL(document.referrer).origin;
+      if(['https://kyokushinkaicataniadojo.it','https://www.kyokushinkaicataniadojo.it','https://editor.flazio.com'].includes(origin))return origin;
+      if(['localhost','127.0.0.1'].includes(location.hostname)&&origin===location.origin)return origin;
+    }catch{}
+    return null;
+  }
+  function requestHostDisplay(action){
+    const origin=displayHostOrigin();
+    if(!origin)return false;
+    window.parent.postMessage({type:'kyokushin:display',action},origin);
+    return true;
+  }
   $('fullscreen-button').addEventListener('click',async()=>{
     clearCombatInput();
     if(document.fullscreenElement||$('arcade').classList.contains('expanded')||landscapeRequested){
       landscapeRequested=false;landscapeAttempt++;nativeLandscapePending=false;nativeLandscapeLocked=false;$('arcade').classList.remove('expanded');
+      requestHostDisplay('exit');
       try{window.screen.orientation?.unlock?.();}catch{}
       try{if(document.fullscreenElement)await document.exitFullscreen();}catch{}
     }else{
@@ -3465,6 +3486,13 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   async function openLandscape(){
     clearCombatInput();
     const attempt=++landscapeAttempt;
+    // In Flazio the parent owns the visible screen and its adaptive scaling.
+    // Let it resize the SAME iframe. The child never rotates its own arena.
+    if(requestHostDisplay('landscape')){
+      landscapeRequested=true;nativeLandscapePending=false;nativeLandscapeLocked=false;
+      $('arcade').classList.add('expanded');syncFullscreenButton();syncControlSurface();
+      return;
+    }
     
     nativeLandscapePending=true;nativeLandscapeLocked=false;
     // Only the device/browser may rotate the screen. The portrait gate stays
@@ -3490,6 +3518,18 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     syncFullscreenButton();syncControlSurface();viewportChanged();
   }
   $('rotate-fullscreen-button')?.addEventListener('click',openLandscape);
+  window.addEventListener('message',event=>{
+    const origin=displayHostOrigin();
+    if(!origin||event.origin!==origin||event.source!==window.parent||event.data?.type!=='kyokushin:display-state'||typeof event.data.landscapeRequested!=='boolean')return;
+    landscapeRequested=event.data.landscapeRequested;
+    $('arcade').classList.toggle('expanded',landscapeRequested);
+    clearCombatInput();syncFullscreenButton();syncControlSurface();viewportChanged();
+  });
+  if(displayHostOrigin()){
+    $('rotate-action-label').textContent='GIOCA IN ORIZZONTALE';
+    $('rotate-description').textContent='Ruota il telefono oppure tocca il pulsante: il gioco si adatta in orizzontale anche con la rotazione bloccata.';
+    syncFullscreenButton();
+  }
   function showDialog(id){if(active&&!paused&&!resultShown)togglePause(true);sound.effect('menuMove');$('game-shell').append($(id));$(id).showModal();}
   $('help-button').addEventListener('click',()=>showDialog('help-dialog'));$('all-moves-button').addEventListener('click',()=>showDialog('help-dialog'));$('credits-button').addEventListener('click',()=>showDialog('credits-dialog'));
   $('mobile-help-button')?.addEventListener('click',()=>showDialog('help-dialog'));
