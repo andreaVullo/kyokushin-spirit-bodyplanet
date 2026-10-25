@@ -86,6 +86,23 @@
         }
         if (belongs) pixels.data.set(rgba.subarray(at * 4, at * 4 + 4), (y * sw + x) * 4);
       }
+      if (frame.neckBlend) {
+        // Each modular portrait ends in an inked cut across the neck. That cut
+        // is a sprite boundary, not an anatomical outline: blend it into the
+        // pose's existing neck while retaining hair, jaw and silhouette edges.
+        const [left, right, top, depth] = frame.neckBlend;
+        for (let gx = left; gx <= right; gx++) {
+          const x = gx - sx;
+          if (x < 0 || x >= sw) continue;
+          let bottom = sh - 1;
+          while (bottom >= Math.max(0, top - sy) && pixels.data[(bottom * sw + x) * 4 + 3] < 120) bottom--;
+          if (bottom < top - sy) continue;
+          for (let y = bottom; y >= Math.max(0, bottom - depth); y--) {
+            const at = (y * sw + x) * 4, t = clamp((bottom - y - 2) / depth, 0, 1);
+            pixels.data[at + 3] *= t * t * (3 - 2 * t);
+          }
+        }
+      }
       context.putImageData(pixels, 0, 0); result.set(frame.component, cut);
     }
     canvas.width = canvas.height = 0; sheets.set(key, result);
