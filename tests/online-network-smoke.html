@@ -27,9 +27,14 @@ function describe(value){return {role:value.session.client?.role,phase:value.ses
 async function cleanup(){const values=currentPeers;currentPeers=[];for(const value of values){const client=value.session.client;value.session.leave();if(client)await client.leave();}await sleep(60);}
 async function checkMode(mode){
  const one=peer('A'),two=peer('B');currentPeers=[one,two];
- log('\n'+(mode==='training'?'ALLENAMENTO':'1 VS 1')+' — matchmaking');
- await one.session.enter('matchmake',{name:'QA Uno',fighter:'angelo',mode});
- await two.session.enter('matchmake',{name:'QA Due',fighter:'samuel',mode});
+ log('\n'+(mode==='training'?'ALLENAMENTO — matchmaking':'1 VS 1 — ingresso con codice stanza'));
+ if(mode==='versus'){
+  await one.session.enter('create',{name:'QA Uno',fighter:'angelo',mode});
+  await two.session.enter('join',{name:'QA Due',fighter:'samuel',mode,code:one.session.room.code});
+ }else{
+  await one.session.enter('matchmake',{name:'QA Uno',fighter:'angelo',mode});
+  await two.session.enter('matchmake',{name:'QA Due',fighter:'samuel',mode});
+ }
  await until(()=>one.session.room?.players.length===2&&two.session.room?.players.length===2&&one.session.client?.connected&&two.session.client?.connected,'due connessioni WebRTC',30000);
  assert(one.session.room.code===two.session.room.code,'I due karateka devono trovarsi nella stessa stanza');
  const host=one.session.localSlot===0?one:two,guest=host===one?two:one;

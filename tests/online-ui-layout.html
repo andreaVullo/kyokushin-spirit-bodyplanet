@@ -36,10 +36,15 @@
     expect(rect(dialog.querySelector('[data-page="letters"] .name-key-row:last-child')).bottom<=keys.bottom+1,dialog.id+': ultima riga irraggiungibile');
     keyboard.press('confirm'); expect(!dialog.open,dialog.id+': impossibile confermare');
   }
-  ui.showRoom({code:'AB23XY',mode:'versus',role:'guest',players:[{slot:0,name:'MARCO',fighter:'samuel',ready:true},{slot:1,name:'ANDREA',fighter:'angelo',ready:false}]});
+  ui.setConnection(true);ui.showRoom({code:'AB23XY',mode:'versus',role:'guest',players:[{slot:0,name:'MARCO',fighter:'samuel',ready:true},{slot:1,name:'ANDREA',fighter:'angelo',ready:false}]});
   expect(ui.localPlayer().name==='ANDREA','lato locale errato');expect(d.querySelector('#online-name').value==='ANDREA','nome cambiato dal polling');
   ui.setBusy(true);ui.showRoom(ui.room);expect(d.querySelector('#online-ready').disabled,'polling abilita azione durante richiesta');ui.setBusy(false);
   expect(!d.querySelector('#online-ready').disabled,'pronto non raggiungibile');
+  ui.setConnection(false,'Ricollegamento in corso');ui.showRoom(ui.room);
+  expect(d.querySelector('#online-ready').disabled,'pronto attivo prima del ripristino');
+  expect(d.querySelector('#online-status').textContent==='Ricollegamento in corso','polling nasconde il ripristino');
+  expect(ui.room.players[0].ready,'ripristino cancella il pronto dell’avversario');
+  ui.setConnection(true);expect(!d.querySelector('#online-ready').disabled,'pronto non torna disponibile dopo il ripristino');
   reports.push({case:frame.title,pass:!errors.length,errors});document.querySelector('#status').textContent=JSON.stringify(reports,null,2);
  }
  document.querySelector('#status').dataset.result=reports.every(r=>r.pass)?'PASS':'FAIL';

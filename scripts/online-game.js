@@ -84,7 +84,7 @@
       this.replayEvent = options.onEvent || this.originalEvent;
       this.interpolationMs = Number.isFinite(options.interpolationMs) ? Math.max(0, Math.min(100, options.interpolationMs)) : 50;
       this.timeoutMs = Number.isFinite(options.timeoutMs) ? Math.max(1000, options.timeoutMs) : 5000;
-      this.epoch = 0; this.running = false; this.disposed = false; this.connected = true;
+      this.epoch = 0; this.running = false; this.disposed = false; this.connected = true; this.reconnecting = false;
       this.localHeld = held(); this.snapshots = []; this.events = []; this.pauseVotes = [false, false];
       this.eventHook = event => {
         if (this.running && this.role === 'host') this.events.push({ seq: ++this.eventSeq, event: clone(event) });
@@ -116,7 +116,7 @@
 
     _status(status, details = {}) { this.onStatus(status, { epoch: this.epoch, role: this.role, ...details }); }
     _send(type, payload = {}) {
-      if (this.disposed || !this.connected) return false;
+      if (this.disposed || !this.connected || this.reconnecting) return false;
       try {
         const sent = this.send({ type, v: 1, epoch: this.epoch, ...payload }) !== false;
         // Only state frames may be dropped by the transport under backpressure.
@@ -126,7 +126,7 @@
       catch (_) { this.disconnect('Connessione interrotta'); return false; }
     }
     _reset(epoch) {
-      this.epoch = epoch; this.running = true; this.connected = true;
+      this.epoch = epoch; this.running = true; this.connected = true; this.reconnecting = false;
       this.frameSeq = 0; this.remoteFrameSeq = -1; this.controlSeq = 0; this.remoteControlSeq = -1;
       this.eventSeq = 0; this.remoteEventSeq = 0; this.events = []; this.snapshots = [];
       this.localHeld = held(); this.pauseVotes = [false, false]; this.frameElapsed = 0;
@@ -212,7 +212,7 @@
       return true;
     }
     setInput(action, down, meta = {}) {
-      if (!this.running || this.disposed || !this.connected || !ACTIONS.includes(action) || typeof down !== 'boolean' || (down && this.game.paused)) return false;
+      if (!this.running || this.disposed || !this.connected || this.reconnecting || !ACTIONS.includes(action) || typeof down !== 'boolean' || (down && this.game.paused)) return false;
       if (this.localHeld[action] === down) return false;
       this.localHeld[action] = down;
       const allowDash = meta.allowDash !== false && meta.phase !== 'move';
@@ -234,7 +234,7 @@
       this._frame(true);
     }
     pause(value = !this.game.paused) {
-      if (!this.running || this.disposed || !this.connected || typeof value !== 'boolean') return false;
+      if (!this.running || this.disposed || !this.connected || this.reconnecting || typeof value !== 'boolean') return false;
       this.clearInput();
       if (this.role === 'host') this._setPause(0, value);
       else this._send('game-pause', { seq: ++this.controlSeq, paused: value });
@@ -250,8 +250,19 @@
     _matchEnd() {
       if (!this.ended && this.state.phase === 'matchOver') { this.ended = true; this.onMatchEnd(this.state, { epoch: this.epoch }); }
     }
+    setReconnecting(value) {
+      if (this.disposed || !this.running || !this.connected || typeof value !== 'boolean' || value === this.reconnecting) return;
+      this.reconnecting = value; this.localHeld = held(); this.game.clearInput();
+      if (!value) {
+        // This grace belongs only to a peer whose transport reported recovery.
+        // The other peer retains its own independent liveness deadline.
+        this.lastSeen = this.lastHeartbeat = this.lastRemoteInput = this.now();
+        if (this.role === 'guest') this._send('game-reset', { seq: ++this.controlSeq });
+        else this._frame(true);
+      }
+    }
     update(dt) {
-      if (!this.running || this.disposed || !this.connected) return this.state;
+      if (!this.running || this.disposed || !this.connected || this.reconnecting) return this.state;
       const now = this.now();
       if (now - this.lastSeen > this.timeoutMs) { this.disconnect('L’altro giocatore non risponde'); return this.state; }
       if (this.role === 'host') {

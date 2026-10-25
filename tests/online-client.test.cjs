@@ -274,3 +274,133 @@ test('a stalled keepalive leave is bounded and cannot retain local room state', 
   await play.clock.run(12000); await leaving;
   assert.equal(request.init.signal.aborted, true); assert.equal(play.clock.pending.size, 0);
 });
+
+test('initial ICE disconnected preserves both unready players and the original negotiation deadline', async () => {
+  const play = setup({ paired: true }); await play.client.create(profile); await tick(); const peer = play.client.peer;
+  peer.connectionState = 'connecting'; peer.iceConnectionState = 'checking';
+  peer.iceConnectionState = 'disconnected'; peer.oniceconnectionstatechange();
+  assert.ok(play.client.room); assert.equal(peer.closed, undefined); assert.equal(play.errors.length, 0);
+  assert.deepEqual(play.client.room.players.map(player => player.ready), [false, false]);
+  assert.equal(play.requests.filter(request => request.body?.action === 'leave').length, 0);
+  assert.ok([...play.clock.pending.values()].some(timer => timer.delay === 25000));
+  assert.equal([...play.clock.pending.values()].filter(timer => timer.delay === 12000).length, 0);
+  await play.clock.run(0); await play.clock.run(5000);
+  assert.ok(play.client.room, 'room polling and heartbeat continue while more candidates arrive');
+  peer.iceConnectionState = 'connected'; peer.connectionState = 'connected'; peer.oniceconnectionstatechange();
+  assert.equal(play.client.connected, false, 'ICE success alone is not an open data channel');
+  peer.channel.open(); assert.equal(play.client.connected, true);
+  assert.equal(play.states.filter(item => item.status === 'connected').length, 1);
+  assert.equal([...play.clock.pending.values()].filter(timer => timer.delay === 25000).length, 0);
+  await play.client.leave();
+});
+
+test('an unopened channel never reports connected while ICE remains disconnected', async () => {
+  const play = setup({ paired: true }); await play.client.create(profile); await tick(); const peer = play.client.peer;
+  peer.iceConnectionState = 'disconnected'; peer.channel.open();
+  assert.equal(play.client.connected, false); assert.equal(play.client.everConnected, false);
+  assert.equal(play.states.filter(item => item.status === 'connected').length, 0);
+  peer.iceConnectionState = 'completed'; peer.connectionState = 'connected'; peer.onconnectionstatechange();
+  assert.equal(play.client.connected, true); assert.equal(play.client.everConnected, true);
+  await play.client.leave();
+});
+
+test('failed first negotiation explains the missing relay without claiming a transient disconnect', async () => {
+  const play = setup({ paired: true }); await play.client.create(profile); await tick();
+  play.client.iceServers = [{ urls: 'stun:provided.example:3478' }];
+  const peer = play.client.peer; peer.iceConnectionState = 'failed'; peer.oniceconnectionstatechange();
+  assert.equal(play.client.room, null); assert.match(play.errors.at(-1).message, /collegamento diretto/);
+  assert.match(play.errors.at(-1).message, /non è ancora configurato un collegamento alternativo/);
+  assert.doesNotMatch(play.errors.at(-1).message, /altra rete|nuova stanza/);
+});
+
+test('initial disconnected eventually uses the original 25 second deadline, without a recovery grace', async () => {
+  const play = setup({ paired: true }); await play.client.create(profile); await tick();
+  const peer = play.client.peer; peer.iceConnectionState = 'disconnected'; peer.oniceconnectionstatechange();
+  assert.equal(play.client.recovering, false); await play.clock.run(25000);
+  assert.equal(play.client.room, null); assert.equal(play.errors.length, 1);
+  assert.equal(play.requests.filter(request => request.body?.action === 'leave').length, 1);
+});
+
+test('an established connection has a cancellable 12 second recovery grace with room membership intact', async () => {
+  const play = setup({ paired: true }); await play.client.create(profile); await tick(); const peer = play.client.peer;
+  peer.connectionState = 'connected'; peer.iceConnectionState = 'connected'; peer.channel.open();
+  peer.connectionState = 'disconnected'; peer.iceConnectionState = 'disconnected'; peer.onconnectionstatechange(); peer.oniceconnectionstatechange();
+  assert.equal(play.client.connected, false); assert.equal(play.client.recovering, true); assert.ok(play.client.room);
+  assert.equal(play.states.filter(item => item.status === 'reconnecting').length, 1);
+  assert.equal([...play.clock.pending.values()].filter(timer => timer.delay === 12000).length, 1);
+  assert.equal(play.requests.filter(request => request.body?.action === 'leave').length, 0);
+  assert.equal(play.client.send({ type: 'game-input', action: 'mae' }), false);
+  await play.clock.run(0); await play.clock.run(5000); assert.ok(play.client.room);
+  peer.iceConnectionState = 'connected'; peer.oniceconnectionstatechange();
+  assert.equal(play.client.connected, false, 'the aggregate connection must recover too');
+  peer.connectionState = 'connected'; peer.onconnectionstatechange();
+  assert.equal(play.client.connected, true); assert.equal(play.client.recovering, false);
+  assert.equal(play.states.at(-1).message, 'Collegamento ripristinato.');
+  assert.equal([...play.clock.pending.values()].filter(timer => timer.delay === 12000).length, 0);
+  assert.equal(play.client.send({ type: 'game-input', action: 'mae' }), true);
+  await play.client.leave();
+});
+
+test('unrecovered established connection closes once after its grace and names the lost connection', async () => {
+  const play = setup({ paired: true }); await play.client.create(profile); await tick(); const peer = play.client.peer; peer.channel.open();
+  peer.iceConnectionState = 'disconnected'; peer.oniceconnectionstatechange();
+  await play.clock.run(12000);
+  assert.equal(play.client.room, null); assert.equal(peer.closed, true); assert.equal(play.errors.length, 1);
+  assert.match(play.errors[0].message, /non si è ripristinato/);
+  assert.equal(play.requests.filter(request => request.body?.action === 'leave').length, 1);
+});
+
+test('leaving during recovery cancels its grace without a late error or reopening the channel', async () => {
+  const play = setup({ paired: true }); await play.client.create(profile); await tick(); const peer = play.client.peer; peer.channel.open();
+  peer.iceConnectionState = 'disconnected'; peer.oniceconnectionstatechange();
+  const grace = [...play.clock.pending.values()].find(timer => timer.delay === 12000).callback;
+  await play.client.leave(); assert.equal(play.clock.pending.size, 0);
+  grace(); await tick(); assert.equal(play.errors.length, 0); assert.equal(play.client.connected, false);
+  assert.equal(play.requests.filter(request => request.body?.action === 'leave').length, 1);
+});
+
+test('a transient failure of an extra ICE candidate cannot destroy an already open channel', async () => {
+  const play = setup({ paired: true }); await play.client.create(profile); await tick(); const peer = play.client.peer; peer.channel.open();
+  play.setResponse(request => request.body?.action === 'signal' && request.body.type === 'candidate' ? jsonResponse({ error: 'Temporaneamente non disponibile' }, 503) : undefined);
+  peer.onicecandidate({ candidate: { candidate: 'candidate:extra', sdpMid: '0', sdpMLineIndex: 0 } }); await tick();
+  assert.equal(play.client.connected, true); assert.ok(play.client.room); assert.equal(play.errors.length, 0);
+  assert.equal(play.requests.filter(request => request.body?.action === 'leave').length, 0);
+  play.setResponse(null); peer.onicecandidate({ candidate: { candidate: 'candidate:next', sdpMid: '0', sdpMLineIndex: 0 } }); await tick();
+  assert.equal(play.requests.at(-1).body.payload.candidate, 'candidate:next');
+  await play.client.leave();
+});
+
+test('candidate membership failures remain fatal even after the channel has opened', async () => {
+  for (const status of [401, 403, 404, 409, 410]) {
+    const play = setup({ paired: true }); await play.client.create(profile); await tick(); const peer = play.client.peer; peer.channel.open();
+    play.setResponse(request => request.body?.action === 'signal' && request.body.type === 'candidate' ? jsonResponse({ error: 'Accesso alla stanza non valido.' }, status) : undefined);
+    peer.onicecandidate({ candidate: { candidate: 'candidate:extra', sdpMid: '0', sdpMLineIndex: 0 } }); await tick();
+    assert.equal(play.client.connected, false); assert.equal(play.client.room, null); assert.equal(play.errors.length, 1);
+  }
+});
+
+test('six relay URLs supplied by the service are preserved for future relay configuration', () => {
+  const play = setup();
+  const urls = ['turn:relay.example:3478?transport=udp','turn:relay.example:3478?transport=tcp','turns:relay.example:5349?transport=tcp','turn:relay.example:53?transport=udp','turn:relay.example:80?transport=tcp','turns:relay.example:443?transport=tcp'];
+  assert.deepEqual(play.client._iceServers([{ urls, username: 'temporary', credential: 'temporary' }])[0].urls, urls);
+});
+
+test('an optional candidate rejected by the browser does not invalidate an established path', async () => {
+  const play = setup({ paired: true }); await play.client.create(profile); await tick(); const peer = play.client.peer;
+  peer.channel.open(); peer.remoteDescription = { type: 'answer', sdp: 'v=0\nanswer' };
+  peer.addIceCandidate = async () => { throw new Error('OperationError: candidate could not be applied'); };
+  play.setResponse(request => request.init.method === 'GET' ? jsonResponse({ room: room('host', true), messages: [{ seq: 8, from: 1, type: 'candidate', payload: { candidate: 'candidate:optional', sdpMid: '0', sdpMLineIndex: 0 } }] }) : undefined);
+  await play.clock.run(0);
+  assert.equal(play.client.cursor, 8); assert.equal(play.client.connected, true); assert.equal(play.errors.length, 0);
+  await play.client.leave();
+});
+
+test('transient posting errors for extra candidates also preserve an active recovery grace', async () => {
+  const play = setup({ paired: true }); await play.client.create(profile); await tick(); const peer = play.client.peer; peer.channel.open();
+  peer.iceConnectionState = 'disconnected'; peer.oniceconnectionstatechange();
+  play.setResponse(request => request.body?.action === 'signal' && request.body.type === 'candidate' ? jsonResponse({ error: 'Temporaneamente non disponibile' }, 503) : undefined);
+  peer.onicecandidate({ candidate: { candidate: 'candidate:extra', sdpMid: '0', sdpMLineIndex: 0 } }); await tick();
+  assert.ok(play.client.room); assert.equal(play.client.recovering, true); assert.equal(play.errors.length, 0);
+  assert.ok([...play.clock.pending.values()].some(timer => timer.delay === 12000));
+  await play.client.leave();
+});

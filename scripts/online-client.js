@@ -28,6 +28,7 @@
       this.generation = 0; this._token = null; this.cursor = 0;
       this.timers = new Set(); this.signalQueue = Promise.resolve(); this.updateQueue = Promise.resolve(); this.peer = null; this.channel = null;
       this.remoteCandidates = []; this.localCandidates = []; this.descriptionSent = false;
+      this.everConnected = false; this.recovering = false; this.connectionTimer = null; this.recoveryTimer = null;
       if (!this.fetch) throw new TypeError('Questo browser non supporta il gioco online');
     }
     _timer(callback, milliseconds) {
@@ -35,6 +36,9 @@
       this.timers.add(timer); return timer;
     }
     _clearTimers() { for (const timer of this.timers) this.clearTimer(timer); this.timers.clear(); }
+    _cancelTimer(field) {
+      if (this[field] !== null) { this.clearTimer(this[field]); this.timers.delete(this[field]); this[field] = null; }
+    }
     _current(generation) { return generation === this.generation && !!this._token; }
     async _request(path, { method = 'GET', token, body, keepalive = false } = {}) {
       const headers = { Accept: 'application/json' };
@@ -83,6 +87,7 @@
       this._token = null; this._code = null; this.room = null; this.role = null; this.connected = false;
       this.cursor = 0; this.peerPromise = null; this.signalQueue = Promise.resolve(); this.updateQueue = Promise.resolve();
       this.remoteCandidates = []; this.localCandidates = []; this.descriptionSent = false;
+      this.everConnected = false; this.recovering = false; this.connectionTimer = null; this.recoveryTimer = null;
       this.pollFailures = 0; this.heartbeatFailures = 0;
     }
     async leave() {
@@ -136,7 +141,7 @@
       if (!Array.isArray(servers) || servers.length > 8) return [];
       return servers.filter(server => {
         const urls = typeof server?.urls === 'string' ? [server.urls] : server?.urls;
-        return Array.isArray(urls) && urls.length > 0 && urls.length <= 4 && urls.every(url => typeof url === 'string' && url.length <= 200 && /^(?:stun|stuns|turn|turns):[^\s]+$/.test(url));
+        return Array.isArray(urls) && urls.length > 0 && urls.length <= 8 && urls.every(url => typeof url === 'string' && url.length <= 200 && /^(?:stun|stuns|turn|turns):[^\s]+$/.test(url));
       }).map(server => ({ urls: copy(server.urls), ...(typeof server.username === 'string' ? { username: server.username } : {}), ...(typeof server.credential === 'string' ? { credential: server.credential } : {}) }));
     }
     _acceptRoom(room, generation) {
@@ -223,7 +228,10 @@
       this.onConnection('connecting', 'Collego i due giocatori…');
       if (!this._current(generation)) return;
       const peer = this.peer = new this.PeerConnection({ iceServers: this.iceServers });
-      this._timer(() => { if (this._current(generation) && !this.connected) this._fail(messageError('Non riesco a collegare i due dispositivi. Prova un’altra rete e crea una nuova stanza.'), generation); }, 25000);
+      this.connectionTimer = this._timer(() => {
+        this.connectionTimer = null;
+        if (this._current(generation) && !this.everConnected) this._fail(this._connectionError(), generation);
+      }, 25000);
       peer.onicecandidate = event => {
         if (!this._current(generation) || !event.candidate) return;
         const candidate = event.candidate.toJSON?.() || event.candidate;
@@ -233,7 +241,17 @@
       };
       const connectionChanged = () => {
         if (!this._current(generation)) return;
-        if (['failed', 'disconnected', 'closed'].includes(peer.connectionState) || ['failed', 'disconnected', 'closed'].includes(peer.iceConnectionState)) this._fail(messageError('Il collegamento con l’altro giocatore si è interrotto. Crea una nuova stanza.'), generation);
+        const states = [peer.connectionState, peer.iceConnectionState];
+        if (states.some(state => state === 'failed' || state === 'closed')) { this._fail(this._connectionError(), generation); return; }
+        if (states.includes('disconnected')) {
+          // ICE can exhaust the current candidates while more candidates are still arriving.
+          // Before the first connection, the original negotiation deadline remains in force.
+          if (this.everConnected) this._beginRecovery(generation);
+          return;
+        }
+        const iceReady = ['connected', 'completed'].includes(peer.iceConnectionState);
+        const peerReady = peer.connectionState === 'connected' || (peer.connectionState === undefined && iceReady);
+        if (peerReady && (!peer.iceConnectionState || iceReady)) this._markConnected(generation);
       };
       peer.onconnectionstatechange = peer.oniceconnectionstatechange = connectionChanged;
       peer.ondatachannel = event => { if (this._current(generation) && this.role === 'guest') this._attachChannel(event.channel, generation); };
@@ -255,11 +273,50 @@
         if (!this._current(generation)) return;
         await this._request(path, { method: 'POST', token, body: { action: 'signal', type, payload } });
       });
-      this.signalQueue = task.catch(error => this._fail(error, generation));
+      this.signalQueue = task.catch(error => {
+        // Once a working channel exists, one unavailable extra candidate must not
+        // destroy it. Authentication and room-membership failures remain terminal.
+        const transient = error.status === 0 || error.status === 408 || error.status === 429 || error.status >= 500;
+        if (type === 'candidate' && this.everConnected && this.channel?.readyState === 'open' && transient) return;
+        this._fail(error, generation);
+      });
       return this.signalQueue;
+    }
+    _connectionError() {
+      if (this.everConnected) return messageError('Il collegamento con l’altro giocatore non si è ripristinato. La stanza è stata chiusa.');
+      const relay = this.iceServers?.some(server => (Array.isArray(server.urls) ? server.urls : [server.urls]).some(url => /^turns?:/i.test(url)));
+      return messageError(relay
+        ? 'Non è stato possibile collegare i due dispositivi. Il collegamento della stanza non è disponibile.'
+        : 'Il collegamento diretto tra i due dispositivi non è riuscito. Per le reti che lo bloccano non è ancora configurato un collegamento alternativo.');
+    }
+    _beginRecovery(generation) {
+      if (!this._current(generation) || this.recovering) return;
+      this.connected = false; this.recovering = true;
+      this.recoveryTimer = this._timer(() => {
+        this.recoveryTimer = null;
+        if (this._current(generation) && this.recovering) this._fail(this._connectionError(), generation);
+      }, 12000);
+      this.onConnection('reconnecting', 'Il collegamento è momentaneamente instabile. Attendo il ripristino…');
+    }
+    _markConnected(generation) {
+      if (!this._current(generation) || this.channel?.readyState !== 'open' || [this.peer?.connectionState, this.peer?.iceConnectionState].some(state => ['disconnected', 'failed', 'closed'].includes(state))) return;
+      const recovered = this.recovering;
+      this._cancelTimer('connectionTimer'); this._cancelTimer('recoveryTimer');
+      this.recovering = false; this.everConnected = true;
+      if (this.connected) return;
+      this.connected = true; this.onConnection('connected', recovered ? 'Collegamento ripristinato.' : 'Avversario collegato.');
     }
     async _flushLocalCandidates(generation) {
       while (this._current(generation) && this.localCandidates.length) await this._signal('candidate', this.localCandidates.shift(), generation);
+    }
+    async _addRemoteCandidate(peer, candidate, generation) {
+      try { await peer.addIceCandidate(candidate); }
+      catch (error) {
+        if (!this._current(generation)) return;
+        // A rejected optional candidate cannot invalidate an established path.
+        if (this.everConnected && this.channel?.readyState === 'open') return;
+        throw error;
+      }
     }
     async _processSignal(message, generation) {
       if (message.type === 'control') return; // Lobby/match controls use the ordered peer channel.
@@ -271,7 +328,7 @@
         if (typeof payload.candidate !== 'string' || payload.candidate.length > 1536) throw messageError('Dati di collegamento non validi.');
         const candidate = { candidate: payload.candidate, sdpMid: payload.sdpMid ?? null, sdpMLineIndex: payload.sdpMLineIndex ?? null };
         if (!peer.remoteDescription) this.remoteCandidates.push(candidate);
-        else await peer.addIceCandidate(candidate);
+        else await this._addRemoteCandidate(peer, candidate, generation);
         return;
       }
       if (payload.type !== message.type || typeof payload.sdp !== 'string' || !payload.sdp.startsWith('v=0') || payload.sdp.length > 12000 || (message.type === 'offer' && this.role !== 'guest') || (message.type === 'answer' && this.role !== 'host')) throw messageError('Dati di collegamento non validi.');
@@ -279,7 +336,7 @@
       await peer.setRemoteDescription({ type: payload.type, sdp: payload.sdp });
       if (!this._current(generation)) return;
       while (this.remoteCandidates.length) {
-        await peer.addIceCandidate(this.remoteCandidates.shift());
+        await this._addRemoteCandidate(peer, this.remoteCandidates.shift(), generation);
         if (!this._current(generation)) return;
       }
       if (message.type === 'offer') {
@@ -297,7 +354,7 @@
       this.channel = channel;
       channel.onopen = () => {
         if (!this._current(generation)) return;
-        this.connected = true; this.onConnection('connected', 'Avversario collegato.');
+        this._markConnected(generation);
       };
       channel.onmessage = event => {
         if (!this._current(generation) || typeof event.data !== 'string' || byteLength(event.data) > MAX_PACKET) return;

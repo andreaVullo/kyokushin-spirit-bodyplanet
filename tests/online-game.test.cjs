@@ -181,6 +181,22 @@ test('missing remote input releases holds, then connection timeout pauses the ga
   assert.equal(play.host.connected, false); assert.equal(play.hostGame.paused, true);
   assert.equal(play.hostStatus.at(-1).status, 'disconnected');
 });
+test('transport recovery freezes local simulation and sends, then resumes without sticky input', () => {
+  const play = pair(); play.contact(); play.host.setInput('right', true); play.guest.setInput('left', true); play.flush();
+  play.host.setReconnecting(true); play.guest.setReconnecting(true);
+  const state = encodeState(play.host.state), packets = play.sent.length;
+  play.advance(11, false);
+  assert.deepEqual(encodeState(play.host.state), state); assert.equal(play.sent.length, packets); assert.equal(play.host.connected, true); assert.equal(play.guest.connected, true);
+  assert.equal(play.guest.setInput('tsuki', true), false); assert.equal(play.host.pause(true), false);
+  play.host.setReconnecting(false); play.guest.setReconnecting(false); play.flush(); play.advance(.3);
+  assert.equal(play.host.connected, true); assert.equal(play.guest.connected, true);
+  assert.ok(play.hostGame.inputs.every(input => Object.values(input.held).every(value => !value)));
+  assert.ok(play.guestGame.inputs.every(input => Object.values(input.held).every(value => !value)));
+});
+test('one peer entering recovery does not hide the other peer independent timeout', () => {
+  const play = pair(); play.host.setReconnecting(true); play.setTime(5100); play.host.update(.01); play.guest.update(.01);
+  assert.equal(play.host.connected, true); assert.equal(play.guest.connected, false);
+});
 
 test('explicit disconnect and disposal release inputs and restore the local engine', () => {
   const play = pair('training'); play.contact(); play.host.setInput('block', true); play.guest.setInput('mae', true); play.flush();

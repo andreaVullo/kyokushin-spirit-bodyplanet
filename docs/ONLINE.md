@@ -16,7 +16,32 @@ GitHub Pages è un servizio statico e da solo non può eseguire il matchmaking o
 
 Il servizio fornisce il server STUN pubblico `stun:stun.cloudflare.com:3478`. Una connessione diretta WebRTC può non riuscire quando NAT o firewall impediscono il collegamento fra i browser, anche su alcune reti mobili. La disponibilità della stanza non prova che la connessione di gioco sia già stabilita.
 
-Questa versione non attiva un relay TURN a pagamento. Per estendere la copertura di rete, il backend può ricevere `TURN_ICE_SERVERS_JSON` nelle variabili runtime del servizio. Il valore è un array di server RTC con `urls`, `username` e `credential`: usare credenziali temporanee emesse dal proprio servizio TURN. La configurazione viene restituita soltanto ai partecipanti autenticati. Non inserire segreti amministrativi del provider, credenziali permanenti, token di pubblicazione o valori di produzione nel repository o nel JavaScript statico. Nessuna connessione viene degradata a un relay dei frame tramite D1.
+**TURN non è attivo nel deployment.** Il fatto che Sites esegua il servizio su Cloudflare Workers non configura automaticamente un relay TURN. Le correzioni della gestione della connessione non attivano un relay e non garantiscono il collegamento su ogni rete mobile.
+
+Il backend accetta `TURN_ICE_SERVERS_JSON` nelle variabili runtime del servizio: un array di server RTC con `urls`, `username` e `credential`. È una configurazione **manuale di credenziali temporanee**, non un sistema di emissione o rotazione automatica. Il backend non rinnova i valori alla scadenza e il client non aggiorna le credenziali della connessione già aperta. Un valore statico scaduto non è quindi una soluzione permanente.
+
+Il backend accetta al massimo quattro elementi TURN, ognuno con un massimo di quattro URL, e aggiunge il proprio elemento STUN. Il client accetta fino a otto elementi, ciascuno con otto URL; il limite effettivo della configurazione distribuita resta quello più stretto del backend. Se il provider restituisce più URL nello stesso elemento, selezionarne al massimo quattro oppure suddividerli in più elementi entro i limiti del backend. I soli schemi TURN accettati dal backend sono `turn:` e `turns:`.
+
+La configurazione viene restituita soltanto ai partecipanti autenticati. Non inserire segreti amministrativi del provider, credenziali permanenti, token di pubblicazione o valori di produzione nel repository o nel JavaScript statico. Nessuna connessione viene degradata a un relay dei frame tramite D1.
+
+### Attivazione futura del relay
+
+1. Il proprietario collega o crea il proprio account Cloudflare e abilita TURN dopo avere verificato condizioni e costi del servizio.
+2. Da dashboard o API crea una TURN key. La chiave amministrativa rimane lato server; non va inserita in `TURN_ICE_SERVERS_JSON`.
+3. Da un ambiente server autorizzato genera credenziali temporanee tramite `POST /v1/turn/keys/{TURN_KEY_ID}/credentials/generate-ice-servers`, scegliendo un TTL che copra la sessione prevista. Conserva soltanto i dati RTC necessari per il passaggio successivo. [Procedura ufficiale Cloudflare](https://developers.cloudflare.com/realtime/turn/generate-credentials/)
+4. Per una prova circoscritta, configura l'array RTC valido in `TURN_ICE_SERVERS_JSON` tramite le variabili runtime Sites, rispettando i limiti sopra indicati. Esegui poi un nuovo deploy della versione salvata per applicare le variabili alla nuova revisione del servizio. Apri nuove stanze dopo il deploy: una stanza esistente non ricarica automaticamente i server ICE.
+5. Verifica due dispositivi su reti differenti e una prova con trasporto relay forzato. Controlla con le statistiche WebRTC che la coppia selezionata utilizzi un candidato `relay`, senza registrare credenziali o indirizzi dei partecipanti.
+6. Prima di un impiego continuativo serve implementare l'emissione e il rinnovo delle credenziali sul backend, con relativi test di scadenza. Questa parte non è presente. Per una configurazione manuale, annota la scadenza e sostituisci i valori in tempo; rimuovili dopo una prova conclusa.
+
+### Stati della connessione e diagnosi
+
+Durante il primo collegamento, uno stato ICE `disconnected` transitorio non chiude immediatamente la stanza: resta valido il limite iniziale di venticinque secondi. Uno stato iniziale `failed` è invece un fallimento definitivo e produce un messaggio che distingue l'impossibilità di stabilire il collegamento dalla perdita di una connessione già riuscita. Nessuno dei due stati, preso da solo, dimostra la causa di uno specifico guasto di rete.
+
+Dopo un collegamento riuscito, il client che rileva una perdita temporanea dispone di dodici secondi per recuperare, mantenendo polling e heartbeat. Il ritorno del collegamento annulla questo termine. Durante il recupero il motore locale sospende simulazione, invii e timeout; al ripristino azzera i comandi mantenuti e risincronizza lo stato. L'altro partecipante conserva il proprio controllo di presenza: se non rileva lo stesso stato transitorio, il suo timeout di gioco può chiudere prima l'incontro. Il margine di dodici secondi non è quindi una garanzia di recupero bilaterale.
+
+Un fallimento definitivo o la scadenza termina la connessione; in assenza di TURN viene indicato il limite del collegamento diretto. Questa gestione evita chiusure premature in presenza di stati transitori, ma non aggiunge percorsi di rete assenti.
+
+Per diagnosticare un `410`, confrontare la sequenza di richieste: può derivare da `leave`, chiusura della stanza oppure scadenza della presenza. I log del signaling mostrano se richieste e heartbeat sono riusciti, ma non certificano che il DataChannel sia stato aperto. Per distinguere un problema di trasporto da uno del servizio servono anche gli stati ICE del client; omettere token, credenziali e dati personali dagli eventuali report.
 
 Riferimenti: [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages), [Cloudflare TURN](https://developers.cloudflare.com/realtime/turn/), [WebSocket e coordinamento fra connessioni](https://developers.cloudflare.com/workers/examples/websockets/).
 

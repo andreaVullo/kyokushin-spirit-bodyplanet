@@ -11,6 +11,7 @@ function fixture(role = 'host', prepare = async () => {}) {
   class UI {
     constructor(options) { this.options = options; this.busy = false; this.result = null; this.error = ''; }
     setBusy(value) { this.busy = value; } setStatus(value) { this.status = value; } setError(value) { this.error = value; }
+    setConnection(value, message) { this.connectionReady = value; this.connectionMessage = message; }
     showHome(value) { this.home = value; this.busy = false; } showRoom(value) { this.room = clone(value); } showSearching() {}
     hide() { this.hidden = true; } hideResult() { this.result = null; } showResult(value) { this.result = value; }
   }
@@ -32,6 +33,7 @@ function fixture(role = 'host', prepare = async () => {}) {
     startHost(info) { this.start = clone(info); this.options.onStatus('started', { epoch: info.epoch }); return true; }
     receive(message) { this.received.push(message); if (message.type === 'game-start') this.options.onStatus('started', { epoch: message.epoch }); }
     dispose() { this.disposed = true; } pause() {} clearInput() {} setInput() {} update() { this.updates++; }
+    setReconnecting(value) { this.reconnecting = value; }
   }
   const session = new OnlineSession({ UI, Client, Engine, roster: { angelo: {}, samuel: {} }, endpoint: 'https://example.test', game: { getState: () => ({ fighters: [] }) },
     setTimeout(fn, ms) { const id = ++timerId; timers.set(id, { fn, ms }); return id; }, clearTimeout(id) { timers.delete(id); },
@@ -130,4 +132,43 @@ test('a stale mutation failure cannot write an error into a new lobby', async ()
   const f = fixture(); const client = await f.enter(), mutation = deferred(); client.update = () => mutation.promise;
   const change = f.session.change({ ready: true }); f.session.leave(); f.session.open(); mutation.reject(new Error('old update failed')); await change;
   assert.equal(f.session.phase, 'home'); assert.equal(f.session.ui.error, '');
+});
+test('lobby recovery preserves room and ready flags while preventing ready until reconnected', async () => {
+  const f = fixture(), client = await f.enter();
+  client.room.players[0].ready = true; client.room.revision++; f.session.roomChanged(client.room);
+  client.connected = false; f.session.connection('reconnecting', 'Ricollego i karateka…');
+  assert.equal(f.session.phase, 'room'); assert.equal(f.session.ui.connectionReady, false); assert.equal(f.session.room.players[0].ready, true);
+  await f.session.change({ ready: true }); assert.equal(client.updates.length, 0);
+  f.ready(); await tick(); assert.equal(f.session.phase, 'room'); assert.equal(client.left, false);
+  client.connected = true; f.session.connection('connected'); await tick();
+  assert.equal(f.session.ui.connectionReady, true); assert.equal(f.session.phase, 'loading'); assert.equal(f.calls.prepare.length, 1);
+});
+test('guest asset completion during recovery defers its loaded control packet', async () => {
+  const loading = deferred(), f = fixture('guest', () => loading.promise), client = await f.enter();
+  f.session.receive(preparePacket()); client.connected = false; f.session.connection('reconnecting');
+  loading.resolve(); await tick(); assert.equal(f.session.phase, 'loading'); assert.equal(client.sent.length, 0); assert.equal(client.left, false);
+  client.connected = true; f.session.connection('connected');
+  assert.deepEqual(client.sent, [{ type: 'online-loaded', epoch: 1 }]);
+});
+test('host VS countdown waits for recovery instead of sending start on a disconnected transport', async () => {
+  const f = fixture(), client = await f.enter(); f.ready(); await tick(); f.session.receive({ type: 'online-loaded', epoch: 1 });
+  client.connected = false; f.session.connection('reconnecting'); f.runTimer(1400);
+  assert.equal(f.session.phase, 'versus'); assert.equal(f.calls.start.length, 0); assert.equal(client.left, false);
+  client.connected = true; f.session.connection('connected'); assert.equal(f.session.phase, 'playing'); assert.equal(f.calls.start.length, 1);
+});
+test('rematch consent arriving during recovery starts once after connection returns', async () => {
+  const f = fixture(); await playing(f); const client = f.session.client; f.session.showResult(); f.session.rematch();
+  client.connected = false; f.session.connection('reconnecting'); f.session.receive({ type: 'online-rematch', epoch: 1 });
+  assert.equal(f.session.phase, 'result'); assert.equal(f.calls.prepare.length, 1);
+  client.connected = true; f.session.connection('connected'); await tick();
+  assert.equal(f.session.phase, 'loading'); assert.equal(f.session.epoch, 2); assert.equal(f.calls.prepare.length, 2);
+});
+test('return-to-room acknowledgment is retried after recovery without changing readiness', async () => {
+  const f = fixture(); await playing(f); const client = f.session.client, mutation = deferred(); client.updateWait = mutation.promise;
+  const returning = f.session.returnToRoom(); client.connected = false; f.session.connection('reconnecting'); mutation.resolve(); await returning;
+  assert.equal(f.session.phase, 'room'); assert.equal(client.sent.at(-1).type, 'online-room');
+  f.session.receive({ type: 'online-room-reset', epoch: 1, revision: client.room.revision });
+  assert.equal(f.session.roomReset.complete, false); assert.equal(f.session.ui.busy, true);
+  client.connected = true; f.session.connection('connected'); assert.equal(client.sent.at(-1).type, 'online-room-reset');
+  assert.equal(f.session.ui.busy, false); assert.ok(f.session.room.players.every(player => !player.ready));
 });

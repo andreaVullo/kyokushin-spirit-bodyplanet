@@ -84,7 +84,7 @@
   const controls = new window.DojoControls({
     element: $('touch-controls'),
     setInput: (player,action,pressed,meta)=>online?.active?online.setInput(action,pressed,{allowDash:meta?.phase!=='move'}):game.setInput(player,action,pressed,{allowDash:meta?.phase!=='move'}),
-    canPlay: ()=>screen==='game'&&active&&!paused&&!resultShown&&!document.body.classList.contains('orientation-blocked')&&!document.querySelector('dialog[open]'),
+    canPlay: ()=>screen==='game'&&active&&!paused&&!online?.reconnecting&&!resultShown&&!document.body.classList.contains('orientation-blocked')&&!document.querySelector('dialog[open]'),
     onTouch: ()=>{if(!touchDetected){touchDetected=true;syncControlSurface();}}
   });
   const display = new window.DojoDisplay({
@@ -103,7 +103,15 @@
     onPrepare:async info=>{active=false;paused=false;clearCombatInput();clearMatchPresentation();Object.assign(config,{player:info.fighters[0],opponent:info.fighters[1],mode:info.mode});await Promise.all([window.FighterArt.loadFighters(info.fighters),window.ArcadeVFX?.load()]);},
     onVersus:info=>{updateSelection();info.names.forEach((name,i)=>{$('versus-p'+(i+1)+'-name').textContent=name.toLocaleUpperCase('it');});$('versus-tag').textContent=info.mode==='training'?'ONLINE · ALLENAMENTO':'ONLINE · 1 VS 1';setScreen('versus','versus-screen');$('status-label').textContent='ENTRAMBI PRONTI · SI COMINCIA';},
     onStart:()=>{active=true;paused=false;clearMatchPresentation();setNames();$('restart-button').hidden=true;$('menu-button').textContent='TORNA IN STANZA';setScreen('game','game');$('status-label').textContent='ONLINE · KUMITE IN CORSO';if(document.hidden||document.querySelector('dialog[open]')||document.body.classList.contains('orientation-blocked'))togglePause(true);},
-    onPause:(value,details)=>{paused=value;clearCombatInput();showPanel('pause-panel',paused);syncControlSurface();$('status-label').textContent=paused?'ONLINE · IN PAUSA — IN ATTESA DI RIPRENDERE':'ONLINE · KUMITE IN CORSO';}
+    onPause:(value,details)=>{paused=value;clearCombatInput();showPanel('pause-panel',paused);syncControlSurface();$('status-label').textContent=paused?'ONLINE · IN PAUSA — IN ATTESA DI RIPRENDERE':'ONLINE · KUMITE IN CORSO';},
+    onConnection:status=>{
+      if(status==='reconnecting'){
+        clearCombatInput();
+        if(screen==='game'||screen==='versus')$('status-label').textContent='ONLINE · RICOLLEGAMENTO IN CORSO…';
+      }else if(status==='connected'&&screen==='game'){
+        $('status-label').textContent=paused?'ONLINE · IN PAUSA — IN ATTESA DI RIPRENDERE':'ONLINE · KUMITE IN CORSO';
+      }
+    }
   });
   function showOnline(){
     if(!ready)return;

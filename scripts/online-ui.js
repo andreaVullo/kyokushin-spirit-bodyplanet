@@ -24,7 +24,7 @@
       this.options = options; this.roster = options.roster || global.KyokushinRoster || {};
       this.art = options.art || global.FighterArt;
       this.profile = { name: '', fighter: Object.keys(this.roster)[0] || 'angelo', mode: 'versus' };
-      this.busy = false; this.room = null; this.view = 'home'; this.previewToken = 0;
+      this.busy = false; this.room = null; this.view = 'home'; this.previewToken = 0; this.connectionReady = false; this.connectionMessage = '';
       const host = options.host || document.getElementById('viewport');
       const panel = document.createElement('section'); this.panel = panel;
       panel.id = 'online-lobby'; panel.className = 'online-lobby front-screen hidden'; panel.hidden = true; panel.inert = true;
@@ -102,7 +102,7 @@
       for (const keyboard of [this.nameKeys, this.codeKeys]) if (keyboard?.dialog.open) keyboard.dialog.close();
     }
     showHome(values = {}) {
-      this.room = null; this.view = 'home'; Object.assign(this.profile, values);
+      this.room = null; this.view = 'home'; this.connectionReady = false; this.connectionMessage = ''; Object.assign(this.profile, values);
       if (!this.roster[this.profile.fighter]) this.profile.fighter = Object.keys(this.roster)[0];
       if (!['versus', 'training'].includes(this.profile.mode)) this.profile.mode = 'versus';
       this.$('#online-name').value = this.profile.name || '';
@@ -140,14 +140,20 @@
       }
       this.$('#online-ready').textContent = local?.ready ? 'NON SONO PRONTO' : 'SONO PRONTO ✓'; this.$('#online-ready').setAttribute('aria-pressed', String(!!local?.ready));
       this.setBusy(this.busy); this.setError(''); this.show(); this.renderProfile(); this.renderPreviews();
-      this.setStatus((room.players?.length || 0) < 2 ? 'Stanza aperta. Invita il secondo karateka.' : room.players.every(player => player.ready) ? 'Entrambi pronti. Preparo la sfida…' : local?.ready ? 'Sei pronto. Aspetto l’altro karateka.' : 'Il secondo karateka è qui. Premi Pronto quando vuoi.');
+      this.setStatus(this.connectionMessage || ((room.players?.length || 0) < 2 ? 'Stanza aperta. Invita il secondo karateka.' : room.players.every(player => player.ready) ? 'Entrambi pronti. Preparo la sfida…' : local?.ready ? 'Sei pronto. Aspetto l’altro karateka.' : 'Il secondo karateka è qui. Premi Pronto quando vuoi.'));
     }
     setBusy(busy, message) {
       this.busy = !!busy; this.panel.setAttribute('aria-busy', String(this.busy));
       this.panel.querySelectorAll('button,input').forEach(element => {
         element.disabled = this.busy && !['online-leave', 'online-back', 'online-copy-code', 'online-copy-link'].includes(element.id);
       });
+      this.$('#online-ready').disabled = this.busy || !this.connectionReady;
       if (message !== undefined) this.setStatus(message);
+    }
+    setConnection(connected, message = '') {
+      this.connectionReady = !!connected; this.connectionMessage = connected ? '' : message;
+      this.$('#online-ready').disabled = this.busy || !this.connectionReady;
+      if (message) this.setStatus(message);
     }
     setStatus(message = '') { this.$('#online-status').textContent = message; }
     setError(message = '') { this.$('#online-error').textContent = message; }
