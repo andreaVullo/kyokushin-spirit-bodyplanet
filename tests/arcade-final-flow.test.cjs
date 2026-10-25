@@ -8,6 +8,7 @@ const vm = require('node:vm');
 // Exercise the real controller, engine and run progression through their public
 // event surfaces. Real ArcadeUI methods run against a minimal DOM; only visual
 // construction, rendering/audio, and the asynchronous network port are inert.
+// The real online session stays off throughout these offline Arcade flows.
 async function fixture() {
   const elements = new Map(), selectors = new Map(), nodes = [], events = new Map(), frames = new Map(), timers = new Map();
   let serial = 0, now = 0, ui;
@@ -53,6 +54,7 @@ async function fixture() {
     addEventListener(type, handler) { if (!events.has(type)) events.set(type, []); events.get(type).push(handler); },
     requestAnimationFrame(callback) { const id = ++serial; frames.set(id, callback); return id; }, cancelAnimationFrame: id => frames.delete(id),
     setTimeout(callback, delay) { const id = ++serial; timers.set(id, { callback, delay }); return id; }, clearTimeout: id => timers.delete(id),
+    setInterval(callback, delay) { const id = ++serial; timers.set(id, { callback, delay, repeat: true }); return id; }, clearInterval: id => timers.delete(id),
     Image: class { complete = true; naturalWidth = 1280; decode() { return Promise.resolve(); } },
     __kyokushinAsset: value => value,
     DojoAudio: class { enabled = false; status = {}; init() { return Promise.resolve(); } effect() {} update() {} },
@@ -61,9 +63,10 @@ async function fixture() {
     DojoOrientation: { resolve: () => ({ width: 1280, height: 720, logicalWidth: 1280, logicalHeight: 720, left: 0, top: 0, blocked: false, virtual: false }) },
     FighterArt: { load: async () => {}, loadFighters: async () => {}, drawSelectionPortrait() {}, drawPortrait() {}, draw() {} },
     ArcadeArt: { load: async () => {}, setCharacter() {} }, DojoLeaderboard: leaderboard,
+    DojoOnlineUI: class { hide() {} hideResult() {} renderPreviews() {} },
   };
   const context = vm.createContext(browser); context.window = context; context.self = context; context.top = context; context.parent = context;
-  for (const file of ['roster.js', 'game.js', 'arcade.js', 'arcade-ui.js']) vm.runInContext(fs.readFileSync(path.join(__dirname, '../scripts', file), 'utf8'), context, { filename: file });
+  for (const file of ['roster.js', 'game.js', 'arcade.js', 'arcade-ui.js', 'online-session.js']) vm.runInContext(fs.readFileSync(path.join(__dirname, '../scripts', file), 'utf8'), context, { filename: file });
   const ArcadeUI = context.ArcadeUI;
   context.ArcadeUI = function(options) {
     ui = Object.create(ArcadeUI.prototype);

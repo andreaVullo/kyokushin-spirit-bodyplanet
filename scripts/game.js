@@ -43,7 +43,7 @@
       this.onEvent = typeof options.onEvent === 'function' ? options.onEvent : () => {};
       this.random = options.random || Math.random;
       this.characters = { ...ROSTER };
-      this.options = { player: 'angelo', mode: 'cpu', difficulty: 'normal' };
+      this.options = { player: 'angelo', mode: 'cpu', difficulty: 'normal', humanOpponent: false };
       this.inputs = [this.newInput(), this.newInput()];
       this.paused = false;
       this.state = null;
@@ -78,6 +78,7 @@
       if (!Object.prototype.hasOwnProperty.call(this.characters, this.options.opponent)) this.options.opponent = this.options.player === 'samuel' ? 'angelo' : 'samuel';
       if (!['cpu', 'versus', 'training'].includes(this.options.mode)) this.options.mode = 'cpu';
       if (!['easy', 'normal', 'hard'].includes(this.options.difficulty)) this.options.difficulty = 'normal';
+      this.options.humanOpponent = this.options.humanOpponent === true;
       this.inputs = [this.newInput(), this.newInput()];
       const id = this.options.player;
       this.state = {
@@ -101,7 +102,10 @@
       if (this.paused) this.clearInput();
       return this.paused;
     }
-    clearInput() { this.inputs = [this.newInput(), this.newInput()]; }
+    clearInput(playerIndex) {
+      if (playerIndex === 0 || playerIndex === 1) this.inputs[playerIndex] = this.newInput();
+      else this.inputs = [this.newInput(), this.newInput()];
+    }
 
     setInput(playerIndex, action, pressed, options = {}) {
       const input = this.inputs[playerIndex];
@@ -179,7 +183,7 @@
         return;
       }
 
-      if (s.mode !== 'versus') this.updateAI(dt);
+      if (s.mode !== 'versus' && !this.options.humanOpponent) this.updateAI(dt);
       for (let i = 0; i < 2; i++) this.updateFighter(s.fighters[i], s.fighters[1 - i], this.inputs[i], dt);
       this.separateFighters();
       this.finishDashes();

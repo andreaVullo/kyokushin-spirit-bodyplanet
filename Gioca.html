@@ -18,11 +18,11 @@
 @media(max-width:650px){.combo-readout{top:38%;max-width:43%}.combo-readout b{font-size:30px}.combo-readout>div{gap:5px}.combo-readout>div>span{font-size:11px}.combo-readout>strong{font-size:5px;letter-spacing:.4px}.combo-readout>small{font-size:5px;margin-top:2px}.defense-guide{gap:8px}.defense-guide article{padding:10px}.defense-guide canvas{height:120px}.defense-guide h3{font-size:18px}.defense-guide p{font-size:10px}.defense-guide .field-label{font-size:6px;letter-spacing:.8px}.combo-routes>div{display:block}.combo-routes span{display:block;margin-top:4px;font-size:10px}.playing .announcer small{font-size:7px;letter-spacing:2px}}
 
 /* Arcade front end: title, fighter selection and match introduction. */
-body:is(.front-title,.front-select,.front-versus,.front-create) .title-row{display:none}
-body:is(.front-title,.front-select,.front-versus,.front-create) .arcade{margin-top:28px}
-body:is(.front-title,.front-select,.front-versus,.front-create) .viewport{aspect-ratio:16/9;min-height:630px;background:#101722}
-body:is(.front-title,.front-select,.front-versus,.front-create) :is(.hud,.arena-shade,.stage-caption,.touch-controls){display:none}
-body:is(.front-title,.front-select,.front-versus,.front-create) #game{visibility:hidden}
+body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) .title-row{display:none}
+body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) .arcade{margin-top:28px}
+body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) .viewport{aspect-ratio:16/9;min-height:630px;background:#101722}
+body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) :is(.hud,.arena-shade,.stage-caption,.touch-controls){display:none}
+body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) #game{visibility:hidden}
 .front-screen{position:absolute;inset:0;isolation:isolate;color:#fff2d7;overflow:hidden}
 .front-screen canvas{position:static;display:block;aspect-ratio:auto}
 .title-screen{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 38%,#4d272b 0,#1d202b 44%,#0b1420 83%)}
@@ -126,9 +126,9 @@ body:is(.front-title,.front-select,.front-versus,.front-create) #game{visibility
   .fighter-bio h3{max-width:190px}
 }
 @media(max-width:650px){
-  body:is(.front-title,.front-select,.front-versus,.front-create) .arcade{margin-top:17px}
+  body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) .arcade{margin-top:17px}
   body.front-title .viewport{aspect-ratio:auto;height:566px;min-height:0}
-  body:is(.front-select,.front-create) .viewport{aspect-ratio:auto;height:650px;min-height:0}
+  body:is(.front-select,.front-create,.front-online) .viewport{aspect-ratio:auto;height:650px;min-height:0}
   body.front-versus .viewport{aspect-ratio:auto;height:520px;min-height:0}
   .title-content{width:100%;padding:12px 12px 40px}
   .title-dojo{font-size:9px;letter-spacing:3.7px}
@@ -196,9 +196,9 @@ body:is(.front-title,.front-select,.front-versus,.front-create) #game{visibility
   .versus-loading{left:15%;right:15%;bottom:36px;font-size:6px;letter-spacing:2px}
 }
 @media(prefers-reduced-motion:reduce){.front-screen *,.front-screen *:before,.front-screen *:after{animation:none!important}}
-body:is(.front-title,.front-select,.front-versus,.front-create) .arcade:fullscreen{justify-content:flex-start;overflow-y:auto}
-body:is(.front-title,.front-select,.front-versus,.front-create) .arcade:fullscreen .viewport{flex-shrink:0}
-body:is(.front-title,.front-select,.front-versus,.front-create) .arcade.expanded .viewport{max-height:none}
+body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) .arcade:fullscreen{justify-content:flex-start;overflow-y:auto}
+body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) .arcade:fullscreen .viewport{flex-shrink:0}
+body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) .arcade.expanded .viewport{max-height:none}
 /* Decorative art must not create a scrollable viewport when focus changes. */
 .front-screen{overflow:clip}
 .versus-screen:focus{outline:none}
@@ -280,8 +280,8 @@ body.embedded #arcade,#arcade:fullscreen,#arcade.expanded{position:relative;disp
 :is(body.embedded #arcade,#arcade:fullscreen,#arcade.expanded)>.arena-bottomline{width:100%;max-width:none;min-height:28px;height:28px;margin:0;flex-shrink:0}
 :is(body.embedded #arcade,#arcade:fullscreen,#arcade.expanded)>.viewport{flex:0 1 auto;width:min(100%,calc((100dvh - 72px)*16/9));aspect-ratio:16/9;height:auto;min-height:0;max-height:none;margin:auto}
 :is(body.embedded #arcade,#arcade:fullscreen,#arcade.expanded)>.viewport>#game{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:16/9}
-body:is(.front-title,.front-select,.front-versus,.front-create) :is(#arcade:fullscreen,#arcade.expanded)>.viewport,body.embedded:is(.front-title,.front-select,.front-versus,.front-create) #arcade>.viewport{flex:1 1 0;aspect-ratio:auto;width:100%;height:auto;min-height:0;max-height:none;margin:0}
-body:is(.front-title,.front-select,.front-versus,.front-create) :is(#arcade:fullscreen,#arcade.expanded){overflow:hidden;justify-content:flex-start}
+body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) :is(#arcade:fullscreen,#arcade.expanded)>.viewport,body.embedded:is(.front-title,.front-select,.front-versus,.front-create,.front-online) #arcade>.viewport{flex:1 1 0;aspect-ratio:auto;width:100%;height:auto;min-height:0;max-height:none;margin:0}
+body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) :is(#arcade:fullscreen,#arcade.expanded){overflow:hidden;justify-content:flex-start}
 body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
 .arcade>dialog{position:fixed;max-height:calc(100dvh - 24px);overflow:auto}
 
@@ -310,9 +310,9 @@ body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
   body:is(.touch-active,.force-touch) .touch-defenses button{font-size:7px;letter-spacing:.25px;gap:4px}
   body:is(.touch-active,.force-touch) .touch-console-note{font-size:6px;letter-spacing:.45px;padding-top:9px;line-height:1.5}
   body:is(.touch-active,.force-touch) .touch-button-icon{font-size:15px}
-  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus,.front-create) #arcade{height:100dvh;min-height:0}
-  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus,.front-create) #arcade>.viewport{flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto;margin:0}
-  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus,.front-create) .arena-bottomline{display:none}
+  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus,.front-create,.front-online) #arcade{height:100dvh;min-height:0}
+  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus,.front-create,.front-online) #arcade>.viewport{flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto;margin:0}
+  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus,.front-create,.front-online) .arena-bottomline{display:none}
   body:is(.touch-active,.force-touch) .selection-panel{overflow-y:auto;overscroll-behavior:contain;grid-template-rows:44px minmax(180px,1fr) 125px auto;gap:12px;padding:13px 14px max(18px,var(--safe-bottom,env(safe-area-inset-bottom)))}
   body:is(.touch-active,.force-touch) .arcade-back{min-width:44px;width:44px;min-height:44px;height:44px}
   body:is(.touch-active,.force-touch) .select-footer .mode-select button{min-height:44px}
@@ -363,8 +363,8 @@ body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
 
 /* Short cabinets: title fits; only the selection panel may scroll. */
 /* Shared by native and virtual landscape; dimensions come from the visible viewport. */
-  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus,.front-create) #arcade>.viewport{position:relative;inset:auto;flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto;margin:0}
-  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus,.front-create) .arena-bottomline{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus,.front-create,.front-online) #arcade>.viewport{position:relative;inset:auto;flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto;margin:0}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus,.front-create,.front-online) .arena-bottomline{display:none}
   body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-content{width:62%;height:100%;justify-content:center;padding:6px 10px 18px}
   body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-dojo{font-size:7px;letter-spacing:2.6px}
   body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-dojo span{font-size:5px;letter-spacing:1.8px;margin-top:4px}
@@ -586,7 +586,8 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <link rel="stylesheet" href="scripts/roster-ui.css?v=20261025-5">
 <link rel="stylesheet" href="scripts/orientation.css?v=20261025-2">
 <link rel="stylesheet" href="scripts/arcade-ui.css?v=20261025-7">
-<link rel="stylesheet" href="scripts/name-keyboard.css?v=20261025-7">
+<link rel="stylesheet" href="scripts/name-keyboard.css?v=20261025-12">
+<link rel="stylesheet" href="styles/online.css?v=20261025-12">
 </head>
 <body class="front-title boot-loading" data-screen="title" data-boot-state="loading">
   <section id="boot-screen" class="boot-screen" aria-label="Caricamento del gioco" aria-busy="true">
@@ -793,7 +794,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 })();
 </script>
 <script src="scripts/roster.js?v=20261025-11"></script>
-<script src="scripts/game.js?v=20261025-2"></script>
+<script src="scripts/game.js?v=20261025-12"></script>
 <script src="scripts/strike-point.js?v=20261025-10"></script>
 <script src="scripts/fighter-geometry.js?v=20261025-11"></script>
 <script src="scripts/gi-branding.js?v=20261025-11"></script>
@@ -2048,8 +2049,13 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <script src="scripts/leaderboard.js?v=20261025-4"></script>
 <script src="scripts/arcade-atlas.js?v=20261025-11"></script>
 <script src="scripts/arcade-art.js?v=20261025-11"></script>
-<script src="scripts/name-keyboard.js?v=20261025-7"></script>
+<script src="scripts/name-keyboard.js?v=20261025-12"></script>
 <script src="scripts/arcade-ui.js?v=20261025-7"></script>
-<script src="scripts/main.js?v=20261025-11"></script>
+<script src="scripts/online-config.js?v=20261025-12"></script>
+<script src="scripts/online-client.js?v=20261025-12"></script>
+<script src="scripts/online-game.js?v=20261025-12"></script>
+<script src="scripts/online-ui.js?v=20261025-12"></script>
+<script src="scripts/online-session.js?v=20261025-12"></script>
+<script src="scripts/main.js?v=20261025-12"></script>
 </body>
 </html>

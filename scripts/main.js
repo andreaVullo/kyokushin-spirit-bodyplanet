@@ -18,6 +18,7 @@
   }) };
   const rosterIds = Object.keys(characters);
   const config = { player: 'angelo', opponent: 'samuel', mode: 'cpu', difficulty: 'normal' };
+  let online = null, onlinePreviousConfig = null;
   let regularConfig = { ...config }, arcadeRun = null, arcadeMatch = null, arcadeStats = null, arcadePreviewToken = 0;
   let selectionTarget = 'player', matchLoading = false, matchLoadId = 0, selectionError = '';
   const bg = new Image(); bg.src = window.__kyokushinAsset("assets/dojo-mirror.png");
@@ -82,7 +83,7 @@
   const game = new window.KyokushinGame({onEvent});
   const controls = new window.DojoControls({
     element: $('touch-controls'),
-    setInput: (player,action,pressed,meta)=>game.setInput(player,action,pressed,{allowDash:meta?.phase!=='move'}),
+    setInput: (player,action,pressed,meta)=>online?.active?online.setInput(action,pressed,{allowDash:meta?.phase!=='move'}):game.setInput(player,action,pressed,{allowDash:meta?.phase!=='move'}),
     canPlay: ()=>screen==='game'&&active&&!paused&&!resultShown&&!document.body.classList.contains('orientation-blocked')&&!document.querySelector('dialog[open]'),
     onTouch: ()=>{if(!touchDetected){touchDetected=true;syncControlSurface();}}
   });
@@ -96,6 +97,27 @@
     onFinalLeaderboard: ()=>showDialog('leaderboard-dialog'),
     onRetry: loadArcadePreview
   });
+  online = new window.DojoOnlineSession({game,roster:characters,endpoint:window.KYOKUSHIN_ONLINE_ENDPOINT,
+    onOpen:showOnline,onBack:()=>showTitle(),onEvent,
+    onLobby:()=>{active=false;paused=false;clearCombatInput();clearMatchPresentation();game.pause(true);setScreen('online');$('status-label').textContent='DOJO ONLINE';},
+    onPrepare:async info=>{active=false;paused=false;clearCombatInput();clearMatchPresentation();Object.assign(config,{player:info.fighters[0],opponent:info.fighters[1],mode:info.mode});await Promise.all([window.FighterArt.loadFighters(info.fighters),window.ArcadeVFX?.load()]);},
+    onVersus:info=>{updateSelection();info.names.forEach((name,i)=>{$('versus-p'+(i+1)+'-name').textContent=name.toLocaleUpperCase('it');});$('versus-tag').textContent=info.mode==='training'?'ONLINE · ALLENAMENTO':'ONLINE · 1 VS 1';setScreen('versus','versus-screen');$('status-label').textContent='ENTRAMBI PRONTI · SI COMINCIA';},
+    onStart:()=>{active=true;paused=false;clearMatchPresentation();setNames();$('restart-button').hidden=true;$('menu-button').textContent='TORNA IN STANZA';setScreen('game','game');$('status-label').textContent='ONLINE · KUMITE IN CORSO';if(document.hidden||document.querySelector('dialog[open]')||document.body.classList.contains('orientation-blocked'))togglePause(true);},
+    onPause:(value,details)=>{paused=value;clearCombatInput();showPanel('pause-panel',paused);syncControlSurface();$('status-label').textContent=paused?'ONLINE · IN PAUSA — IN ATTESA DI RIPRENDERE':'ONLINE · KUMITE IN CORSO';}
+  });
+  function showOnline(){
+    if(!ready)return;
+    leaveArcade();cancelMatchLoading();onlinePreviousConfig={...config};
+    online.open({fighter:config.player,code:pageOptions.get('room')||''});sound.init();
+  }
+  function leaveOnline(){
+    if(online?.active)online.leave();
+    if(onlinePreviousConfig)Object.assign(config,onlinePreviousConfig);onlinePreviousConfig=null;
+    $('p1-tag').textContent='PLAYER 01';
+  }
+  // A hidden tab pauses combat, while keeping the room and peer liveness alive.
+  setInterval(()=>{if(document.hidden&&online?.active)online.update(0);},250);
+  window.addEventListener('pagehide',()=>{if(online?.active)showTitle(false);});
   function syncLandscapeLayout(){
     const viewport=window.visualViewport;
     const layout=window.DojoOrientation.resolve({
@@ -159,19 +181,20 @@
     panel.setAttribute('aria-hidden', String(!visible));
   }
   function clearCombatInput() {
-    controls.clear();game.clearInput();heldKeys.clear();
+    controls.clear();if(online?.active)online.clearInput();else game.clearInput();heldKeys.clear();
   }
   function setScreen(next, focusId) {
     clearTimeout(versusTimeout);versusTimeout=null;transitionId++;
     screen=next;document.body.dataset.screen=next;
-    for(const front of ['title','select','versus','create'])document.body.classList.toggle('front-'+front,next===front);
+    if(next!=='online')online?.ui.hide();
+    for(const front of ['title','select','versus','create','online'])document.body.classList.toggle('front-'+front,next===front);
     document.body.classList.toggle('playing',next==='game');
     showPanel('title-screen',next==='title');showPanel('selection-panel',next==='select');showPanel('versus-screen',next==='versus');showPanel('arcade-create',next==='create');
     $('versus-screen').tabIndex=-1;
     canvas.tabIndex=next==='game'?0:-1;
     $('pause-button').disabled=next!=='game';
     syncControlSurface();
-    const hints=next==='title'?[['INVIO','INIZIA']]:next==='create'?[['INVIO','CREA'],['ESC','TITOLO']]:next==='select'?[['← →','SCEGLI'],['↑ ↓','P1 / AVVERSARIO'],['INVIO','COMBATTI']]:next==='versus'?[['ESC','ANNULLA']]:[['ESC','PAUSA'],['F','GINOCCHIO']];
+    const hints=next==='online'?[['ESC','TITOLO']]:next==='title'?[['INVIO','INIZIA']]:next==='create'?[['INVIO','CREA'],['ESC','TITOLO']]:next==='select'?[['← →','SCEGLI'],['↑ ↓','P1 / AVVERSARIO'],['INVIO','COMBATTI']]:next==='versus'?[['ESC','ANNULLA']]:[['ESC','PAUSA'],['F','GINOCCHIO']];
     $('bottom-hint').replaceChildren();
     hints.forEach(([key,label],i)=>{
       if(i){const divider=document.createElement('span');divider.className='hint-divider';divider.textContent='/';$('bottom-hint').append(divider);}
@@ -189,7 +212,7 @@
   }
   function opponentId() {return config.opponent || (config.player==='angelo'?'samuel':'angelo');}
   function opponentTag() {return config.mode==='versus'?'GIOCATORE 02':config.mode==='training'?'PARTNER':'CPU';}
-  function modeName() {return arcadeRun?'ARCADE':config.mode==='versus'?'2 GIOCATORI':config.mode==='training'?'ALLENAMENTO':'VS CPU';}
+  function modeName() {return online?.active?(config.mode==='training'?'ONLINE · ALLENAMENTO':'ONLINE · 1 VS 1'):arcadeRun?'ARCADE':config.mode==='versus'?'2 GIOCATORI':config.mode==='training'?'ALLENAMENTO':'VS CPU';}
   function cancelMatchLoading() {
     matchLoadId++;matchLoading=false;selectionError='';
     arcadeUI.setBusy(false);
@@ -287,6 +310,7 @@
     $('stage-tip').textContent='CATANIA, ITALIA ●';
   }
   function showTitle(focus=true) {
+    leaveOnline();
     if(arcadeRun&&!arcadeRun.getState().finished){finishArcade();return;}
     leaveArcade();arcadePreviewToken++;
     cancelMatchLoading();
@@ -295,6 +319,7 @@
     $('status-label').textContent='IL DOJO TI ASPETTA';
   }
   function showSelection() {
+    leaveOnline();
     if(!ready){if(loadFailed)location.reload();return;}
     leaveArcade();arcadePreviewToken++;cancelMatchLoading();resetPreview();updateSelection();setScreen('select','start-button');
     $('status-label').textContent='SCEGLI IL TUO KARATEKA';
@@ -322,6 +347,7 @@
     showDialog('leaderboard-dialog');arcadeUI.loadLeaderboard();
   }
   function showArcadeCreator() {
+    leaveOnline();
     if(!ready)return;
     leaveArcade();regularConfig={...config};cancelMatchLoading();resetPreview();
     setScreen('create','arcade-name');$('status-label').textContent='ARCADE · CREA IL TUO KARATEKA';
@@ -407,6 +433,7 @@
     arcadeUI.showResult(progress,arcadeRun.finalRecord());
   }
   async function beginVersus(duration=1400) {
+    if(online?.active){online.rematch();return;}
     if(arcadeRun){if(arcadeRun.getState().finished)showArcadeCreator();else prepareArcadeMatch();return;}
     if(!ready||screen==='versus'||matchLoading)return;
     if(screen!=='select')showSelection();
@@ -432,8 +459,9 @@
 
   function setNames() {
     const fighters=game.getState().fighters;
-    fighters.forEach((f,i)=>{const p='p'+(i+1),c=characters[f.id];$(p+'-name').textContent=c.name;$(p+'-rank').textContent=c.rank+(c.variant?' · '+c.variant:'');});
+    fighters.forEach((f,i)=>{const p='p'+(i+1),c=characters[f.id];$(p+'-name').textContent=online?.active&&online.info?online.info.names[i].toLocaleUpperCase('it'):c.name;$(p+'-rank').textContent=c.rank+(c.variant?' · '+c.variant:'');});
     $('p2-tag').textContent=config.mode==='versus'?'PLAYER 02':config.mode==='training'?'PARTNER':'CPU';
+    if(online?.active){$('p1-tag').textContent=online.localSlot===0?'TU':'AVVERSARIO';$('p2-tag').textContent=online.localSlot===1?'TU':'AVVERSARIO';}
     $('mode-label').textContent='TURBO 1.30× / '+modeName();
   }
   function updateHud(dt) {
@@ -456,6 +484,7 @@
     if(active&&!paused&&s.phase==='matchOver'&&!resultShown){resultTimer+=dt;if(resultTimer>1.7)showResult();}
   }
   function startMatch() {
+    if(online?.active)return;
     if(!ready)return;
     sound.init();clearCombatInput();clearMatchPresentation();active=true;paused=false;
     if(!arcadeRun)config.difficulty=$('difficulty').value;
@@ -471,6 +500,7 @@
   }
   function togglePause(force) {
     if(screen!=='game'||!active||resultShown)return;
+    if(online?.active){online.pause(typeof force==='boolean'?force:!paused);return;}
     paused=typeof force==='boolean'?force:!paused;sound.effect(paused?'pause':'resume');clearCombatInput();game.pause(paused);showPanel('pause-panel',paused);
     syncControlSurface();
     $('status-label').textContent=paused?'COMBATTIMENTO IN PAUSA':config.mode==='training'?'ALLENAMENTO LIBERO':'KUMITE IN CORSO';
@@ -480,10 +510,10 @@
     if(arcadeRun){showArcadeResult();return;}
     resultShown=true;const s=game.getState(),winner=s.winner;sound.effect('victory',{winner});
     showPanel('result-panel',true);$('announcer').replaceChildren();
-    $('result-title').textContent=winner===null?'HIKIWAKE':characters[s.fighters[winner].id].short+' VINCE';
-    $('result-eyebrow').textContent=winner===0?'OSU! · LO SPIRITO HA VINTO':'OSU! · OGNI SFIDA È UN INIZIO';
+    $('result-title').textContent=winner===null?'HIKIWAKE':(online?.active?online.info.names[winner].toLocaleUpperCase('it'):characters[s.fighters[winner].id].short)+' VINCE';
+    $('result-eyebrow').textContent=winner===(online?.active?online.localSlot:0)?'OSU! · LO SPIRITO HA VINTO':'OSU! · OGNI SFIDA È UN INIZIO';
     $('result-text').textContent='ROUND '+s.fighters[0].wins+' — '+s.fighters[1].wins+' · Rispetto al tuo avversario. Ci si rivede sul tatami.';
-    $('status-label').textContent='MATCH COMPLETATO';clearCombatInput();syncControlSurface();$('rematch-button').focus({preventScroll:true});
+    $('status-label').textContent='MATCH COMPLETATO';clearCombatInput();syncControlSurface();if(online?.active){online.showResult();document.querySelector('[data-online-result=rematch]')?.focus({preventScroll:true});}else $('rematch-button').focus({preventScroll:true});
   }
 
   function drawBackground(t) {
@@ -498,8 +528,8 @@
     if(window.FighterArt)window.FighterArt.draw(ctx,f,t);
 
   }
-  function drawEffects(dt) {
-    window.ArcadeVFX?.draw(ctx,dt,{reducedMotion,state:game.getState()});
+  function drawEffects(dt,renderState=game.getState()) {
+    window.ArcadeVFX?.draw(ctx,dt,{reducedMotion,state:renderState});
     for(const p of particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=400*dt;ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.color;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.atan2(p.vy,p.vx));ctx.fillRect(-p.size*2,-p.size/2,p.size*4,p.size);ctx.restore();}particles=particles.filter(p=>p.life>0);ctx.globalAlpha=1;
     for(const r of rings){r.life-=dt;r.r+=dt*220;ctx.globalAlpha=Math.max(0,r.life/r.max);ctx.strokeStyle=r.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,Math.PI*2);ctx.stroke();}rings=rings.filter(r=>r.life>0);ctx.globalAlpha=1;
     for(const p of floatTexts){p.life-=dt;p.y-=dt*85;ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.font='italic 24px Impact, sans-serif';ctx.textAlign='center';ctx.strokeStyle='#743c2b';ctx.lineWidth=3;ctx.strokeText(p.text,p.x,p.y);ctx.fillStyle=p.color;ctx.fillText(p.text,p.x,p.y);}floatTexts=floatTexts.filter(p=>p.life>0);ctx.globalAlpha=1;
@@ -541,12 +571,13 @@
   function frame(now) {
     const dt=Math.min((now-lastTime)/1000,.05);lastTime=now;clock+=dt;
     if(active&&!paused&&!resultShown&&arcadeRun&&arcadeStats&&game.getState().phase==='fight')arcadeStats.elapsed+=dt;
-    if(active&&!paused)game.update(dt);
+    if(online?.active)online.update(dt);else if(active&&!paused)game.update(dt);
     ctx.save();
     if(shake>0&&!reducedMotion){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake*.55);}shake=Math.max(0,shake-dt*45);
     drawBackground(clock);
-    if(active)game.getState().fighters.forEach(f=>drawFighter(f,clock));
-    drawEffects(paused?0:dt);ctx.restore();
+    const renderState=online?.active?online.renderState:game.getState();
+    if(active)renderState.fighters.forEach(f=>drawFighter(f,clock));
+    drawEffects(paused?0:dt,renderState);ctx.restore();
     if(flash>0){if(!reducedMotion){ctx.globalAlpha=flash;ctx.fillStyle='#fff7ca';ctx.fillRect(0,0,1280,720);ctx.globalAlpha=1;}flash=Math.max(0,flash-dt*.8);}
     if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('move-toast').classList.remove('show');}
     updateHud(dt);drawDefenseGuide(clock);drawMotionGuide(clock);sound.update(audioState());syncAudioButton();requestAnimationFrame(frame);
@@ -560,12 +591,12 @@
     if(document.querySelector('dialog[open]')||document.body.classList.contains('orientation-blocked')||e.ctrlKey||e.metaKey||e.altKey)return;
     if(e.code==='Escape'&&!e.repeat){
       if(screen==='select'){e.preventDefault();showTitle();}
-      else if(screen==='versus'){e.preventDefault();arcadeRun?finishArcade():showSelection();}
+      else if(screen==='versus'){e.preventDefault();online?.active?online.returnToRoom():arcadeRun?finishArcade():showSelection();}
       else if(screen==='game'){e.preventDefault();togglePause();}
       return;
     }
     if(e.target.closest?.('select,input,textarea,[contenteditable="true"]'))return;
-    if(screen==='create')return;
+    if(screen==='create'||screen==='online')return;
     if(e.code==='Enter'&&e.repeat){e.preventDefault();return;}
     const nativeControl=!!e.target.closest?.('button,a[href],summary');
     if(screen==='versus'){
@@ -592,7 +623,7 @@
     }
     if(!active||paused||resultShown)return;
     if(e.code==='KeyS'||e.code==='ArrowDown'){e.preventDefault();return;}
-    let action=p1[e.code],player=0;if(!action&&config.mode==='versus'){action=p2[e.code];player=1;}
+    let action=p1[e.code],player=0;if(!action&&(config.mode==='versus'||online?.active)){action=p2[e.code];player=online?.active?0:1;}
     if(action){e.preventDefault();if(!e.repeat){controls.press('key:'+e.code,player,action);heldKeys.set(e.code,{player,action});}}
   }
   window.addEventListener('keydown',e=>keyboard(e,true));window.addEventListener('keyup',e=>keyboard(e,false));
@@ -619,7 +650,7 @@
   $('selection-back-button').addEventListener('click',()=>showTitle());
   $('start-button').addEventListener('click',()=>beginVersus());$('rematch-button').addEventListener('click',()=>beginVersus(900));$('restart-button').addEventListener('click',()=>beginVersus(900));
   $('pause-button').addEventListener('click',()=>togglePause());$('resume-button').addEventListener('click',()=>togglePause(false));
-  $('menu-button').addEventListener('click',()=>arcadeRun?finishArcade():showSelection());
+  $('menu-button').addEventListener('click',()=>online?.active?online.returnToRoom():arcadeRun?finishArcade():showSelection());
   $('result-menu-button').addEventListener('click',()=>arcadeRun&&!arcadeRun.getState().finished?finishArcade():showSelection());
   document.querySelector('.brand')?.addEventListener('click',e=>{e.preventDefault();showTitle();});
   buildRoster();
@@ -681,7 +712,8 @@
       $('title-start-button').disabled=false;$('title-load-label').textContent='INIZIA';
       $('arcade-title-button').disabled=false;
       $('start-button').disabled=false;$('start-label').textContent='COMBATTI';
-      updateSelection();showTitle(false);
+      updateSelection();showTitle(false);online.ui.renderPreviews();
+      if(pageOptions.get('room'))showOnline();
       // Prepare the first arena frame before revealing it. A hidden loading
       // iframe may not receive animation frames, so readiness must not await one.
       drawBackground(clock);

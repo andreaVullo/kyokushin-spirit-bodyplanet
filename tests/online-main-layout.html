@@ -1,0 +1,51 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verifica online nel gioco completo</title>
+<style>body{margin:16px;font:14px system-ui;background:#111c27;color:#f5e8c8}h1{font-size:24px}iframe{border:1px solid #9b875e;display:block;margin:14px 0;max-width:none}#status{white-space:pre-wrap}details{margin-bottom:16px}#fixtures{overflow:auto}</style>
+<h1>Online nel gioco completo · telefoni e rotazione bloccata</h1><details><summary id="summary">Verifica in corso…</summary><pre id="status">Caricamento…</pre></details><div id="fixtures"></div>
+<script>
+(async()=>{
+ const params=new URLSearchParams(location.search),cases=[{w:568,h:240},{w:568,h:320},{w:710,h:266},{w:844,h:390},{w:390,h:844,virtual:true}];
+ const reports=[],delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ for(const c of cases){
+  const iframe=document.createElement('iframe');iframe.width=c.w;iframe.height=c.h;iframe.title=`${c.w}×${c.h}${c.virtual?' · rotazione bloccata':''}`;
+  document.querySelector('#fixtures').append(iframe);const loaded=new Promise(resolve=>iframe.addEventListener('load',resolve,{once:true}));
+  iframe.src='../Gioca.html?touch=1&standalone=1&onlinePreview=1';await loaded;
+  const win=iframe.contentWindow,d=iframe.contentDocument,errors=[],expect=(ok,msg)=>{if(!ok)errors.push(msg)};
+  const deadline=Date.now()+30000;while(!win.dojo?.ready&&Date.now()<deadline)await delay(100);
+  expect(!!win.dojo?.ready,'gioco non pronto');
+  if(c.virtual){d.querySelector('#rotate-fullscreen-button').click();await delay(180);}
+  await new Promise(resolve=>win.requestAnimationFrame(()=>win.requestAnimationFrame(resolve)));
+  const rect=element=>element.getBoundingClientRect(),title=d.querySelector('#title-screen'),online=d.querySelector('#online-title-button');
+  expect(!!online,'pulsante Online assente');
+  const titleBox=rect(title),onlineBox=rect(online);
+  if(!c.virtual){
+    expect(onlineBox.left>=titleBox.left-1&&onlineBox.right<=titleBox.right+1,'Online esce lateralmente dal titolo');
+    expect(onlineBox.top>=titleBox.top-1&&onlineBox.bottom<=titleBox.bottom+1,'Online tagliato verticalmente nel titolo');
+  }else expect(!d.body.classList.contains('orientation-blocked')&&d.body.classList.contains('virtual-landscape'),'rotazione virtuale non attiva');
+  online.click();await new Promise(resolve=>win.requestAnimationFrame(()=>win.requestAnimationFrame(resolve)));
+  const panel=d.querySelector('#online-lobby'),scroll=d.querySelector('.online-scroll'),footer=d.querySelector('.online-footer'),viewport=d.querySelector('#viewport');
+  expect(d.body.dataset.screen==='online'&&!panel.hidden&&!panel.inert,'main non apre la lobby');
+  expect(panel.offsetWidth<=viewport.clientWidth+1&&panel.offsetHeight<=viewport.clientHeight+1,'lobby fuori dal campo di gioco');
+  expect(scroll.offsetTop+scroll.offsetHeight<=footer.offsetTop+1,'footer sopra la zona scorrevole');
+  expect(footer.offsetTop+footer.offsetHeight<=panel.offsetHeight+1,'footer fuori dalla lobby');
+  expect(panel.scrollWidth<=panel.clientWidth+1,'overflow orizzontale lobby');
+  expect(d.querySelectorAll('[data-online-fighter]').length===10,'roster non completo');
+  const inputs=[['#online-name-keys','#online-name-keyboard','#online-name','ANDREA'],['#online-code-keys','#online-code-keyboard','#online-code','AB23XY']];
+  for(const [trigger,id,input,text] of inputs){
+    d.querySelector(input).dispatchEvent(new win.PointerEvent('pointerdown',{pointerType:'touch',bubbles:true}));
+    d.querySelector(trigger).click();const dialog=d.querySelector(id);await new Promise(resolve=>win.requestAnimationFrame(resolve));
+    expect(dialog.open,id+': tastiera non aperta');
+    for(const letter of text)dialog.querySelector('[data-key="'+letter+'"]').click();
+    const box=rect(dialog),buttons=rect(dialog.querySelector('footer')),editing=rect(dialog.querySelector('.name-editing')),keys=rect(dialog.querySelector('.name-keys'));
+    expect(box.left>=-1&&box.right<=c.w+1&&box.top>=-1&&box.bottom<=c.h+1,id+': tastiera fuori schermo');
+    expect(buttons.top>=editing.bottom-1&&editing.top>=keys.bottom-1,id+': righe sovrapposte');
+    expect(buttons.bottom<=box.bottom+1,id+': conferma tagliata');
+    expect(d.querySelector(input).readOnly&&d.querySelector(input).inputMode==='none',id+': tastiera OS possibile');
+    dialog.querySelector('[data-key="confirm"]').click();expect(!dialog.open,id+': conferma non chiude');expect(d.querySelector(input).value===text,id+': valore errato');
+  }
+  if(params.get('keyboard')==='1')d.querySelector('#online-code-keys').click();
+  reports.push({case:iframe.title,pass:!errors.length,errors});document.querySelector('#status').textContent=JSON.stringify(reports,null,2);
+  document.querySelector('#summary').textContent=reports.filter(item=>item.pass).length+'/'+reports.length+' formati verificati';
+ }
+ document.querySelector('#status').dataset.result=reports.every(item=>item.pass)?'PASS':'FAIL';
+})().catch(error=>{document.querySelector('#status').textContent=error.stack;document.querySelector('#status').dataset.result='ERROR';document.querySelector('#summary').textContent='Errore durante la verifica';});
+</script></html>

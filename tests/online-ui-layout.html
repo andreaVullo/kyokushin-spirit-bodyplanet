@@ -1,0 +1,47 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><title>Verifica lobby e tastiere online mobile</title>
+<style>body{font:14px system-ui;background:#111c27;color:#f5e8c8;margin:16px}iframe{border:1px solid #9b875e;margin:16px 0;display:block}pre{white-space:pre-wrap}</style>
+<h1>Lobby online · telefono, rotazione bloccata e tastiere</h1><pre id="status">Caricamento…</pre><div id="fixtures"></div>
+<script src="load-real-art.js"></script><script>
+(async()=>{
+ await loadRealFighterArt(); await FighterArt.load();
+ const html=await fetch('../Gioca.html').then(r=>r.text()),parsed=new DOMParser().parseFromString(html,'text/html');
+ const styles=[...parsed.querySelectorAll('style,link[rel=stylesheet]')].map(e=>e.outerHTML).join('')+'<link rel="stylesheet" href="styles/online.css">';
+ const cases=[{w:710,h:266},{w:568,h:240},{w:844,h:280},{w:320,h:568},{w:390,h:844,virtual:true}];
+ const reports=[];
+ for(const c of cases){
+  const frame=document.createElement('iframe');frame.width=c.w;frame.height=c.h;frame.title=`${c.w}×${c.h}${c.virtual?' · rotazione bloccata':''}`;document.querySelector('#fixtures').append(frame);
+  const lw=c.virtual?c.h:c.w,lh=c.virtual?c.w:c.h,land=lw>lh;
+  const classes=['front-online','embedded','touch-active','force-touch',land?'landscape-layout':'',lh<=330?'landscape-tiny':'',lh<=380&&land?'landscape-short':'',c.virtual?'virtual-landscape landscape-requested':''].join(' ');
+  const variables=`--view-width:${c.w}px;--view-height:${c.h}px;--layout-width:${lw}px;--layout-height:${lh}px;--view-left:0px;--view-top:0px;`;
+  const load=new Promise(resolve=>frame.addEventListener('load',resolve,{once:true}));
+  frame.srcdoc=`<!doctype html><html style="${variables}"><head><base href="${new URL('../',location.href)}"><meta name="viewport" content="width=device-width,initial-scale=1">${styles}</head><body class="${classes}"><main id="game-shell"><section id="arcade" class="arcade expanded"><header class="arena-topline">BODYPLANET</header><div id="viewport" class="viewport"></div></section><div id="result-panel" hidden></div></main><script src="scripts/roster.js"><\/script><script src="scripts/name-keyboard.js"><\/script><script src="scripts/online-ui.js"><\/script><script>window.calls=[];window.fixtureUI=new DojoOnlineUI({roster:KyokushinRoster,art:parent.FighterArt,onCreate:v=>calls.push(v),onReady:v=>calls.push(v)});fixtureUI.showHome({name:'ANDREA',fighter:'angelo',code:'AB23XY'});fixtureUI.nameKeys.setTouch(true);fixtureUI.codeKeys.setTouch(true);<\/script></body></html>`;
+  await load;await new Promise(r=>frame.contentWindow.requestAnimationFrame(()=>frame.contentWindow.requestAnimationFrame(r)));
+  const d=frame.contentDocument,ui=frame.contentWindow.fixtureUI,errors=[],expect=(ok,msg)=>{if(!ok)errors.push(msg)};
+  const rect=e=>e.getBoundingClientRect();
+  const panel=d.querySelector('#online-lobby'),scroll=d.querySelector('.online-scroll'),footer=d.querySelector('.online-footer');
+  expect(scroll.offsetTop+scroll.offsetHeight<=footer.offsetTop+1,'azioni sovrapposte alla zona scorrevole');
+  expect(footer.offsetTop+footer.offsetHeight<=panel.offsetHeight+1,'azioni fuori dalla lobby');
+  expect(d.querySelectorAll('[data-online-fighter]').length===10,'roster non completo');
+  scroll.scrollTop=scroll.scrollHeight;
+  expect(d.querySelector('.online-roster').offsetTop+d.querySelector('.online-roster').offsetHeight<=scroll.offsetTop+scroll.scrollTop+scroll.clientHeight+2,'ultimo karateka irraggiungibile');
+  scroll.scrollTop=0;
+  for(const keyboard of [ui.nameKeys,ui.codeKeys]){
+    keyboard.open(); await new Promise(r=>frame.contentWindow.requestAnimationFrame(r));
+    const dialog=keyboard.dialog,box=rect(dialog),bottom=rect(dialog.querySelector('footer')),editing=rect(dialog.querySelector('.name-editing')),keys=rect(dialog.querySelector('.name-keys'));
+    expect(bottom.top>=editing.bottom-1,dialog.id+': conferma sovrapposta ai comandi');
+    expect(editing.top>=keys.bottom-1,dialog.id+': comandi sovrapposti ai tasti');
+    expect(bottom.bottom<=box.bottom&&box.bottom<=c.h+1,dialog.id+': conferma fuori schermo');
+    expect(keyboard.input.readOnly&&keyboard.input.inputMode==='none',dialog.id+': tastiera nativa non esclusa');
+    const area=dialog.querySelector('.name-keys'); area.scrollTop=area.scrollHeight;
+    expect(rect(dialog.querySelector('[data-page="letters"] .name-key-row:last-child')).bottom<=keys.bottom+1,dialog.id+': ultima riga irraggiungibile');
+    keyboard.press('confirm'); expect(!dialog.open,dialog.id+': impossibile confermare');
+  }
+  ui.showRoom({code:'AB23XY',mode:'versus',role:'guest',players:[{slot:0,name:'MARCO',fighter:'samuel',ready:true},{slot:1,name:'ANDREA',fighter:'angelo',ready:false}]});
+  expect(ui.localPlayer().name==='ANDREA','lato locale errato');expect(d.querySelector('#online-name').value==='ANDREA','nome cambiato dal polling');
+  ui.setBusy(true);ui.showRoom(ui.room);expect(d.querySelector('#online-ready').disabled,'polling abilita azione durante richiesta');ui.setBusy(false);
+  expect(!d.querySelector('#online-ready').disabled,'pronto non raggiungibile');
+  reports.push({case:frame.title,pass:!errors.length,errors});document.querySelector('#status').textContent=JSON.stringify(reports,null,2);
+ }
+ document.querySelector('#status').dataset.result=reports.every(r=>r.pass)?'PASS':'FAIL';
+})().catch(e=>{document.querySelector('#status').textContent=e.stack;document.querySelector('#status').dataset.result='ERROR';});
+</script></html>

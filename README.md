@@ -1,6 +1,6 @@
 # Kyokushin Spirit — BodyPlanet Dojo
 
-Picchiaduro 2D arcade per browser, ambientato nel dojo Fitness & Wellness BodyPlanet di Catania. Dieci karateka, un creatore di personaggi per la scalata Arcade dalla cintura bianca al 10° Dan, combinazioni di pugni e calci, guardia, salti, scatti e kaiten. Nessuna installazione o dipendenza esterna necessaria per giocare; la classifica pubblica richiede una connessione Internet.
+Picchiaduro 2D arcade per browser, ambientato nel dojo Fitness & Wellness BodyPlanet di Catania. Dieci karateka, un creatore di personaggi per la scalata Arcade dalla cintura bianca al 10° Dan, combinazioni di pugni e calci, guardia, salti, scatti e kaiten. Nessuna installazione necessaria; classifica pubblica e incontri online richiedono una connessione Internet.
 
 ## Gioca subito
 
@@ -13,6 +13,8 @@ All’apertura compare **Caricamento del dojo…**: il titolo e i comandi divent
 3. Premi **Invio** o **Combatti**: dopo la presentazione **VS**, inizia il kumite.
 
 Per la nuova scalata premi **Arcade** dal titolo o dalla scelta della modalità: scegli nome, uomo o donna e una delle cinque capigliature, quindi **Entra nel tatami**. **Classifica**, sul titolo, apre il muro dei risultati pubblici del dojo.
+
+Per giocare a distanza apri il gioco pubblicato e premi **Online**: scegli nome e karateka, poi **Cerca avversario**, **Crea stanza privata** oppure inserisci un codice. Sono disponibili **1 vs 1** e **Allenamento**. Quando la connessione è pronta, entrambi premono **Sono pronto**. La rivincita richiede due conferme; tornando in stanza potete cambiare personaggio. Alcune reti mobili o protette possono impedire la connessione diretta: [hosting e limiti di rete](docs/ONLINE.md).
 
 Nella selezione, **Esc** o la freccia **Titolo** riportano alla schermata iniziale. Durante il combattimento, **Esc** apre la pausa. Nelle modalità classiche puoi riprendere, ricominciare o tornare alla scelta del personaggio; al termine dell’incontro, **Rivincita** permette di rigiocare. In Arcade puoi riprendere o terminare la scalata: non si ricomincia lo stesso incontro per conservare l’avanzamento. L’audio si attiva dopo un clic, un tasto o un tocco completo dentro il gioco. Il pulsante **Audio** in alto permette di silenziarlo, riattivarlo o ritentarne l’avvio dopo un’interruzione.
 

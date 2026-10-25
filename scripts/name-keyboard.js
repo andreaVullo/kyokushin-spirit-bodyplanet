@@ -3,11 +3,14 @@
   'use strict';
   const letters = /^[\p{L}\p{M}\p{N} .’'\-]$/u;
   class NameDraft {
-    constructor(value = '') { this.chars = Array.from(value.normalize('NFC')).slice(0, 24); this.caret = this.chars.length; }
+    constructor(value = '', { maxLength = 24, code = false } = {}) {
+      this.maxLength = maxLength; this.code = code;
+      this.chars = Array.from(code ? value.normalize('NFC').toUpperCase() : value.normalize('NFC')).slice(0, maxLength); this.caret = this.chars.length;
+    }
     get value() { return this.chars.join(''); }
     insert(value) {
-      const chars = Array.from(value.normalize('NFC'));
-      if (!chars.length || chars.some(char => !letters.test(char)) || this.chars.length + chars.length > 24) return false;
+      const chars = Array.from(this.code ? value.normalize('NFC').toUpperCase() : value.normalize('NFC'));
+      if (!chars.length || chars.some(char => !(this.code ? /^[A-Z0-9]$/ : letters).test(char)) || this.chars.length + chars.length > this.maxLength) return false;
       this.chars.splice(this.caret, 0, ...chars); this.caret += chars.length; return true;
     }
     backspace() { if (this.caret) this.chars.splice(--this.caret, 1); }
@@ -15,8 +18,9 @@
     move(delta) { this.caret = Math.max(0, Math.min(this.chars.length, this.caret + delta)); }
   }
   class NameKeyboard {
-    constructor({ input, trigger, host, validate, onConfirm, next }) {
+    constructor({ input, trigger, host, validate, onConfirm, next, id = 'name-keyboard', context = 'ARCADE / CREA IL TUO KARATEKA', title = 'SCRIVI IL TUO NOME', confirmLabel = 'CONFERMA NOME ✓', inputLabel = 'Nome del karateka', maxLength = 24, code = false }) {
       Object.assign(this, { input, trigger, validate, onConfirm, next });
+      Object.assign(this, { maxLength, code, inputLabel });
       this.touch = !!global.navigator?.maxTouchPoints || !!global.matchMedia?.('(any-pointer: coarse)').matches;
       this.setTouch(this.touch);
       // Covers pens/hybrid devices even when the initial media query said mouse.
@@ -27,14 +31,20 @@
       });
       trigger.addEventListener('click', () => this.open());
       const dialog = document.createElement('dialog'); this.dialog = dialog;
-      dialog.id = 'name-keyboard'; dialog.className = 'name-keyboard';
-      dialog.setAttribute('aria-labelledby', 'name-keyboard-title');
+      dialog.id = id; dialog.className = 'name-keyboard'; dialog.classList.toggle('code-keyboard', code);
+      dialog.setAttribute('aria-labelledby', id + '-title');
       dialog.innerHTML = `<header><div><small>ARCADE / CREA IL TUO KARATEKA</small><h2 id="name-keyboard-title">SCRIVI IL TUO NOME</h2></div><button type="button" class="close-dialog" aria-label="Annulla modifica nome">×</button></header>
         <div class="name-keyboard-display" role="textbox" aria-readonly="true" aria-label="Nome del karateka"><span class="name-before"></span><i aria-hidden="true"></i><span class="name-after"></span></div>
         <div class="name-keyboard-info"><span>Tocca le lettere, poi conferma.</span><span class="name-count"></span></div>
         <div class="name-keys"></div><p class="name-error" role="alert"></p>
         <footer><button type="button" data-key="cancel">ANNULLA</button><button type="button" data-key="confirm">CONFERMA NOME ✓</button></footer>`;
       host.append(dialog);
+      dialog.querySelector('header small').textContent = context;
+      dialog.querySelector('h2').id = id + '-title'; dialog.querySelector('h2').textContent = title;
+      dialog.querySelector('[data-key="confirm"]').textContent = confirmLabel;
+      dialog.querySelector('.name-keyboard-display').setAttribute('aria-label', inputLabel);
+      dialog.querySelector('.close-dialog').setAttribute('aria-label', 'Annulla modifica');
+      dialog.querySelector('.close-dialog').addEventListener('click', () => dialog.close());
       const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM', 'ÀÈÉÌÒÙ'];
       const keys = dialog.querySelector('.name-keys');
       const alphabet = document.createElement('div'), symbols = document.createElement('div');
@@ -44,15 +54,18 @@
       for (const row of rows) {
         const line = document.createElement('div'); line.className = 'name-key-row';
         for (const char of row) line.append(this.button(char, char, true));
-        if (row === 'ZXCVBNM') line.prepend(this.button('shift', '⇧', false, 'Maiuscole o minuscole'));
+        if (row === 'ZXCVBNM' && !code) line.prepend(this.button('shift', '⇧', false, 'Maiuscole o minuscole'));
         if (row === 'ÀÈÉÌÒÙ') for (const char of ["'", '-', '.']) line.append(this.button(char, char));
         (row === 'ÀÈÉÌÒÙ' ? symbols : alphabet).append(line);
       }
       const numbers = document.createElement('div'); numbers.className = 'name-key-row name-numbers';
       for (const char of '1234567890') numbers.append(this.button(char, char));
       symbols.prepend(numbers);
+      if (code) { alphabet.append(numbers); symbols.hidden = true; }
       const editing = document.createElement('div'); editing.className = 'name-key-row name-editing';
-      for (const [key, label, accessible] of [['page', '123 / ÀÈ', 'Numeri e accenti'], ['left', '←', 'Sposta cursore a sinistra'], ['space', 'SPAZIO', 'Spazio'], ['right', '→', 'Sposta cursore a destra'], ['backspace', '⌫', 'Cancella lettera']]) editing.append(this.button(key, label, false, accessible));
+      for (const [key, label, accessible] of [['page', '123 / ÀÈ', 'Numeri e accenti'], ['left', '←', 'Sposta cursore a sinistra'], ['space', 'SPAZIO', 'Spazio'], ['right', '→', 'Sposta cursore a destra'], ['backspace', '⌫', 'Cancella lettera']]) {
+        if (!code || !['page', 'space'].includes(key)) editing.append(this.button(key, label, false, accessible));
+      }
       keys.after(editing);
       dialog.addEventListener('click', event => {
         const button = event.target.closest('button');
@@ -75,7 +88,7 @@
     }
     setTouch(touch) {
       this.touch = touch; this.input.readOnly = touch; this.input.inputMode = touch ? 'none' : 'text';
-      if (touch) { this.input.setAttribute('aria-haspopup', 'dialog'); this.input.placeholder = 'Tocca per scrivere il tuo nome'; }
+      if (touch) { this.input.setAttribute('aria-haspopup', 'dialog'); this.input.placeholder = this.code ? 'Tocca per scrivere il codice' : 'Tocca per scrivere il tuo nome'; }
     }
     button(key, label, letter = false, accessible) {
       const button = document.createElement('button'); button.type = 'button'; button.dataset.key = key; button.textContent = label;
@@ -85,12 +98,12 @@
     }
     open() {
       if (this.input.disabled || this.dialog.open) return;
-      this.input.blur(); this.draft = new NameDraft(this.input.value); this.upper = true; this.symbols = false; this.confirmed = false;
+      this.input.blur(); this.draft = new NameDraft(this.input.value, { maxLength: this.maxLength, code: this.code }); this.upper = true; this.symbols = false; this.confirmed = false;
       this.dialog.querySelector('.name-error').textContent = '';
       this.render(); this.dialog.showModal(); this.dialog.querySelector('[data-key="Q"]').focus({ preventScroll: true });
     }
     write(char) {
-      this.dialog.querySelector('.name-error').textContent = this.draft.insert(char) ? '' : 'Massimo 24 caratteri.';
+      this.dialog.querySelector('.name-error').textContent = this.draft.insert(char) ? '' : this.code ? 'Usa soltanto lettere e numeri, massimo ' + this.maxLength + ' caratteri.' : 'Massimo ' + (this.maxLength || 24) + ' caratteri.';
       this.render();
     }
     press(key) {
@@ -115,15 +128,14 @@
     render() {
       this.dialog.querySelector('.name-before').textContent = this.draft.chars.slice(0, this.draft.caret).join('');
       this.dialog.querySelector('.name-after').textContent = this.draft.chars.slice(this.draft.caret).join('');
-      this.dialog.querySelector('.name-keyboard-display').setAttribute('aria-label', 'Nome del karateka: ' + (this.draft.value || 'vuoto'));
-      this.dialog.querySelector('.name-count').textContent = this.draft.chars.length + ' / 24';
+      this.dialog.querySelector('.name-keyboard-display').setAttribute('aria-label', (this.inputLabel || 'Nome del karateka') + ': ' + (this.draft.value || 'vuoto'));
+      this.dialog.querySelector('.name-count').textContent = this.draft.chars.length + ' / ' + (this.maxLength || 24);
       this.dialog.querySelectorAll('[data-letter]').forEach(button => { button.textContent = this.upper ? button.dataset.letter : button.dataset.letter.toLocaleLowerCase('it'); });
-      this.dialog.querySelector('[data-key="shift"]').setAttribute('aria-pressed', String(this.upper));
+      this.dialog.querySelector('[data-key="shift"]')?.setAttribute('aria-pressed', String(this.upper));
       this.dialog.querySelector('[data-page="letters"]').hidden = !!this.symbols;
       this.dialog.querySelector('[data-page="symbols"]').hidden = !this.symbols;
       const page = this.dialog.querySelector('[data-key="page"]');
-      page.textContent = this.symbols ? 'ABC' : '123 / ÀÈ';
-      page.setAttribute('aria-label', this.symbols ? 'Torna alle lettere' : 'Numeri e accenti');
+      if (page) { page.textContent = this.symbols ? 'ABC' : '123 / ÀÈ'; page.setAttribute('aria-label', this.symbols ? 'Torna alle lettere' : 'Numeri e accenti'); }
     }
   }
   global.DojoNameKeyboard = NameKeyboard;

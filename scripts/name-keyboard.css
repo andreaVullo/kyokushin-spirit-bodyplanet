@@ -1,55 +1,55 @@
 .name-keyboard-trigger{display:block;border:1px solid #bfa46b;background:#253343;color:#f9dfaa;min-height:36px;padding:7px 12px;margin:7px 0;font:700 10px Arial,sans-serif;cursor:pointer}
-dialog#name-keyboard{box-sizing:border-box;width:min(640px,calc(100vw - 20px));max-width:640px;max-height:calc(100dvh - 20px);margin:auto;padding:18px;background:linear-gradient(145deg,#293949,#101b29);color:#fff0cc;border:1px solid #ddbd7c;overflow:hidden;border-radius:8px;overscroll-behavior:contain}
-#name-keyboard::backdrop{background:#07111bed;backdrop-filter:blur(6px)}
-#name-keyboard header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-#name-keyboard header small{font:700 8px Arial,sans-serif;letter-spacing:1.5px;color:#dbc390}
-#name-keyboard h2{font:italic 28px/1.1 Impact,'Arial Narrow',sans-serif;margin:5px 0 0;color:#fff0cc}
-#name-keyboard .close-dialog{position:static;flex-shrink:0;width:40px;height:40px;border:1px solid #788593;background:#1e2e40;color:#f1dcac;font-size:24px}
+dialog.name-keyboard{box-sizing:border-box;width:min(640px,calc(100vw - 20px));max-width:640px;max-height:calc(100dvh - 20px);margin:auto;padding:18px;background:linear-gradient(145deg,#293949,#101b29);color:#fff0cc;border:1px solid #ddbd7c;overflow:hidden;border-radius:8px;overscroll-behavior:contain}
+.name-keyboard::backdrop{background:#07111bed;backdrop-filter:blur(6px)}
+.name-keyboard header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.name-keyboard header small{font:700 8px Arial,sans-serif;letter-spacing:1.5px;color:#dbc390}
+.name-keyboard h2{font:italic 28px/1.1 Impact,'Arial Narrow',sans-serif;margin:5px 0 0;color:#fff0cc}
+.name-keyboard .close-dialog{position:static;flex-shrink:0;width:40px;height:40px;border:1px solid #788593;background:#1e2e40;color:#f1dcac;font-size:24px}
 .name-keyboard-display{min-height:48px;padding:10px;box-sizing:border-box;background:#080f18;border:1px solid #a08d64;font:700 22px/1.3 Arial,sans-serif;overflow-wrap:anywhere;white-space:pre-wrap;color:#ffefcf}
 .name-keyboard-display i{display:inline-block;width:2px;height:1.05em;background:#e6bd72;vertical-align:-.1em}
 .name-keyboard-info{display:flex;justify-content:space-between;gap:8px;margin:7px 0 12px;font:10px/1.3 Arial,sans-serif;color:#c2cbd2}
 .name-count{white-space:nowrap;color:#e9cc95}
 .name-keys{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:3px;flex:0 1 auto}.name-key-page{display:grid;gap:6px}.name-key-page[hidden]{display:none!important}
 .name-key-row{display:flex;justify-content:center;gap:5px}
-#name-keyboard button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}
+.name-keyboard button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}
 .name-key-row button{min-width:0;flex:1;max-width:56px;min-height:44px;border:1px solid #7e8c9c;border-radius:4px;background:#35485d;box-shadow:0 2px #0a1420;color:#fff2d6;font:700 17px Arial,sans-serif;padding:4px 0}
-#name-keyboard button:active{background:#ac8746;color:#0b1828;transform:translateY(1px)}
-#name-keyboard button:focus-visible{outline:2px solid #fff0bf;outline-offset:2px}
+.name-keyboard button:active{background:#ac8746;color:#0b1828;transform:translateY(1px)}
+.name-keyboard button:focus-visible{outline:2px solid #fff0bf;outline-offset:2px}
 .name-key-row [aria-pressed=true]{background:#d9b16e;color:#152334;border-color:#f4d99f}
 .name-editing [data-key=space]{max-width:none;flex:4;font-size:11px;letter-spacing:2px}
 .name-editing [data-key=backspace]{flex:2;max-width:none;font-size:23px}
 .name-error{min-height:0;margin:6px 0;font:11px/1.35 Arial,sans-serif;color:#ffb6a1}
-#name-keyboard footer{display:flex;gap:10px;padding:0;margin:0;border:0;position:static;flex-shrink:0;background:#172536}
-#name-keyboard footer button{min-height:46px;padding:9px 12px;border:1px solid #8994a0;background:#203144;color:#e4e6df;font:800 11px Arial,sans-serif}
-#name-keyboard [data-key=confirm]{flex:1;color:#13202f;background:#e7c07a;border-color:#f2d49a;font-size:14px}
+.name-keyboard footer{display:flex;gap:10px;padding:0;margin:0;border:0;position:static;flex-shrink:0;background:#172536}
+.name-keyboard footer button{min-height:46px;padding:9px 12px;border:1px solid #8994a0;background:#203144;color:#e4e6df;font:800 11px Arial,sans-serif}
+.name-keyboard [data-key=confirm]{flex:1;color:#13202f;background:#e7c07a;border-color:#f2d49a;font-size:14px}
 /* Dimensions follow the physical screen: the dialog stays upright even when
    the cabinet is rotated in CSS because the phone's rotation is locked. */
-@media(max-width:370px){dialog#name-keyboard{padding:12px}.name-key-row{gap:3px}.name-key-row button{font-size:15px}#name-keyboard h2{font-size:24px}.name-keyboard-display{font-size:19px}}
+@media(max-width:370px){dialog.name-keyboard{padding:12px}.name-key-row{gap:3px}.name-key-row button{font-size:15px}.name-keyboard h2{font-size:24px}.name-keyboard-display{font-size:19px}}
 @media(max-height:500px) and (min-width:480px){
-  dialog#name-keyboard{padding:8px 14px}#name-keyboard header{margin-bottom:4px}#name-keyboard header small{display:none}#name-keyboard h2{font-size:22px;margin:0}#name-keyboard .close-dialog{height:26px;min-height:26px;width:34px}.name-keyboard-display{min-height:32px;padding:3px 9px;font-size:18px}.name-keyboard-info{margin:3px 0 5px;font-size:9px}
-  .name-key-page{gap:3px}.name-key-row{gap:5px}.name-key-row button{min-height:28px;font-size:14px;padding:2px 0}.name-editing button{min-height:28px}.name-editing [data-key=backspace]{font-size:19px}.name-numbers{gap:3px}#name-keyboard footer button{min-height:36px;padding:5px}.name-error{min-height:0;margin:4px 0;font-size:10px}
+  dialog.name-keyboard{padding:8px 14px}.name-keyboard header{margin-bottom:4px}.name-keyboard header small{display:none}.name-keyboard h2{font-size:22px;margin:0}.name-keyboard .close-dialog{height:26px;min-height:26px;width:34px}.name-keyboard-display{min-height:32px;padding:3px 9px;font-size:18px}.name-keyboard-info{margin:3px 0 5px;font-size:9px}
+  .name-key-page{gap:3px}.name-key-row{gap:5px}.name-key-row button{min-height:28px;font-size:14px;padding:2px 0}.name-editing button{min-height:28px}.name-editing [data-key=backspace]{font-size:19px}.name-numbers{gap:3px}.name-keyboard footer button{min-height:36px;padding:5px}.name-error{min-height:0;margin:4px 0;font-size:10px}
 }
 
 /* Reserve distinct rows for editing and confirmation; only the letter area can
    scroll on unusually short viewports, never behind either action row. */
-#name-keyboard[open]{display:flex;flex-direction:column}
-#name-keyboard>header,#name-keyboard>.name-keyboard-display,#name-keyboard>.name-keyboard-info,#name-keyboard>.name-editing,#name-keyboard>.name-error{flex-shrink:0}
-#name-keyboard .name-editing{margin-top:5px;padding:0 3px}
-#name-keyboard [data-key=page]{flex:2;max-width:none;font-size:10px}
-#name-keyboard .name-error:empty{height:0;margin:4px 0}
-#name-keyboard .name-keyboard-display{max-height:3em;overflow-y:auto}
+.name-keyboard[open]{display:flex;flex-direction:column}
+.name-keyboard>header,.name-keyboard>.name-keyboard-display,.name-keyboard>.name-keyboard-info,.name-keyboard>.name-editing,.name-keyboard>.name-error{flex-shrink:0}
+.name-keyboard .name-editing{margin-top:5px;padding:0 3px}
+.name-keyboard [data-key=page]{flex:2;max-width:none;font-size:10px}
+.name-keyboard .name-error:empty{height:0;margin:4px 0}
+.name-keyboard .name-keyboard-display{max-height:3em;overflow-y:auto}
 /* Browser and host toolbars can leave only 240–280 CSS pixels. Put the name
    beside the title so all three letter rows remain visible at that height. */
 @media(max-height:320px) and (min-width:480px){
-  #name-keyboard[open]{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto auto;column-gap:10px;height:246px;padding:6px 12px}
-  #name-keyboard>header{grid-column:1;grid-row:1;margin:0;min-height:32px}
-  #name-keyboard h2{font-size:20px;white-space:nowrap}
-  #name-keyboard .close-dialog{position:absolute;right:10px;top:7px;width:30px;min-width:30px;height:30px;min-height:30px;font-size:20px}
-  #name-keyboard>.name-keyboard-display{grid-column:2;grid-row:1;margin-right:38px}
-  #name-keyboard>.name-keyboard-info{display:none}
-  #name-keyboard>.name-keys{grid-column:1/-1;grid-row:2;margin-top:3px}
-  #name-keyboard>.name-editing{grid-column:1/-1;grid-row:3;margin-top:3px}
-  #name-keyboard>.name-error{grid-column:1/-1;grid-row:4}
-  #name-keyboard>.name-error:empty{margin:2px 0}
-  #name-keyboard>footer{grid-column:1/-1;grid-row:5}
+  .name-keyboard[open]{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto auto;column-gap:10px;height:246px;padding:6px 12px}
+  .name-keyboard>header{grid-column:1;grid-row:1;margin:0;min-height:32px}
+  .name-keyboard h2{font-size:20px;white-space:nowrap}
+  .name-keyboard .close-dialog{position:absolute;right:10px;top:7px;width:30px;min-width:30px;height:30px;min-height:30px;font-size:20px}
+  .name-keyboard>.name-keyboard-display{grid-column:2;grid-row:1;margin-right:38px}
+  .name-keyboard>.name-keyboard-info{display:none}
+  .name-keyboard>.name-keys{grid-column:1/-1;grid-row:2;margin-top:3px}
+  .name-keyboard>.name-editing{grid-column:1/-1;grid-row:3;margin-top:3px}
+  .name-keyboard>.name-error{grid-column:1/-1;grid-row:4}
+  .name-keyboard>.name-error:empty{margin:2px 0}
+  .name-keyboard>footer{grid-column:1/-1;grid-row:5}
 }

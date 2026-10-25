@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verifica rete online reale</title><style>
+body{font:16px/1.5 system-ui;margin:0;background:#101923;color:#edf4ed;padding:24px}main{max-width:1000px;margin:auto}button{padding:14px 24px;font:700 18px system-ui;background:#f4d680;color:#14212b;border:0;border-radius:8px;cursor:pointer}button:disabled{opacity:.5}pre{white-space:pre-wrap;background:#071018;padding:20px;border:1px solid #586571;border-radius:8px}.pass{color:#8fe3a5}.fail{color:#ff9a94}#state{font-size:24px;font-weight:800}p{max-width:850px}small{color:#b9c3ca}
+</style></head><body><main><h1>Verifica online: due giocatori reali</h1><p>Questa prova apre due connessioni WebRTC e usa il servizio locale. Verifica ricerca avversario, mosse, pausa condivisa, ritorno nella stanza, rivincita e disconnessione in 1 vs 1 e allenamento.</p><p><small>Fixture di collaudo: la fine partita viene impostata esplicitamente per provare la rivincita. Nessuna classifica viene letta o modificata. Non usa il servizio pubblico.</small></p><button id="run">RUN — AVVIA VERIFICA</button><p id="state" role="status">Pronto</p><pre id="output">In attesa.</pre><pre id="measurements" hidden></pre></main>
+<script src="../scripts/roster.js"></script><script src="../scripts/game.js"></script><script src="../scripts/online-game.js"></script><script src="../scripts/online-client.js"></script><script src="../scripts/online-session.js"></script>
+<script>
+'use strict';
+const runButton=document.getElementById('run'),stateLabel=document.getElementById('state'),output=document.getElementById('output');
+const endpoint='http://127.0.0.1:8789';
+let currentPeers=[],running=false,results=[];
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function log(text){output.textContent+=text+'\n';}
+function assert(condition,message){if(!condition)throw new Error(message);}
+async function until(predicate,label,timeout=18000){const start=performance.now();while(performance.now()-start<timeout){if(predicate())return;for(const peer of currentPeers)if(peer.failure)throw new Error(peer.label+': '+peer.failure);await sleep(40);}throw new Error('Tempo scaduto: '+label);}
+class FixtureUI{
+ constructor(options){this.options=options;this.error='';this.view='';}
+ showHome(){this.view='home';}showRoom(room){this.view='room';this.room=room;}showSearching(){this.view='searching';}setBusy(){}setStatus(){}hide(){}hideResult(){}showResult(){this.view='result';}setError(error){this.error=error;if(this.owner&&error)this.owner.failure=error;}
+}
+function peer(label){
+ const value={label,events:[],starts:0,paused:false,failure:null};
+ value.game=new KyokushinGame({onEvent:event=>value.events.push(event)});
+ value.session=new DojoOnlineSession({game:value.game,roster:KyokushinRoster,endpoint,UI:FixtureUI,
+   onOpen(){},onBack(){},onLobby(){value.game.pause(true);},onPrepare:async()=>{},onVersus(){},onStart(){value.starts++;},onPause:paused=>{value.paused=paused;},onEvent:event=>value.events.push(event)});
+ value.session.ui.owner=value;value.session.open();return value;
+}
+function describe(value){return {role:value.session.client?.role,phase:value.session.phase,epoch:value.session.epoch,code:value.session.room?.code,connected:value.session.client?.connected,paused:value.game.paused,hp:value.game.state.fighters.map(f=>f.hp)};}
+async function cleanup(){const values=currentPeers;currentPeers=[];for(const value of values){const client=value.session.client;value.session.leave();if(client)await client.leave();}await sleep(60);}
+async function checkMode(mode){
+ const one=peer('A'),two=peer('B');currentPeers=[one,two];
+ log('\n'+(mode==='training'?'ALLENAMENTO':'1 VS 1')+' — matchmaking');
+ await one.session.enter('matchmake',{name:'QA Uno',fighter:'angelo',mode});
+ await two.session.enter('matchmake',{name:'QA Due',fighter:'samuel',mode});
+ await until(()=>one.session.room?.players.length===2&&two.session.room?.players.length===2&&one.session.client?.connected&&two.session.client?.connected,'due connessioni WebRTC',30000);
+ assert(one.session.room.code===two.session.room.code,'I due karateka devono trovarsi nella stessa stanza');
+ const host=one.session.localSlot===0?one:two,guest=host===one?two:one;
+ assert(host.session.client.role==='host'&&guest.session.client.role==='guest','Ruoli host e ospite distinti');
+ log('✓ Stanza '+host.session.room.code+' · canale affidabile collegato');
+ await host.session.change({ready:true});await guest.session.change({ready:true});
+ await until(()=>currentPeers.every(p=>p.session.phase==='playing'&&p.game.state.phase==='fight'),'caricamento, VS e avvio');
+ assert(host.game.state.mode===mode&&guest.game.state.mode===mode,'Modalità uguale sui due dispositivi');
+ if(mode==='training')assert(host.game.state.timer===Infinity&&guest.game.state.timer===Infinity,'Allenamento senza tempo');
+ const firstEpoch=host.session.epoch;
+ log('✓ Entrambi pronti · VS · combattimento sincronizzato');
+ host.session.setInput('right',true);guest.session.setInput('left',true);
+ await until(()=>host.game.state.fighters[1].x-host.game.state.fighters[0].x<145,'movimento da entrambi i giocatori',5000);
+ host.session.setInput('right',false);guest.session.setInput('left',false);await sleep(120);
+ assert(host.game.state.fighters[0].x>380&&host.game.state.fighters[1].x<900,'I due input muovono slot diversi');
+ const hitsBefore=guest.events.filter(e=>e.type==='hit').length;
+ host.session.setInput('tsuki',true);host.session.setInput('tsuki',false);
+ await until(()=>guest.events.filter(e=>e.type==='hit').length>hitsBefore,'colpo host ricevuto dall’ospite',4000);
+ await sleep(420);
+ const guestAttacks=host.events.filter(e=>e.type==='attack'&&e.player===1).length;
+ guest.session.setInput('mae',true);guest.session.setInput('mae',false);
+ await until(()=>host.events.filter(e=>e.type==='attack'&&e.player===1).length>guestAttacks&&guest.events.some(e=>e.type==='attack'&&e.player===1&&e.move==='mae'),'input ospite ed evento replicato',4000);
+ log('✓ Movimento di entrambi · contatto host · attacco ospite · eventi replicati');
+ host.session.pause(true);await until(()=>host.game.paused&&guest.game.paused,'pausa su entrambi');
+ guest.session.pause(true);await sleep(100);host.session.pause(false);await sleep(180);
+ assert(host.game.paused&&guest.game.paused,'La pausa dell’altro giocatore deve essere rispettata');
+ const pausedElapsed=host.game.state.elapsed;await sleep(250);assert(host.game.state.elapsed===pausedElapsed,'Il tempo non avanza in pausa');
+ guest.session.pause(false);await until(()=>!host.game.paused&&!guest.game.paused,'ripresa condivisa');
+ log('✓ Pausa condivisa · due consensi per riprendere · tempo fermo');
+ await host.session.returnToRoom();
+ await until(()=>currentPeers.every(p=>p.session.phase==='room'&&p.session.roomReset?.complete),'ritorno in stanza e azzeramento pronto');
+ assert(currentPeers.every(p=>p.session.room.players.every(player=>!player.ready)),'Tutti i pronto devono essere azzerati');
+ assert(currentPeers.every(p=>!p.session.engine),'Nessuna vecchia simulazione deve continuare nella stanza');
+ await host.session.change({ready:true});await guest.session.change({ready:true});
+ await until(()=>currentPeers.every(p=>p.session.phase==='playing'),'secondo avvio dalla stanza');
+ assert(host.session.epoch===firstEpoch+1&&guest.session.epoch===host.session.epoch,'Nuova partita con un nuovo identificativo');
+ log('✓ Ritorno nella stessa stanza · pronto azzerati · nuova partita');
+ // Controlled test fixture: end the authoritative match to exercise rematch consent.
+ const fixtureState=host.game.state;fixtureState.phase='matchOver';fixtureState.winner=0;fixtureState.roundWinner=0;fixtureState.fighters[0].wins=2;fixtureState.announcement='FINE TEST';
+ await until(()=>guest.game.state.phase==='matchOver','risultato autorevole sull’ospite');
+ host.session.showResult();guest.session.showResult();
+ host.session.rematch();await sleep(100);assert(host.session.phase==='result','Una sola richiesta non può avviare la rivincita');
+ guest.session.rematch();await until(()=>currentPeers.every(p=>p.session.phase==='playing'),'rivincita concordata');
+ assert(host.session.epoch===firstEpoch+2&&guest.session.epoch===host.session.epoch,'La rivincita deve cambiare identificativo');
+ assert(host.game.state.fighters.every(f=>f.hp===1000)&&guest.game.state.fighters.every(f=>f.hp===1000),'La rivincita riparte da salute piena');
+ log('✓ Risultato di test replicato · consenso separato · rivincita pulita');
+ const result={mode,code:host.session.room.code,epochs:host.session.epoch,starts:[host.starts,guest.starts],host:describe(host),guest:describe(guest)};
+ const departing=guest.session.client;guest.session.leave();await departing.leave();
+ // Disconnection is the expected terminal result for the remaining player.
+ const start=performance.now();while(performance.now()-start<12000&&host.session.phase!=='home')await sleep(50);
+ assert(host.session.phase==='home'&&!host.session.client&&!host.session.engine,'L’uscita deve chiudere la partita anche per l’altro karateka');
+ assert(host.game.paused,'Il combattimento deve fermarsi alla disconnessione');
+ result.disconnect='pass';log('✓ Disconnessione · stanza e simulazioni chiuse');results.push(result);
+ await cleanup();
+}
+runButton.addEventListener('click',async()=>{
+ if(running)return;
+ if(!['127.0.0.1','localhost'].includes(location.hostname)){stateLabel.textContent='Solo ambiente locale';stateLabel.className='fail';return;}
+ running=true;runButton.disabled=true;results=[];output.textContent='Endpoint locale: '+endpoint+'\n';stateLabel.textContent='Verifica in corso…';stateLabel.className='';
+ let last=performance.now();const loop=setInterval(()=>{const now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;for(const value of currentPeers)value.session.update(dt);},16);
+ try{await checkMode('versus');await checkMode('training');stateLabel.textContent='PASS — 2 modalità completate';stateLabel.className='pass';log('\nTUTTE LE VERIFICHE SUPERATE');document.getElementById('measurements').textContent=JSON.stringify({ok:true,results});}
+ catch(error){stateLabel.textContent='FAIL — '+error.message;stateLabel.className='fail';log('\nERRORE: '+error.stack);document.getElementById('measurements').textContent=JSON.stringify({ok:false,error:error.message,results,peers:currentPeers.map(describe)});}
+ finally{clearInterval(loop);await cleanup();running=false;runButton.disabled=false;}
+});
+</script></body></html>
