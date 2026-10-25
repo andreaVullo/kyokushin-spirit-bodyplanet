@@ -44,6 +44,14 @@ test('host starts two equal fighters; guest never independently simulates physic
   assert.ok(Math.abs(play.host.state.elapsed - play.guest.state.elapsed) < 1 / 30 + .001);
 });
 
+test('match start carries the selected arena without adding it to recurring simulation frames', () => {
+  const play = pair();
+  assert.equal(play.host.startHost({ epoch: 2, mode: 'versus', fighters: ['angelo', 'samuel'], stageId: 'anfiteatro-turi-ferro' }), true);
+  play.flush();
+  assert.equal(latest(play, 'game-start').stageId, 'anfiteatro-turi-ferro');
+  play.advance(.1); assert.equal(Object.hasOwn(latest(play, 'game-frame'), 'stageId'), false);
+});
+
 test('guest keyboard/touch uses slot 1 and fast press/release survives between snapshots', () => {
   const play = pair(); play.contact();
   play.guest.setInput('tsuki', true); play.guest.setInput('tsuki', false); play.flush();

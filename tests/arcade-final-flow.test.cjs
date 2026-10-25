@@ -12,7 +12,7 @@ const vm = require('node:vm');
 async function fixture(options = {}) {
   const elements = new Map(), selectors = new Map(), nodes = [], events = new Map(), frames = new Map(), timers = new Map();
   let serial = 0, now = 0, ui, online;
-  const work = { draws: 0, hudWrites: [], audioUpdates: 0 };
+  const work = { draws: 0, hudWrites: [], audioUpdates: 0, imageLoads: [] };
   const hudNode = /^(?:p[12]-(?:health|ghost|ki|rounds|ki-label|combo(?:-count|-moves|-damage)?)|timer|round-label|announcer)$/;
   const mutation = (item, field) => { if (hudNode.test(item.id || '')) work.hudWrites.push(item.id + ':' + field); };
   const drawing = new Set(['drawImage', 'fillRect', 'clearRect', 'strokeRect', 'fill', 'stroke', 'fillText', 'strokeText']);
@@ -61,7 +61,11 @@ async function fixture(options = {}) {
     requestAnimationFrame(callback) { const id = ++serial; frames.set(id, callback); return id; }, cancelAnimationFrame: id => frames.delete(id),
     setTimeout(callback, delay) { const id = ++serial; timers.set(id, { callback, delay }); return id; }, clearTimeout: id => timers.delete(id),
     setInterval(callback, delay) { const id = ++serial; timers.set(id, { callback, delay, repeat: true }); return id; }, clearInterval: id => timers.delete(id),
-    Image: class { complete = true; naturalWidth = 1280; decode() { return Promise.resolve(); } },
+    Image: class { complete = true; naturalWidth = 1280; decode() {
+      work.imageLoads.push(this.src);
+      if (options.stageFailures?.has(this.src)) return Promise.reject(new Error('Stage unavailable'));
+      return options.stageGate?.(this.src) || Promise.resolve();
+    } },
     __kyokushinAsset: value => value,
     DojoAudio: class { enabled = false; status = {}; init() { return Promise.resolve(); } effect() {} update() { work.audioUpdates++; } },
     DojoControls: class { clear() {} press() {} release() {} },
@@ -73,6 +77,7 @@ async function fixture(options = {}) {
   };
   if (options.assetsReady) browser.__kyokushinAssetsReady = options.assetsReady;
   const context = vm.createContext(browser); context.window = context; context.self = context; context.top = context; context.parent = context;
+  if (options.stages) vm.runInContext(fs.readFileSync(path.join(__dirname, '../scripts/stages.js'), 'utf8'), context, { filename: 'stages.js' });
   for (const file of ['roster.js', 'game.js', 'arcade.js', 'arcade-ui.js', 'online-session.js']) vm.runInContext(fs.readFileSync(path.join(__dirname, '../scripts', file), 'utf8'), context, { filename: file });
   const OnlineSession = context.DojoOnlineSession;
   context.DojoOnlineSession = function(options) { online = new OnlineSession(options); return online; };
@@ -85,7 +90,7 @@ async function fixture(options = {}) {
     return ui;
   };
   vm.runInContext(fs.readFileSync(path.join(__dirname, '../scripts/main.js'), 'utf8'), context, { filename: 'main.js' });
-  async function settle() { for (let i = 0; i < 8; i++) await Promise.resolve(); }
+  async function settle() { for (let i = 0; i < 16; i++) await Promise.resolve(); }
   function frame() { now += 50; const pending = [...frames.values()]; frames.clear(); for (const callback of pending) callback(now); }
   function key(code) { for (const callback of events.get('keydown') || []) callback({ code, target: get('game'), repeat: false, preventDefault() {} }); }
   async function createRun() {
@@ -104,6 +109,80 @@ async function fixture(options = {}) {
   function resetWork() { work.draws = 0; work.hudWrites.length = 0; work.audioUpdates = 0; }
   return { context, document, get, ui, online, timers, createRun, finishMatch, frame, key, settle, work, resetWork };
 }
+
+test('a selected arena loads only before the match and remains unchanged for its rematch', async () => {
+  const f = await fixture({ stages: true });
+  assert.deepEqual(f.work.imageLoads, ['assets/dojo-mirror.png']);
+  f.context.dojo.menu();
+  f.get('stage-select').value = 'parco-gioeni'; f.get('stage-select').dispatch('change');
+  assert.equal(f.context.dojo.config.stageId, 'parco-gioeni');
+  assert.equal(f.work.imageLoads.length, 1, 'browsing a choice should not download every arena');
+  await f.context.dojo.start();
+  assert.equal(f.context.dojo.stage.id, 'parco-gioeni');
+  assert.equal(f.get('versus-stage').textContent, 'Parco Gioeni · Catania');
+  assert.equal(f.get('stage-name').textContent, 'PARCO GIOENI');
+  f.context.dojo.startMatch(); f.finishMatch(0);
+  f.get('rematch-button').dispatch('click'); await f.settle();
+  assert.equal(f.context.dojo.stage.id, 'parco-gioeni');
+  assert.equal(f.work.imageLoads.length, 2, 'the rematch uses the decoded image already in memory');
+});
+
+test('a random local match keeps its arena on rematch but choosing a new fight advances the bag', async () => {
+  const f = await fixture({ stages: true });
+  f.context.dojo.menu(); f.get('stage-select').value = 'random'; f.get('stage-select').dispatch('change');
+  await f.context.dojo.start();
+  const first = f.context.dojo.stage.id;
+  f.context.dojo.startMatch(); f.finishMatch(0);
+  f.get('rematch-button').dispatch('click'); await f.settle();
+  assert.equal(f.context.dojo.stage.id, first);
+  f.context.dojo.menu(); await f.context.dojo.start();
+  assert.notEqual(f.context.dojo.stage.id, first);
+  assert.equal(f.context.dojo.config.stageId, 'random');
+});
+
+test('Arcade visits every arena in six encounters and restores the selected local arena on exit', async () => {
+  const f = await fixture({ stages: true });
+  f.context.dojo.menu(); f.get('stage-select').value = 'rifugio-gualberto'; f.get('stage-select').dispatch('change');
+  await f.createRun();
+  const visited = [];
+  for (let fight = 0; fight < 6; fight++) {
+    visited.push(f.context.dojo.stage.id);
+    f.context.dojo.startMatch();
+    for (let count = 0; count < 10; count++) f.frame();
+    assert.equal(f.context.dojo.stage.id, visited.at(-1), 'simulation frames must not change the arena');
+    f.finishMatch(0);
+    if (fight < 5) { f.get('rematch-button').dispatch('click'); await f.settle(); }
+  }
+  assert.equal(new Set(visited).size, 6);
+  f.get('result-menu-button').dispatch('click'); // End the ongoing climb.
+  f.get('result-menu-button').dispatch('click'); // Return to character selection.
+  assert.equal(f.context.dojo.screen, 'select');
+  assert.equal(f.context.dojo.config.stageId, 'rifugio-gualberto');
+  assert.equal(f.get('stage-select').value, 'rifugio-gualberto');
+});
+
+test('leaving selection during an arena download cannot apply a stale arena later', async () => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  const f = await fixture({ stages: true, stageGate: src => src.includes('parco-gioeni') ? gate : null });
+  f.context.dojo.menu(); f.get('stage-select').value = 'parco-gioeni'; f.get('stage-select').dispatch('change');
+  const pending = f.context.dojo.start();
+  f.context.dojo.title(); release(); await pending;
+  assert.equal(f.context.dojo.screen, 'title');
+  assert.equal(f.context.dojo.stage.id, 'dojo');
+});
+
+test('a failed arena image still opens a playable match in the dojo with a visible explanation', async () => {
+  const f = await fixture({ stages: true, stageFailures: new Set(['assets/stages/parco-gioeni.webp']) });
+  f.context.dojo.menu(); f.get('stage-select').value = 'parco-gioeni'; f.get('stage-select').dispatch('change');
+  await f.context.dojo.start();
+  assert.equal(f.context.dojo.screen, 'versus');
+  assert.equal(f.context.dojo.stage.id, 'dojo');
+  assert.equal(f.get('stage-load-note').hidden, false);
+  assert.match(f.get('stage-load-note').textContent, /Bodyplanet Dojo/);
+  f.context.dojo.startMatch();
+  assert.equal(f.context.dojo.active, true);
+});
 
 test('idle title, selection and Arcade creation do not redraw the hidden arena or rewrite its HUD', async () => {
   const f = await fixture();

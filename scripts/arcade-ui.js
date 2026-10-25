@@ -25,7 +25,7 @@
           <fieldset><legend>02 / IL TUO KARATEKA</legend><div class="creator-genders"><button type="button" data-arcade-gender="male" aria-pressed="true">UOMO</button><button type="button" data-arcade-gender="female" aria-pressed="false">DONNA</button></div></fieldset>
           <fieldset><legend>03 / CAPIGLIATURA</legend><div id="arcade-hair-options" class="creator-hair"></div></fieldset>
           <div class="creator-journey"><span>BIANCA</span><div id="arcade-rank-trail" aria-label="Progressione delle cinture"></div><strong>10º DAN</strong></div>
-          <p class="creator-rules">20 sfide. Una promozione per vittoria. Una sconfitta termina la scalata. <strong>Nome e risultato finale vengono salvati automaticamente nella classifica pubblica.</strong> Nessun account richiesto. La partita non può essere ripresa.</p>
+          <p class="creator-rules">20 sfide in arene casuali. Una promozione per vittoria. Una sconfitta termina la scalata. <strong>Nome e risultato finale vengono salvati automaticamente nella classifica pubblica.</strong> Nessun account richiesto. La partita non può essere ripresa.</p>
           <p id="arcade-create-error" class="arcade-message" role="alert"></p>
           </div>
           <small class="creator-scroll-hint">Scorri le opzioni per scegliere il karateka e i capelli ↕</small>

@@ -600,7 +600,8 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <link rel="stylesheet" href="scripts/orientation.css?v=20261025-16">
 <link rel="stylesheet" href="scripts/arcade-ui.css?v=20261025-7">
 <link rel="stylesheet" href="scripts/name-keyboard.css?v=20261025-16">
-<link rel="stylesheet" href="styles/online.css?v=20261025-16">
+<link rel="stylesheet" href="styles/online.css?v=20261025-17">
+<link rel="stylesheet" href="styles/stages.css?v=20261025-17">
 </head>
 <body class="front-title boot-loading" data-screen="title" data-boot-state="loading">
   <section id="boot-screen" class="boot-screen" aria-label="Caricamento del gioco" aria-busy="true">
@@ -712,18 +713,18 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
           <div class="select-heading"><button id="selection-back-button" class="arcade-back" aria-label="Torna al titolo">← <span>TITOLO</span></button><div><span>PLAYER SELECT</span><h2>SCEGLI IL TUO KARATEKA</h2></div><b class="select-stamp" aria-hidden="true">極真</b></div>
           <div class="select-stage">
             <article class="fighter-showcase showcase-p1"><span class="select-player-tag">PLAYER 01</span><canvas id="select-p1-art" width="600" height="640" aria-label="Ritratto del karateka selezionato"></canvas><div class="fighter-bio"><span id="select-p1-rank">SENSEI · III DAN</span><h3 id="select-p1-name">ANGELO PIERINO</h3><small id="select-p1-belt">CINTURA NERA · 3 STRISCE ORO</small></div></article>
-            <div class="select-versus" aria-hidden="true"><span>KUMITE</span><b>VS</b><small>BODYPLANET<br>DOJO</small></div>
+            <div class="select-versus" aria-hidden="true"><span>KUMITE</span><b>VS</b><small id="selection-stage-label">BODYPLANET<br>DOJO</small></div>
             <article class="fighter-showcase showcase-p2"><span class="select-player-tag" id="select-p2-tag">CPU</span><canvas id="select-p2-art" width="600" height="640" aria-label="Ritratto dell’avversario"></canvas><div class="fighter-bio"><span id="select-p2-rank">SENPAI · 1 KYU</span><h3 id="select-p2-name">SAMUEL VILLANI</h3><small id="select-p2-belt">CINTURA MARRONE · 1 STRISCIA NERA</small></div></article>
           </div>
           <div class="roster-section"><div class="roster-instruction"><span>01 / IL TUO KARATEKA</span><small>← → SCEGLI <i>·</i> INVIO CONFERMA</small></div><div class="fighter-select" role="group" aria-label="Karateka disponibili">
             <button class="fighter-option selected" data-fighter="angelo" aria-pressed="true" aria-label="Scegli Angelo Pierino, Sensei terzo Dan"><canvas width="300" height="260" data-roster-portrait="angelo" aria-hidden="true"></canvas><span class="roster-name">ANGELO<small>III DAN</small></span><span class="roster-cursor">1P</span></button>
             <button class="fighter-option" data-fighter="samuel" aria-pressed="false" aria-label="Scegli Samuel Villani, Senpai primo Kyu"><canvas width="300" height="260" data-roster-portrait="samuel" aria-hidden="true"></canvas><span class="roster-name">SAMUEL<small>1 KYU</small></span><span class="roster-cursor">1P</span></button>
           </div><p id="selection-status" class="selection-status" aria-live="polite">ANGELO PIERINO · PRONTO A COMBATTERE</p></div>
-          <div class="select-footer"><div class="mode-side"><span class="field-label">02 / LA TUA SFIDA</span><div class="mode-select" role="group" aria-label="Modalità"><button data-mode="cpu" class="selected" aria-pressed="true">VS CPU</button><button data-mode="versus" aria-pressed="false">2 GIOCATORI</button><button data-mode="training" aria-pressed="false">ALLENAMENTO</button></div><small class="mobile-versus-note">2 giocatori: serve una tastiera condivisa.</small></div><label class="difficulty-label">DIFFICOLTÀ <select id="difficulty"><option value="easy">Principiante</option><option value="normal" selected>Karateka</option><option value="hard">Kyokushin</option></select></label><button class="start-button" id="start-button" disabled><span id="start-label">COMBATTI</span><span>↗</span></button></div>
+          <div class="select-footer"><div class="mode-side"><span class="field-label">02 / LA TUA SFIDA</span><div class="mode-select" role="group" aria-label="Modalità"><button data-mode="cpu" class="selected" aria-pressed="true">VS CPU</button><button data-mode="versus" aria-pressed="false">2 GIOCATORI</button><button data-mode="training" aria-pressed="false">ALLENAMENTO</button></div><small class="mobile-versus-note">2 giocatori: serve una tastiera condivisa.</small></div><label class="difficulty-label">DIFFICOLTÀ <select id="difficulty"><option value="easy">Principiante</option><option value="normal" selected>Karateka</option><option value="hard">Kyokushin</option></select></label><label class="stage-field">ARENA <select id="stage-select" aria-label="Arena"></select></label><button class="start-button" id="start-button" disabled><span id="start-label">COMBATTI</span><span>↗</span></button></div>
         </section>
 
         <section class="versus-screen front-screen hidden" id="versus-screen" aria-label="Presentazione incontro" inert>
-          <div class="versus-heading"><span>THE NEXT BATTLE</span><strong id="versus-tag">BODYPLANET DOJO · VS CPU</strong></div>
+          <div class="versus-heading"><span>THE NEXT BATTLE</span><strong id="versus-tag">BODYPLANET DOJO · VS CPU</strong><small id="versus-stage"></small><small id="stage-load-note" hidden></small></div>
           <div class="versus-fighter versus-left"><canvas id="versus-p1-art" width="600" height="640" aria-label="Giocatore 1"></canvas><h2 id="versus-p1-name">ANGELO PIERINO</h2><span>PLAYER 01</span></div>
           <b class="versus-mark" aria-hidden="true">VS</b>
           <div class="versus-fighter versus-right"><canvas id="versus-p2-art" width="600" height="640" aria-label="Avversario"></canvas><h2 id="versus-p2-name">SAMUEL VILLANI</h2><span>OSU! · 押忍</span></div>
@@ -731,7 +732,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
         </section>
         <div class="overlay-panel hidden" id="pause-panel"><span class="mini-label">UN RESPIRO. POI SI RIPARTE.</span><h2>PAUSA</h2><button class="primary-button" id="resume-button">RIPRENDI ↗</button><button class="secondary-button" id="restart-button">RICOMINCIA</button><button class="secondary-button" id="menu-button">SCELTA PERSONAGGIO</button></div>
         <div class="overlay-panel hidden" id="result-panel"><span class="mini-label" id="result-eyebrow">IPPON · MATCH COMPLETATO</span><h2 id="result-title">OSU!</h2><p id="result-text"></p><button class="primary-button" id="rematch-button">RIVINCITA ↗</button><button class="secondary-button" id="result-menu-button">SCELTA PERSONAGGIO</button></div>
-        <div class="stage-caption"><span>STAGE 01 <b>BODYPLANET DOJO</b></span><span id="stage-tip">CATANIA, ITALIA <i>●</i></span></div>
+        <div class="stage-caption"><span><span id="stage-number">STAGE 01</span> <b id="stage-name">BODYPLANET DOJO</b></span><span id="stage-tip">CATANIA, ITALIA <i>●</i></span></div>
       </div>
       <div class="arena-bottomline"><span><span class="status-dot"></span><span id="status-label">IL DOJO TI ASPETTA</span></span><span id="bottom-hint"><kbd>INVIO</kbd> PER COMINCIARE <span class="hint-divider">/</span> <kbd>ESC</kbd> PAUSA</span><span>空手道</span></div>
       <div class="touch-controls" id="touch-controls" aria-label="Comandi touch del giocatore 1" aria-hidden="true" inert>
@@ -2048,13 +2049,14 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <script src="scripts/arcade-atlas.js?v=20261025-11"></script>
 <script src="scripts/arcade-art.js?v=20261025-15"></script>
 <script src="scripts/name-keyboard.js?v=20261025-12"></script>
-<script src="scripts/arcade-ui.js?v=20261025-7"></script>
+<script src="scripts/arcade-ui.js?v=20261025-17"></script>
 <script src="scripts/online-config.js?v=20261025-12"></script>
 <script src="scripts/online-client.js?v=20261025-14"></script>
-<script src="scripts/online-game.js?v=20261025-15"></script>
-<script src="scripts/online-ui.js?v=20261025-15"></script>
-<script src="scripts/online-session.js?v=20261025-14"></script>
+<script src="scripts/online-game.js?v=20261025-17"></script>
+<script src="scripts/stages.js?v=20261025-17"></script>
+<script src="scripts/online-ui.js?v=20261025-17"></script>
+<script src="scripts/online-session.js?v=20261025-17"></script>
 <script src="scripts/game-interaction.js?v=20261025-13"></script>
-<script src="scripts/main.js?v=20261025-16"></script>
+<script src="scripts/main.js?v=20261025-17"></script>
 </body>
 </html>

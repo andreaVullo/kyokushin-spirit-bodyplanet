@@ -25,6 +25,7 @@
   class OnlineUI {
     constructor(options = {}) {
       this.options = options; this.roster = options.roster || global.KyokushinRoster || {};
+      this.stages = options.stages || global.DojoStages;
       this.art = options.art || global.FighterArt;
       this.profile = { name: '', fighter: Object.keys(this.roster)[0] || 'angelo', mode: 'versus' };
       this.busy = false; this.room = null; this.view = 'home'; this.previewToken = 0; this.connectionReady = false; this.connectionMessage = '';
@@ -49,6 +50,7 @@
           <section class="online-room" aria-label="Stanza online" hidden>
             <div class="online-room-heading"><div><small id="online-room-mode">1 VS 1</small><strong id="online-room-code"></strong></div><div><button type="button" id="online-copy-code">COPIA CODICE</button><button type="button" id="online-copy-link">CONDIVIDI INVITO ↗</button></div></div>
             <div class="online-players"></div>
+            <fieldset class="online-stage" hidden><legend>ARENA DELLA SFIDA</legend><div class="online-stage-options" role="group" aria-label="Scegli l’arena"></div><p id="online-stage-note"></p></fieldset>
             <p class="online-room-help">Scegli il tuo karateka e premi Pronto. Si parte quando siete pronti entrambi.</p>
           </section>
           <section class="online-roster" aria-label="Scegli il tuo karateka"><div class="online-roster-heading"><span>03 / SCEGLI IL TUO KARATEKA</span><small id="online-roster-note">Puoi scegliere solo il tuo personaggio.</small></div><div class="online-fighters" role="group" aria-label="Karateka disponibili"></div></section>
@@ -72,6 +74,11 @@
         const canvas = document.createElement('canvas'); canvas.width = 180; canvas.height = 190; canvas.dataset.onlinePortrait = id; canvas.setAttribute('aria-hidden', 'true');
         const name = document.createElement('strong'); name.textContent = fighter.name;
         button.append(canvas, name); button.addEventListener('click', () => this.selectFighter(id)); this.$('.online-fighters').append(button);
+      }
+      for (const stage of this.stages?.list || []) {
+        const button = document.createElement('button'); button.type = 'button'; button.dataset.onlineStage = stage.id;
+        button.textContent = stage.name; button.addEventListener('click', () => this.invoke('onStage', stage.id));
+        this.$('.online-stage-options').append(button);
       }
       this.$('#online-name').addEventListener('input', () => { this.profile.name = this.$('#online-name').value; this.setError(''); });
       this.$('#online-code').addEventListener('input', () => { this.$('#online-code').value = this.$('#online-code').value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); this.setError(''); });
@@ -151,11 +158,13 @@
         element.disabled = this.busy && !['online-leave', 'online-back', 'online-copy-code', 'online-copy-link'].includes(element.id);
       });
       this.$('#online-ready').disabled = this.busy || !this.connectionReady;
+      this.renderStage();
       if (message !== undefined) this.setStatus(message);
     }
     setConnection(connected, message = '') {
       this.connectionReady = !!connected; this.connectionMessage = connected ? '' : message;
       this.$('#online-ready').disabled = this.busy || !this.connectionReady;
+      this.renderStage();
       if (message) this.setStatus(message);
     }
     setStatus(message = '') { this.$('#online-status').textContent = message; }
@@ -177,6 +186,16 @@
       if (this.busy || !this.roster[id] || this.profile.fighter === id) return;
       this.profile.fighter = id; this.renderProfile(); this.renderPreviews();
       if (this.room) this.invoke('onUpdate', { fighter: id, name: this.profile.name });
+    }
+    renderStage() {
+      const group = this.$('.online-stage'); group.hidden = !this.stages || !this.room;
+      if (group.hidden) return;
+      const stage = this.stages.get(this.room.stageId), host = this.room.role === 'host', ready = !!this.localPlayer()?.ready;
+      this.panel.querySelectorAll('[data-online-stage]').forEach(button => {
+        button.setAttribute('aria-pressed', String(button.dataset.onlineStage === stage.id));
+        button.disabled = !host || ready || this.busy || !!this.room.stageIds && !this.room.stageIds.includes(button.dataset.onlineStage);
+      });
+      this.$('#online-stage-note').textContent = !host ? 'Arena scelta da chi ha creato la stanza: ' + stage.name + '.' : ready ? 'Arena: ' + stage.name + '. Togli Pronto per cambiarla.' : 'Scegli l’arena per entrambi i karateka.';
     }
     renderProfile() {
       const fighter = this.roster[this.profile.fighter];

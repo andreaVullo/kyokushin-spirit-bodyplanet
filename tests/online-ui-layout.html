@@ -14,7 +14,7 @@
   const classes=['front-online','embedded','touch-active','force-touch',land?'landscape-layout':'',lh<=330?'landscape-tiny':'',lh<=380&&land?'landscape-short':'',c.virtual?'virtual-landscape landscape-requested':''].join(' ');
   const variables=`--view-width:${c.w}px;--view-height:${c.h}px;--layout-width:${lw}px;--layout-height:${lh}px;--view-left:0px;--view-top:0px;`;
   const load=new Promise(resolve=>frame.addEventListener('load',resolve,{once:true}));
-  frame.srcdoc=`<!doctype html><html style="${variables}"><head><base href="${new URL('../',location.href)}"><meta name="viewport" content="width=device-width,initial-scale=1">${styles}</head><body class="${classes}"><main id="game-shell"><section id="arcade" class="arcade expanded"><header class="arena-topline">BODYPLANET</header><div id="viewport" class="viewport"></div></section><div id="result-panel" hidden></div></main><script src="scripts/roster.js"><\/script><script src="scripts/name-keyboard.js"><\/script><script src="scripts/online-ui.js"><\/script><script>window.calls=[];window.fixtureUI=new DojoOnlineUI({roster:KyokushinRoster,art:parent.FighterArt,onCreate:v=>calls.push(v),onReady:v=>calls.push(v)});fixtureUI.showHome({name:'ANDREA',fighter:'angelo',code:'AB23XY'});fixtureUI.nameKeys.setTouch(true);fixtureUI.codeKeys.setTouch(true);<\/script></body></html>`;
+  frame.srcdoc=`<!doctype html><html style="${variables}"><head><base href="${new URL('../',location.href)}"><meta name="viewport" content="width=device-width,initial-scale=1">${styles}</head><body class="${classes}"><main id="game-shell"><section id="arcade" class="arcade expanded"><header class="arena-topline">BODYPLANET</header><div id="viewport" class="viewport"></div></section><div id="result-panel" hidden></div></main><script src="scripts/roster.js"><\/script><script src="scripts/name-keyboard.js"><\/script><script src="scripts/stages.js"><\/script><script src="scripts/online-ui.js"><\/script><script>window.calls=[];window.fixtureUI=new DojoOnlineUI({roster:KyokushinRoster,art:parent.FighterArt,onCreate:v=>calls.push(v),onReady:v=>calls.push(v),onStage:v=>calls.push({stageId:v})});fixtureUI.showHome({name:'ANDREA',fighter:'angelo',code:'AB23XY'});fixtureUI.nameKeys.setTouch(true);fixtureUI.codeKeys.setTouch(true);<\/script></body></html>`;
   await load;await new Promise(r=>frame.contentWindow.requestAnimationFrame(()=>frame.contentWindow.requestAnimationFrame(r)));
   const d=frame.contentDocument,ui=frame.contentWindow.fixtureUI,errors=[],expect=(ok,msg)=>{if(!ok)errors.push(msg)};
   const rect=e=>e.getBoundingClientRect();
@@ -45,6 +45,19 @@
   expect(d.querySelector('#online-status').textContent==='Ricollegamento in corso','polling nasconde il ripristino');
   expect(ui.room.players[0].ready,'ripristino cancella il pronto dell’avversario');
   ui.setConnection(true);expect(!d.querySelector('#online-ready').disabled,'pronto non torna disponibile dopo il ripristino');
+  const stageIds=frame.contentWindow.DojoStages.list.map(stage=>stage.id);
+  ui.showRoom({...ui.room,stageId:'parco-gioeni',stageIds});
+  expect(d.querySelectorAll('[data-online-stage]').length===6,'elenco arene incompleto');
+  expect([...d.querySelectorAll('[data-online-stage]')].every(button=>button.disabled),'ospite può cambiare arena');
+  expect(d.querySelector('[data-online-stage=parco-gioeni]').getAttribute('aria-pressed')==='true','arena host non visibile');
+  ui.showRoom({...ui.room,role:'host',players:ui.room.players.map(p=>({...p,ready:false}))});
+  const stageButton=d.querySelector('[data-online-stage=rifugio-gualberto]');stageButton.click();
+  expect(frame.contentWindow.calls.at(-1)?.stageId==='rifugio-gualberto','scelta arena host non ricevuta');
+  expect([...d.querySelectorAll('[data-online-stage]')].every(button=>button.offsetHeight>=44),'tasti arena troppo piccoli');
+  expect(d.querySelector('.online-stage').scrollWidth<=scroll.clientWidth+2,'arena eccede larghezza mobile');
+  scroll.scrollTop=scroll.scrollHeight;
+  expect(d.querySelector('.online-roster').offsetTop+d.querySelector('.online-roster').offsetHeight<=scroll.offsetTop+scroll.scrollTop+scroll.clientHeight+2,'ultimo karateka irraggiungibile con arene');
+  expect(footer.offsetTop+footer.offsetHeight<=panel.offsetHeight+1,'pronto fuori lobby con arene');
   reports.push({case:frame.title,pass:!errors.length,errors});document.querySelector('#status').textContent=JSON.stringify(reports,null,2);
  }
  document.querySelector('#status').dataset.result=reports.every(r=>r.pass)?'PASS':'FAIL';

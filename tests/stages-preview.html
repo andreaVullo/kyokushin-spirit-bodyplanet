@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Le arene · Kyokushin Spirit</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0d1722;color:#f9eed5;font:14px/1.5 system-ui,sans-serif}main{max-width:1440px;margin:auto;padding:32px}header{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:25px}.eyebrow{font-size:11px;letter-spacing:3px;color:#e5b866;font-weight:800}h1{font-size:clamp(28px,5vw,52px);letter-spacing:-1px;margin:8px 0 0;line-height:1.05}p{color:#b5c1cd;margin:10px 0 0}button{font:800 12px system-ui;letter-spacing:.6px;padding:14px 20px;border:1px solid #e7bd74;background:#e7bd74;color:#14202d;cursor:pointer;white-space:nowrap}button:disabled{opacity:.5;cursor:wait}#gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.arena{min-width:0;background:#172737;border:1px solid #344758;overflow:hidden}.arena canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#111c27}.caption{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}.caption strong{font-size:16px}.caption span{display:block;font-size:11px;color:#b6c4d0;margin-top:2px}.number{font-size:25px;color:#dfb36c;font-weight:900;font-style:italic}#gallery-status,#summary{color:#e5c581;font-weight:700}.check-heading{margin:40px 0 16px;border-top:1px solid #344758;padding-top:24px;display:flex;align-items:center;justify-content:space-between;gap:16px}.check-heading h2{font-size:22px;margin:0}details{margin:16px 0}pre{font:12px/1.5 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:#b8ccd8}#fixtures{display:flex;align-items:start;gap:20px;flex-wrap:wrap}.fixture{max-width:100%;overflow:auto;background:#142331;border:1px solid #344758;padding:12px}.fixture h3{font-size:13px;margin:0 0 10px;color:#e5c581}iframe{display:block;border:0;max-width:none}#gallery-status[data-result=FAIL],#summary[data-result=FAIL]{color:#ff9f8f}@media(max-width:720px){main{padding:18px}header{display:block}header button{margin-top:18px}#gallery{grid-template-columns:1fr}.caption strong{font-size:14px}.check-heading{align-items:start;flex-direction:column}}
+@media(min-width:1100px){main{padding:24px}header{margin-bottom:16px}h1{font-size:38px}#gallery{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.caption{padding:8px 12px}.caption strong{font-size:13px}.caption span{font-size:10px}.number{font-size:22px}}
+</style>
+<main>
+<header><div><div class="eyebrow">KYOKUSHIN SPIRIT · LE ARENE</div><h1>Da Catania al tatami.</h1><p>Sei ambientazioni. Stessi karateka, stesso piano di combattimento.</p></div><button id="gallery-reload">RICARICA ANTEPRIME</button></header>
+<p id="gallery-status" role="status">Caricamento delle arene e dei karateka…</p>
+<div id="gallery"></div>
+<div class="check-heading"><div><h2>Selezione e combattimento</h2><p>Gioco reale in cinque finestre: computer, telefono e browser delle chat.</p></div><button id="run">VERIFICA LE ARENE</button></div>
+<p id="summary" role="status">Pronto per la verifica.</p>
+<details><summary>Risultati delle verifiche</summary><pre id="report"></pre></details>
+<div id="fixtures"></div>
+</main>
+<script src="../scripts/stages.js"></script>
+<script src="load-real-art.js"></script>
+<script>
+const $=id=>document.getElementById(id),delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const tick=win=>new Promise(resolve=>win.requestAnimationFrame(()=>win.requestAnimationFrame(resolve)));
+const contains=(inner,outer)=>inner.left>=outer.left-2&&inner.right<=outer.right+2&&inner.top>=outer.top-2&&inner.bottom<=outer.bottom+2;
+let artworkReady;
+async function gallery(){
+ $('gallery-reload').disabled=true;$('gallery-status').dataset.result='LOADING';
+ $('gallery-status').textContent='Caricamento delle arene e dei karateka…';
+ try{
+  artworkReady ||= (async()=>{await loadRealFighterArt();await window.__kyokushinAssetsReady;await FighterArt.load();await FighterArt.loadFighters(['angelo','samuel']);})();
+  await artworkReady;
+  const loader=DojoStages.createLoader({resolve:stage=>stage.id==='dojo'?__kyokushinAsset(stage.src):new URL('../'+stage.src,location.href).href});
+  const game=new KyokushinGame(),fighters=game.getState().fighters,results=[];
+  fighters[0].x=390;fighters[1].x=890;$('gallery').replaceChildren();
+  for(const stage of DojoStages.list){
+   const card=document.createElement('article');card.className='arena';card.dataset.stageId=stage.id;
+   const canvas=document.createElement('canvas');canvas.width=1280;canvas.height=720;canvas.setAttribute('aria-label',stage.name+' con due karateka sul piano di combattimento');
+   const caption=document.createElement('div');caption.className='caption';
+   const description=document.createElement('div'),name=document.createElement('strong'),place=document.createElement('span'),number=document.createElement('b');
+   name.textContent=stage.name;place.textContent=stage.location;number.className='number';number.textContent=String(stage.number).padStart(2,'0');description.append(name,place);caption.append(description,number);card.append(canvas,caption);$('gallery').append(card);
+   const result=await loader.load(stage.id),ctx=canvas.getContext('2d');
+   if(result.fallback)throw new Error('Immagine non disponibile: '+stage.name);
+   ctx.drawImage(result.image,0,0,1280,720);
+   for(const fighter of fighters){ctx.save();ctx.globalAlpha=.24;ctx.fillStyle='#27172d';ctx.beginPath();ctx.ellipse(fighter.x,627,62,10,0,0,Math.PI*2);ctx.fill();ctx.restore();FighterArt.draw(ctx,fighter,0);}
+   results.push({id:stage.id,width:result.image.naturalWidth,height:result.image.naturalHeight,fallback:result.fallback});
+  }
+  $('gallery-status').dataset.result='PASS';$('gallery-status').dataset.images=JSON.stringify(results);
+  $('gallery-status').textContent='6 / 6 arene caricate · piano di combattimento comune · immagini reali del gioco';
+ }catch(error){$('gallery-status').dataset.result='FAIL';$('gallery-status').textContent=error.message;}
+ $('gallery-reload').disabled=false;
+}
+$('gallery-reload').onclick=gallery;gallery();
+
+const cases=[{w:1100,h:760,label:'Computer'},{w:390,h:700,label:'Telefono verticale',touch:true},{w:700,h:300,label:'Telefono orizzontale',touch:true},{w:320,h:420,label:'Chat verticale',touch:true},{w:568,h:240,label:'Chat orizzontale',touch:true}];
+const reports=[];
+function publish(name,errors,details={}){reports.push({case:name,pass:!errors.length,errors,...details});$('report').textContent=JSON.stringify(reports,null,2);$('summary').textContent=reports.filter(item=>item.pass).length+' / '+reports.length+' verifiche superate';}
+async function until(test,message,timeout=30000){const end=Date.now()+timeout;while(!test()){if(Date.now()>end)throw new Error(message);await delay(50);}}
+async function openPlayableDisplay(frame){
+ const win=frame.contentWindow,d=frame.contentDocument;
+ if(d.body.classList.contains('orientation-blocked')){
+  d.querySelector('#rotate-fullscreen-button').click();
+  await until(()=>!d.body.classList.contains('orientation-blocked'),'La vista orizzontale non si apre',3000);
+  await delay(100);await tick(win);
+ }
+}
+async function checkSelection(frame,c){
+ const win=frame.contentWindow,d=frame.contentDocument,errors=[],expect=(ok,message)=>{if(!ok)errors.push(message);};
+ win.dojo.menu();await openPlayableDisplay(frame);await tick(win);
+ const panel=d.querySelector('#selection-panel'),select=d.querySelector('#stage-select'),footer=d.querySelector('.select-footer'),viewport=d.querySelector('#viewport');
+ expect(win.dojo.screen==='select','Scelta personaggio non aperta');
+ expect(!d.body.classList.contains('orientation-blocked'),'Avviso ruota il telefono sopra la selezione');
+ if(c.touch&&c.h>c.w)expect(d.body.classList.contains('virtual-landscape'),'Telefono verticale senza rotazione virtuale');
+ expect(!!select&&!select.disabled,'Scelta arena assente o disattivata');
+ expect(select?.options.length===7,'Mancano arene o scelta Casuale');
+ expect(d.documentElement.scrollWidth<=c.w+2,'Pagina più larga della finestra');
+ expect(panel.offsetWidth<=viewport.clientWidth+2,'Selezione oltre il campo visibile');
+ for(const element of [select,d.querySelector('#start-button'),d.querySelector('#difficulty')]){
+  if(!element)continue;element.scrollIntoView({behavior:'instant',block:'nearest',inline:'nearest'});await tick(win);
+  expect(contains(element.getBoundingClientRect(),panel.getBoundingClientRect()),element.id+': comando fuori dal pannello');
+  expect(contains(element.getBoundingClientRect(),viewport.getBoundingClientRect()),element.id+': comando tagliato dal campo');
+ }
+ const stageRect=select.getBoundingClientRect(),startRect=d.querySelector('#start-button').getBoundingClientRect();
+ const overlap=Math.min(stageRect.right,startRect.right)-Math.max(stageRect.left,startRect.left)>1&&Math.min(stageRect.bottom,startRect.bottom)-Math.max(stageRect.top,startRect.top)>1;
+ expect(!overlap,'Scelta arena sovrapposta a Combatti');
+ expect(footer.scrollWidth<=footer.clientWidth+2,'Footer con comandi tagliati orizzontalmente');
+ publish(c.label+' '+c.w+'×'+c.h+' · selezione',errors,{logicalViewport:[viewport.clientWidth,viewport.clientHeight],footer:[footer.clientWidth,footer.clientHeight],options:[...select.options].map(option=>option.value)});
+}
+async function checkFight(frame,stage,label,c){
+ const win=frame.contentWindow,d=frame.contentDocument,errors=[],expect=(ok,message)=>{if(!ok)errors.push(message);};
+ win.dojo.menu();const select=d.querySelector('#stage-select');select.value=stage.id;select.dispatchEvent(new win.Event('change',{bubbles:true}));
+ expect(win.dojo.config.stageId===stage.id,'La scelta arena non aggiorna il gioco');
+ await win.dojo.start();await tick(win);
+ expect(win.dojo.screen==='versus','La presentazione VS non si apre');
+ expect(win.dojo.stage.id===stage.id,'Arena effettiva diversa dalla selezione');
+ expect(d.querySelector('#versus-stage').textContent.includes(stage.name),'Nome arena assente dalla presentazione VS');
+ expect(d.querySelector('#stage-load-note').hidden,'Ripiego sul dojo: immagine mancante');
+ win.dojo.startMatch();await openPlayableDisplay(frame);await tick(win);
+ const resume=d.querySelector('#resume-button');if(!d.querySelector('#pause-panel').classList.contains('hidden')){resume.click();await tick(win);}
+ expect(win.dojo.screen==='game','Combattimento non avviato');
+ expect(d.querySelector('#game').dataset.stageId===stage.id,'Sfondo del combattimento non aggiornato');
+ expect(d.querySelector('#stage-name').textContent===stage.name.toLocaleUpperCase('it'),'Didascalia arena errata');
+ const canvas=d.querySelector('#game'),viewport=d.querySelector('#viewport'),canvasBox=canvas.getBoundingClientRect(),canvasStyle=win.getComputedStyle(canvas);
+ expect(!d.body.classList.contains('orientation-blocked'),'Avviso ruota il telefono sopra il combattimento');
+ expect(canvasBox.width>0&&canvasBox.height>0&&canvasStyle.display!=='none'&&canvasStyle.visibility!=='hidden','Campo di combattimento non visibile');
+ expect(contains(canvasBox,viewport.getBoundingClientRect()),'Campo di combattimento tagliato dal viewport');
+ if(c.touch){
+  expect(contains(canvasBox,{left:0,top:0,right:c.w,bottom:c.h}),'Campo di combattimento oltre la finestra del telefono');
+  expect(d.body.classList.contains('virtual-landscape')===(c.h>c.w),'Rotazione virtuale incoerente con il formato del telefono');
+ }
+ win.dojo.game.pause(true);publish(label+' · '+stage.name,errors,{orientation:d.body.dataset.orientationMode,canvas:[Math.round(canvasBox.width),Math.round(canvasBox.height)]});win.dojo.menu();await tick(win);
+}
+$('run').onclick=async()=>{
+ $('run').disabled=true;$('summary').dataset.result='RUNNING';reports.length=0;$('fixtures').replaceChildren();$('summary').textContent='Verifica in corso…';
+ try{
+  let mobileFrame=null,mobileSection=null,mobileTitle=null;
+  for(const [index,c]of cases.entries()){
+   const section=c.touch&&mobileSection?mobileSection:document.createElement('section');section.className='fixture';
+   const title=c.touch&&mobileTitle?mobileTitle:document.createElement('h3');title.textContent=c.label+' · '+c.w+' × '+c.h;
+   const reused=c.touch&&mobileFrame,frame=reused||document.createElement('iframe');frame.width=c.w;frame.height=c.h;frame.loading='eager';frame.allow="fullscreen 'none'";frame.title=title.textContent;
+   if(!reused){
+    section.append(title,frame);$('fixtures').append(section);frame.src='../Gioca.html?standalone=1&arenaQA='+index+(c.touch?'&touch=1':'');
+    if(c.touch){mobileFrame=frame;mobileSection=section;mobileTitle=title;}
+   }
+   section.scrollIntoView({behavior:'instant',block:'start'});
+   await until(()=>frame.contentWindow.dojo?.ready,'Gioco non pronto in '+title.textContent);await delay(150);
+   if(reused){frame.contentWindow.dispatchEvent(new frame.contentWindow.Event('resize'));await tick(frame.contentWindow);}
+   await checkSelection(frame,c);
+   for(const stage of(index===0?DojoStages.list:[DojoStages.list[index]]))await checkFight(frame,stage,title.textContent,c);
+  }
+  const ok=reports.every(item=>item.pass);$('summary').dataset.result=ok?'PASS':'FAIL';$('report').dataset.result=ok?'PASS':'FAIL';
+  $('summary').textContent=reports.filter(item=>item.pass).length+' / '+reports.length+' verifiche superate · cinque finestre · sei arene';
+ }catch(error){publish('Errore della verifica',[error.stack]);$('summary').dataset.result='FAIL';$('report').dataset.result='FAIL';}
+ $('run').disabled=false;
+ $('run').focus({preventScroll:true});window.scrollTo({top:0,left:0,behavior:'instant'});
+};
+</script>
+</html>

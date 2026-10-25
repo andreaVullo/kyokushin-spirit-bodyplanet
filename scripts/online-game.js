@@ -151,7 +151,7 @@
       if (!integer(epoch) || epoch <= this.epoch || !['versus', 'training'].includes(options.mode) || !Array.isArray(ids) || ids.length !== 2 || ids.some(id => !own(this.game.characters, id) || id === 'arcade-player')) return false;
       this.role = 'host'; this.ids = ids.slice(); this._reset(epoch);
       this.game.start({ player: ids[0], opponent: ids[1], mode: options.mode, difficulty: 'normal', humanOpponent: true });
-      const sent = this._send('game-start', { seq: 0, fighters: ids.slice(), mode: options.mode, state: encodeState(this.state), events: this.events.slice() });
+      const sent = this._send('game-start', { seq: 0, fighters: ids.slice(), mode: options.mode, ...(typeof options.stageId === 'string' ? { stageId: options.stageId } : {}), state: encodeState(this.state), events: this.events.slice() });
       if (!sent) return false;
       if (sent) this.events.length = 0;
       this._status('started', { fighters: ids.slice(), mode: options.mode });

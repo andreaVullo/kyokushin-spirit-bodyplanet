@@ -4,20 +4,23 @@
   class OnlineSession {
     constructor(options) {
       this.options=options;this.phase='off';this.epoch=0;this.generation=0;this.room=null;this.client=null;this.engine=null;this.timer=null;
+      this.stages=options.stages||global.DojoStages;this.stageId='dojo';this.remoteStageIds=null;
       this.schedule=options.setTimeout||global.setTimeout.bind(global);this.unschedule=options.clearTimeout||global.clearTimeout.bind(global);
       this.roomReset=null;this.minimumRoomRevision=0;this.transportReady=false;this.reconnecting=false;this.pendingPrepare=null;this.pendingStartPacket=null;this.pendingStart=false;
-      this.ui=new (options.UI||global.DojoOnlineUI)({roster:options.roster,inviteBase:options.inviteBase,
+      this.ui=new (options.UI||global.DojoOnlineUI)({roster:options.roster,inviteBase:options.inviteBase,stages:this.stages,
         onOpen:()=>options.onOpen(),onBack:()=>options.onBack(),onLeave:()=>{this.leave();options.onBack();},
         onCreate:p=>this.enter('create',p),onJoin:p=>this.enter('join',p),onMatchmake:p=>this.enter('matchmake',p),
         onReady:ready=>this.change({ready}),onUpdate:p=>this.change({fighter:p.fighter,ready:false}),
+        onStage:id=>this.changeStage(id),
         onRematch:()=>this.rematch(),onReturnToRoom:()=>this.returnToRoom()});
     }
     get active(){return this.phase!=='off';}
     get localSlot(){return this.client?.role==='guest'?1:0;}
     get renderState(){return this.engine?.renderState||this.options.game.getState();}
-    open(values={}){this.leave();this.phase='home';this.options.onLobby();this.ui.showHome(values);}
+    open(values={}){this.leave();this.stageId=this.stages?.isValid(values.stageId)?values.stageId:'dojo';this.phase='home';this.options.onLobby();this.ui.showHome(values);}
     async enter(method,profile){
       if(this.phase!=='home')return;
+      if(method==='join')this.stageId='dojo';
       this.phase='joining';const generation=++this.generation;
       this.ui.setBusy(true,'Apro il dojo online…');if(method==='matchmake')this.ui.showSearching();
       const Client=this.options.Client||global.DojoOnlineClient;
@@ -33,7 +36,7 @@
     }
     roomChanged(room){
       if(!room||Number.isSafeInteger(room.revision)&&room.revision<this.minimumRoomRevision)return;
-      this.room={...room,players:room.players.map(player=>({...player}))};
+      this.room={...room,stageId:this.stageId,stageIds:this.sharedStageIds(),players:room.players.map(player=>({...player}))};
       if(this.roomReset&&!this.roomReset.complete)this.room.players.forEach(player=>{player.ready=false;});
       if(['joining','room'].includes(this.phase)){this.ui.showRoom(this.room);if(this.phase==='room')this.maybePrepare();}
     }
@@ -49,6 +52,7 @@
       if(status==='connected'){
         this.transportReady=true;this.reconnecting=false;this.engine?.setReconnecting(false);
         this.ui.setConnection?.(true);this.ui.setStatus('Connessione pronta. Scegli il karateka e premi Pronto.');
+        if(this.stages&&!this.send({type:'online-stages',ids:this.stages.list.map(stage=>stage.id)}))return;
         if(this.pendingPrepare){const info=this.pendingPrepare;this.pendingPrepare=null;this.receive(info);}
         if(this.pendingStartPacket){const packet=this.pendingStartPacket;this.pendingStartPacket=null;this.receive(packet);}
         if(this.phase==='loading'&&this.localLoaded){if(this.client?.role==='host')this.maybeVersus();else this.send({type:'online-loaded',epoch:this.epoch});}
@@ -72,18 +76,33 @@
       try{await client.update(values);}catch(error){if(generation===this.generation&&this.client===client)this.ui.setError(error.message);}
       finally{if(generation===this.generation&&this.client===client&&this.phase==='room')this.ui.setBusy(false);}
     }
+    sharedStageIds(){
+      if(!this.stages)return ['dojo'];
+      return this.stages.list.map(stage=>stage.id).filter(id=>!this.remoteStageIds||this.remoteStageIds.includes(id));
+    }
+    refreshStage(){if(this.room){this.room.stageId=this.stageId;this.room.stageIds=this.sharedStageIds();if(['joining','room'].includes(this.phase))this.ui.showRoom(this.room);}}
+    changeStage(id){
+      if(this.phase!=='room'||this.client?.role!=='host'||!this.stages?.isValid(id)||this.room?.players.find(p=>p.slot===0)?.ready||this.ui.busy||!this.sharedStageIds().includes(id))return;
+      this.stageId=id;this.refreshStage();
+      if(this.transportReady)this.send({type:'online-stage',epoch:this.epoch,stageId:id});
+    }
     maybePrepare(){
       if(this.phase!=='room'||!this.transportReady||this.client?.role!=='host'||!this.client.connected||this.roomReset&&!this.roomReset.complete||this.room?.players.length!==2||!this.room.players.every(p=>p.ready))return;
       const players=[...this.room.players].sort((a,b)=>a.slot-b.slot);
-      this.prepare({type:'online-prepare',epoch:this.epoch+1,mode:this.room.mode,fighters:players.map(p=>p.fighter),names:players.map(p=>p.name)},true);
+      // Older clients ignore the optional stage exchange and still share the original dojo.
+      if(!this.remoteStageIds?.includes(this.stageId))this.stageId='dojo';
+      this.prepare({type:'online-prepare',epoch:this.epoch+1,mode:this.room.mode,stageId:this.stageId,fighters:players.map(p=>p.fighter),names:players.map(p=>p.name)},true);
     }
     async prepare(info,host){
       if(!Number.isSafeInteger(info.epoch)||info.epoch<=this.epoch||!['versus','training'].includes(info.mode)||!Array.isArray(info.fighters)||info.fighters.length!==2||info.fighters.some(id=>!Object.prototype.hasOwnProperty.call(this.options.roster,id))||!Array.isArray(info.names)||info.names.length!==2||info.names.some(n=>typeof n!=='string'||n.length>96))return;
       if(!['room','result'].includes(this.phase))return;
       if(host!== (this.client?.role==='host')||!this.client?.connected)return;
+      const stageId=info.stageId===undefined?'dojo':info.stageId;
+      if(stageId!=='dojo'&&!this.stages?.isValid(stageId))return;
+      info={...info,stageId};this.stageId=stageId;this.refreshStage();
       const generation=++this.generation;this.epoch=info.epoch;this.info=info;this.phase='loading';this.localLoaded=false;this.remoteLoaded=false;this.votes=[false,false];this.roomReset=null;this.pendingStart=false;this.pendingStartPacket=null;
       this.makeEngine();
-      this.ui.hideResult();this.ui.setBusy(true,'Carico le mosse di entrambi i karateka…');
+      this.ui.hideResult();this.ui.setBusy(true,'Carico l’arena e le mosse di entrambi i karateka…');
       if(host&&!this.send(info))return;
       this.unschedule(this.timer);this.timer=this.schedule(()=>{if(generation===this.generation)this.fail('Il caricamento della sfida è scaduto. Rientra in una nuova stanza.');},45000);
       try{
@@ -91,7 +110,7 @@
         if(generation!==this.generation||this.phase!=='loading')return;
         this.localLoaded=true;
         if(host)this.maybeVersus();else if(this.transportReady)this.send({type:'online-loaded',epoch:this.epoch});
-      }catch(error){if(generation!==this.generation||this.phase!=='loading')return;this.send({type:'online-error',epoch:this.epoch});this.fail('Non riesco a caricare le mosse. Rientra nella stanza per riprovare.');}
+      }catch(error){if(generation!==this.generation||this.phase!=='loading')return;this.send({type:'online-error',epoch:this.epoch});this.fail('Non riesco a caricare le mosse o l’arena. Rientra nella stanza per riprovare.');}
     }
     maybeVersus(){
       if(this.phase==='loading'&&this.transportReady&&this.localLoaded&&this.remoteLoaded&&this.client?.role==='host'){
@@ -111,9 +130,21 @@
     }
     receive(message){
       if(!message||typeof message.type!=='string')return;
+      if(message.type==='online-stages'&&this.stages&&this.client&&Array.isArray(message.ids)&&message.ids.length<=64&&message.ids.every(id=>typeof id==='string'&&id.length<=64)&&message.ids.includes('dojo')){
+        this.remoteStageIds=message.ids.filter(id=>this.stages.isValid(id));
+        if(this.client.role==='host'&&['joining','room'].includes(this.phase)){
+          if(!this.remoteStageIds.includes(this.stageId))this.stageId='dojo';
+          if(this.transportReady)this.send({type:'online-stage',epoch:this.epoch,stageId:this.stageId});
+        }
+        this.refreshStage();return;
+      }
+      if(message.type==='online-stage'&&this.client?.role==='guest'&&['joining','room'].includes(this.phase)&&message.epoch===this.epoch&&this.stages?.isValid(message.stageId)){
+        this.stageId=message.stageId;this.refreshStage();return;
+      }
       if(message.type.startsWith('game-')){
         if(!this.engine||message.epoch!==this.epoch||!['versus','playing','result'].includes(this.phase))return;
         if(message.type==='game-start'&&(this.client?.role!=='guest'||this.phase!=='versus'||message.mode!==this.info?.mode||!Array.isArray(message.fighters)||message.fighters.length!==2||message.fighters.some((id,i)=>id!==this.info.fighters[i])))return;
+        if(message.type==='game-start'&&(message.stageId??'dojo')!==(this.info.stageId??'dojo'))return;
         if(message.type==='game-start'&&this.reconnecting){this.pendingStartPacket=message;return;}
         this.engine.receive(message);return;
       }
@@ -166,10 +197,12 @@
       this.phase='failed';this.unschedule(this.timer);this.disposeEngine();
       const client=this.client;this.client=null;client?.leave();this.generation++;
       this.options.onLobby();this.ui.hideResult();this.phase='home';this.room=null;this.epoch=0;this.roomReset=null;this.minimumRoomRevision=0;this.transportReady=false;this.reconnecting=false;this.pendingPrepare=null;this.pendingStartPacket=null;this.pendingStart=false;this.ui.showHome();this.ui.setError(message);
+      this.stageId='dojo';this.remoteStageIds=null;
     }
     leave(){
       this.generation++;this.unschedule(this.timer);this.phase='off';this.disposeEngine();this.roomReset=null;this.minimumRoomRevision=0;this.transportReady=false;this.reconnecting=false;this.pendingPrepare=null;this.pendingStartPacket=null;this.pendingStart=false;
       const client=this.client;this.client=null;client?.leave();this.room=null;this.epoch=0;this.votes=[false,false];this.ui.hide();this.ui.hideResult();
+      this.stageId='dojo';this.remoteStageIds=null;
     }
     setInput(action,pressed,options){return this.engine?.setInput(action,pressed,options);}
     clearInput(){this.engine?.clearInput();}

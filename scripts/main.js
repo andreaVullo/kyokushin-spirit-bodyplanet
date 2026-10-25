@@ -18,11 +18,14 @@
     samuel: { name: 'SAMUEL VILLANI', rank: 'SENPAI · 1 KYU', short: 'SAMUEL', belt: 'CINTURA MARRONE · 1 STRISCIA NERA', beltColor: 'brown' }
   }) };
   const rosterIds = Object.keys(characters);
-  const config = { player: 'angelo', opponent: 'samuel', mode: 'cpu', difficulty: 'normal' };
+  const config = { player: 'angelo', opponent: 'samuel', mode: 'cpu', difficulty: 'normal', stageId: 'dojo' };
   let online = null, onlinePreviousConfig = null;
   let regularConfig = { ...config }, arcadeRun = null, arcadeMatch = null, arcadeStats = null, arcadePreviewToken = 0;
   let selectionTarget = 'player', matchLoading = false, matchLoadId = 0, selectionError = '';
-  const bg = new Image();
+  const stages = window.DojoStages, stageLoader = stages?.createLoader();
+  const stageBag = stages?.createShuffleBag();
+  let arcadeStageBag = null, arcadeStageMatchId = null, arcadeStageId = 'dojo';
+  let bg = new Image(), currentStage = stages?.get('dojo') || { id: 'dojo', name: 'Bodyplanet Dojo', location: 'Catania', number: 1, motes: true };
   let ready = false, active = false, paused = false, lastTime = performance.now(), clock = 0;
   let screen = 'title', versusTimeout = null, transitionId = 0, loadFailed = false;
   const heldKeys = new Map();
@@ -101,7 +104,13 @@
   online = new window.DojoOnlineSession({game,roster:characters,endpoint:window.KYOKUSHIN_ONLINE_ENDPOINT,
     onOpen:showOnline,onBack:()=>showTitle(),onEvent,
     onLobby:()=>{active=false;paused=false;clearCombatInput();clearMatchPresentation();game.pause(true);setScreen('online');$('status-label').textContent='DOJO ONLINE';},
-    onPrepare:async info=>{active=false;paused=false;clearCombatInput();clearMatchPresentation();Object.assign(config,{player:info.fighters[0],opponent:info.fighters[1],mode:info.mode});await Promise.all([window.FighterArt.loadFighters(info.fighters),window.ArcadeVFX?.load()]);},
+    onPrepare:async info=>{
+      active=false;paused=false;clearCombatInput();clearMatchPresentation();
+      Object.assign(config,{player:info.fighters[0],opponent:info.fighters[1],mode:info.mode,stageId:stages?.get(info.stageId).id||'dojo'});
+      const [arena]=await Promise.all([loadStage(config.stageId),window.FighterArt.loadFighters(info.fighters),window.ArcadeVFX?.load()]);
+      if(arena.fallback)throw new Error('Non riesco a caricare l’arena scelta per entrambi i karateka.');
+      if(online?.active&&online.info?.epoch===info.epoch)applyStage(arena);
+    },
     onVersus:info=>{updateSelection();info.names.forEach((name,i)=>{$('versus-p'+(i+1)+'-name').textContent=name.toLocaleUpperCase('it');});$('versus-tag').textContent=info.mode==='training'?'ONLINE · ALLENAMENTO':'ONLINE · 1 VS 1';setScreen('versus','versus-screen');$('status-label').textContent='ENTRAMBI PRONTI · SI COMINCIA';},
     onStart:()=>{active=true;paused=false;clearMatchPresentation();setNames();$('restart-button').hidden=true;$('menu-button').textContent='TORNA IN STANZA';setScreen('game','game');$('status-label').textContent='ONLINE · KUMITE IN CORSO';if(document.hidden||document.querySelector('dialog[open]')||document.body.classList.contains('orientation-blocked'))togglePause(true);},
     onPause:(value,details)=>{paused=value;clearCombatInput();showPanel('pause-panel',paused);syncControlSurface();$('status-label').textContent=paused?'ONLINE · IN PAUSA — IN ATTESA DI RIPRENDERE':'ONLINE · KUMITE IN CORSO';},
@@ -117,7 +126,7 @@
   function showOnline(){
     if(!ready)return;
     leaveArcade();cancelMatchLoading();onlinePreviousConfig={...config};
-    online.open({fighter:config.player,code:pageOptions.get('room')||''});sound.init();
+    online.open({fighter:config.player,stageId:config.stageId,code:pageOptions.get('room')||''});sound.init();
   }
   function leaveOnline(){
     if(online?.active)online.leave();
@@ -183,7 +192,7 @@
     if(rotate&&active&&!paused&&!resultShown)togglePause(true);
   }
   // Exposed for automated smoke tests and deterministic bug reports.
-  window.dojo = { game, config, start:()=>beginVersus(), startMatch, menu:showSelection, title:showTitle, get screen(){return screen;}, get active(){return active;}, get ready(){return ready;} };
+  window.dojo = { game, config, start:()=>beginVersus(), startMatch, menu:showSelection, title:showTitle, get stage(){return currentStage;}, get screen(){return screen;}, get active(){return active;}, get ready(){return ready;} };
 
   function showPanel(id, visible) {
     const panel = $(id);
@@ -226,6 +235,37 @@
   function opponentId() {return config.opponent || (config.player==='angelo'?'samuel':'angelo');}
   function opponentTag() {return config.mode==='versus'?'GIOCATORE 02':config.mode==='training'?'PARTNER':'CPU';}
   function modeName() {return online?.active?(config.mode==='training'?'ONLINE · ALLENAMENTO':'ONLINE · 1 VS 1'):arcadeRun?'ARCADE':config.mode==='versus'?'2 GIOCATORI':config.mode==='training'?'ALLENAMENTO':'VS CPU';}
+  async function loadStage(id) {
+    return stageLoader ? stageLoader.load(id) : {stage:currentStage,image:bg,fallback:false};
+  }
+  function applyStage(arena) {
+    currentStage=arena.stage;bg=arena.image;
+    canvas.dataset.stageId=currentStage.id;
+    if($('stage-name'))$('stage-name').textContent=currentStage.name.toLocaleUpperCase('it');
+    if($('stage-number'))$('stage-number').textContent='STAGE '+String(currentStage.number).padStart(2,'0');
+    if($('versus-stage'))$('versus-stage').textContent=currentStage.name+' · '+currentStage.location;
+    if($('stage-load-note')){
+      $('stage-load-note').textContent=arena.fallback?'Arena non disponibile: si combatte al Bodyplanet Dojo.':'';
+      $('stage-load-note').hidden=!arena.fallback;
+    }
+  }
+  function buildStageChoices() {
+    const select=$('stage-select');if(!select||!stages)return;
+    const choices=[...stages.list,{id:'random',name:'Casuale · tutte le arene'}];
+    select.replaceChildren(...choices.map(stage=>{
+      const option=document.createElement('option');option.value=stage.id;option.textContent=stage.name;return option;
+    }));
+    select.value=config.stageId;
+    updateStageChoiceLabel();
+    select.addEventListener('change',()=>{
+      if(screen!=='select'||matchLoading||!stages.isChoice(select.value))return;
+      config.stageId=select.value;updateStageChoiceLabel();sound.effect('menuMove');
+    });
+  }
+  function updateStageChoiceLabel() {
+    const label=$('selection-stage-label');
+    if(label)label.textContent=config.stageId==='random'?'Arena casuale':stages?.get(config.stageId).name||'Bodyplanet Dojo';
+  }
   function cancelMatchLoading() {
     matchLoadId++;matchLoading=false;selectionError='';
     arcadeUI.setBusy(false);
@@ -237,6 +277,7 @@
     $('start-label').textContent=matchLoading?'CARICO…':selectionError?'RIPROVA':'COMBATTI';
     document.querySelectorAll('[data-fighter],[data-selection-target],[data-mode]').forEach(button=>button.disabled=matchLoading);
     $('difficulty').disabled=matchLoading||config.mode!=='cpu';
+    if($('stage-select')){$('stage-select').disabled=matchLoading;$('stage-select').value=config.stageId;}
   }
   function setSelectionTarget(target) {
     if(screen!=='select'||matchLoading||!['player','opponent'].includes(target))return;
@@ -287,6 +328,7 @@
     document.querySelectorAll('[data-roster-portrait]').forEach(surface=>portrait(surface,surface.dataset.rosterPortrait,1,true));
   }
   function updateSelection() {
+    updateStageChoiceLabel();
     const ids=[config.player,opponentId()];
     ids.forEach((id,i)=>{
       const character=characters[id],prefix='select-p'+(i+1);
@@ -350,7 +392,7 @@
       if(!arcadeRun.getState().finished)arcadeRun.finish();
       Object.assign(config,regularConfig);
     }
-    arcadeRun=null;arcadeMatch=null;arcadeStats=null;
+    arcadeRun=null;arcadeMatch=null;arcadeStats=null;arcadeStageBag=null;arcadeStageMatchId=null;
     arcadeUI.showRun(null);arcadeUI.showResult(null);
     $('restart-button').hidden=false;$('menu-button').textContent='SCELTA PERSONAGGIO';
     $('rematch-button').textContent='RIVINCITA ↗';$('rematch-button').disabled=false;
@@ -388,20 +430,23 @@
   function beginArcade(profile) {
     if(matchLoading||screen!=='create')return;
     arcadeRun=window.DojoArcade.createRun({...profile,rosterIds});
+    arcadeStageBag=stages?.createShuffleBag();arcadeStageMatchId=null;
     applyArcadeCharacter();prepareArcadeMatch();
   }
   async function prepareArcadeMatch() {
     if(!arcadeRun||arcadeRun.getState().finished||matchLoading)return;
     const run=arcadeRun;arcadeMatch=run.nextMatch();
+    if(arcadeStageMatchId!==arcadeMatch.matchId){arcadeStageId=arcadeStageBag?.next()||'dojo';arcadeStageMatchId=arcadeMatch.matchId;}
     applyArcadeCharacter();
-    Object.assign(config,{player:'arcade-player',opponent:arcadeMatch.opponent,mode:'cpu',difficulty:arcadeMatch.difficulty});
+    Object.assign(config,{player:'arcade-player',opponent:arcadeMatch.opponent,mode:'cpu',difficulty:arcadeMatch.difficulty,stageId:arcadeStageId});
     active=false;paused=false;clearCombatInput();game.pause(true);
     matchLoading=true;arcadeUI.setBusy(true);$('rematch-button').disabled=true;
     const requestId=++matchLoadId,screenToken=transitionId;
     sound.init();
     try {
-      await Promise.all([window.FighterArt.loadFighters([config.player,config.opponent]),window.ArcadeVFX?.load()]);
+      const [arena]=await Promise.all([loadStage(config.stageId),window.FighterArt.loadFighters([config.player,config.opponent]),window.ArcadeVFX?.load()]);
       if(requestId!==matchLoadId||arcadeRun!==run||transitionId!==screenToken)return;
+      applyStage(arena);
       matchLoading=false;arcadeUI.setBusy(false);$('rematch-button').disabled=false;
       clearMatchPresentation();game.start(config);game.pause(true);setNames();updateSelection();
       $('versus-tag').textContent='ARCADE · SFIDA '+arcadeMatch.number+'/20 · VERSO '+arcadeMatch.targetRank.label;
@@ -449,6 +494,8 @@
     if(online?.active){online.rematch();return;}
     if(arcadeRun){if(arcadeRun.getState().finished)showArcadeCreator();else prepareArcadeMatch();return;}
     if(!ready||screen==='versus'||matchLoading)return;
+    const rematch=screen==='game'&&(active||resultShown);
+    const stageId=rematch?currentStage.id:config.stageId==='random'?(stageBag?.next()||'dojo'):config.stageId;
     if(screen!=='select')showSelection();
     sound.init();sound.effect('menuConfirm');config.difficulty=$('difficulty').value;
     active=false;paused=false;clearCombatInput();clearMatchPresentation();game.pause(true);
@@ -456,8 +503,9 @@
     const requestId=++matchLoadId,screenToken=transitionId;
     const fighterIds=[config.player,opponentId()];
     try{
-      await Promise.all([window.FighterArt.loadFighters(fighterIds),window.ArcadeVFX?.load()]);
+      const [arena]=await Promise.all([loadStage(stageId),window.FighterArt.loadFighters(fighterIds),window.ArcadeVFX?.load()]);
       if(requestId!==matchLoadId||screen!=='select'||transitionId!==screenToken)return;
+      applyStage(arena);
       matchLoading=false;updateSelection();setScreen('versus','versus-screen');
       $('status-label').textContent='IL KUMITE STA PER INIZIARE';
       const token=transitionId;
@@ -535,7 +583,8 @@
 
   function drawBackground(t) {
     if(bg.complete&&bg.naturalWidth)ctx.drawImage(bg,0,0,1280,720);else{ctx.fillStyle='#8a7053';ctx.fillRect(0,0,1280,720);}
-    // Sparse motes catch the dojo's late-afternoon light.
+    // Keep indoor dust out of the outdoor arenas.
+    if(!currentStage.motes||reducedMotion)return;
     ctx.save();ctx.globalCompositeOperation='screen';
     for(let i=0;i<21;i++){const x=(i*163+t*(3+i%5))%1280,y=200+(i*61)%365+Math.sin(t*.5+i)*12;ctx.globalAlpha=.13+Math.sin(t+i)*.08;ctx.fillStyle='#fff0c3';ctx.beginPath();ctx.arc(x,y,.9+(i%3)*.45,0,Math.PI*2);ctx.fill();}ctx.restore();
   }
@@ -677,6 +726,7 @@
   $('result-menu-button').addEventListener('click',()=>arcadeRun&&!arcadeRun.getState().finished?finishArcade():showSelection());
   document.querySelector('.brand')?.addEventListener('click',e=>{e.preventDefault();showTitle();});
   buildRoster();
+  buildStageChoices();
   $('arcade-title-button').addEventListener('click',showArcadeCreator);
   const arcadeModeButton=document.createElement('button');arcadeModeButton.type='button';arcadeModeButton.textContent='ARCADE';arcadeModeButton.dataset.arcadeMode='true';
   arcadeModeButton.addEventListener('click',showArcadeCreator);document.querySelector('.mode-select').append(arcadeModeButton);
@@ -732,8 +782,13 @@
     syncAudioButton();showTitle(false);
     try{
       await window.__kyokushinAssetsReady;
-      bg.src=window.__kyokushinAsset('assets/dojo-mirror.png');
-      await Promise.all([bg.decode(),window.FighterArt.load()]);ready=true;
+      if(stageLoader){
+        const [arena]=await Promise.all([loadStage('dojo'),window.FighterArt.load()]);applyStage(arena);
+      }else{
+        bg.src=window.__kyokushinAsset('assets/dojo-mirror.png');
+        await Promise.all([bg.decode(),window.FighterArt.load()]);
+      }
+      ready=true;
       $('title-start-button').disabled=false;$('title-load-label').textContent='INIZIA';
       $('arcade-title-button').disabled=false;
       $('start-button').disabled=false;$('start-label').textContent='COMBATTI';

@@ -1,0 +1,53 @@
+{
+  "generator": "Built-in ImageGen",
+  "created": "2026-10-25",
+  "composition": {
+    "canvas": [
+      1280,
+      720
+    ],
+    "fighterGroundY": 625
+  },
+  "stages": [
+    {
+      "id": "spiaggia-libera-3",
+      "file": "spiaggia-libera-3.webp",
+      "prompt": "Use case: stylized-concept. Create one finished 16:9 widescreen 2D side-view fighting game stage background, 1536x864 or equivalent wide 16:9. First attached image is our existing dojo background: match its hand-painted high quality anime fighting game scenery, crisp subtle ink outlines, warm light, textured color shapes, grounded perspective. Second image is location reference for Spiaggia libera n. 3, Playa di Catania: broad golden sand, turquoise Ionian sea curving away on the RIGHT, distant Catania skyline along the center horizon and enormous hazy Mount Etna behind to the LEFT, sparse beach structures far away. Transform this into an original painted game environment, vibrant clear late afternoon with fluffy clouds, warm sand and blue sea. Camera is level at the fighters' waist height, straight horizontal stage composition. Mandatory usable ground: the entire bottom 30 percent is an uninterrupted gently textured LEVEL golden-sand fighting strip from left edge to right edge, nothing in front of fighters. Their feet will land at 87 percent image height. Sea starts only behind this foreground strip on right, never underneath foot line. Environmental landmarks in upper two-thirds. No fighters, no close people, no UI, no logos, no captions, no borders. Do not copy the dojo interior or training mats. Deliver only the full-bleed background.",
+      "sourcePages": [
+        "https://catania.liveuniversity.it/2023/06/15/catania-riaprono-spiagge-libere-playa-quando/"
+      ]
+    },
+    {
+      "id": "torneo-kyokushin",
+      "file": "torneo-kyokushin.webp",
+      "prompt": "Use case: stylized-concept. Create one finished 16:9 widescreen 2D side-view fighting game stage background, 1536x864 or equivalent wide16:9. Attached dojo image is art-style reference only: match its hand-painted high quality anime fighting game scenery, crisp subtle ink outlines, textured color shapes, warm dramatic lighting and grounded perspective. Scene: a large European Kyokushin karate championship sports arena, inspired by a real international tournament in an indoor palace of sport. Wide unobstructed competition tatami in muted blue with a red perimeter and thin visible interlocking seams, distant audience grandstands, officials' table far behind the mat, overhead metal roof trusses and diffuse spotlights, a few vertical ceremonial red-white banners with subtle brushstroke patterns. Professional prestigious championship atmosphere, no boxing ring or ropes or cage. Camera is straight-on at fighter waist height, slightly looking across a flat mat. Mandatory bottom30percent is unobstructed LEVEL tatami from leftedge to rightedge; the fighters' feet will be at87percentimageheight. Backgroundstandsshouldstaybehindupper65percent. Audience as small indistinct silhouettes only, no athletes/referees in foreground. No UI, no tournament dates, no brands or sponsorlogos, no captions, no illegible decorative lettering. Only full-bleed background.",
+      "sourcePages": [
+        "https://app.kumitetechnology.com/en/tournament/37/"
+      ]
+    },
+    {
+      "id": "rifugio-gualberto",
+      "file": "rifugio-gualberto.webp",
+      "prompt": "Use case: stylized-concept. Produce a finished widescreen 16:9 2D fighting game backdrop,1536x864 or equivalent16:9. First attached dojo is STYLE REFERENCE ONLY: match the highquality handpainted anime fighting game scenery, subtle crisp ink linework, textured colors, grounded perspective. Other photos are the actual Rifugio San Giovanni Gualberto on Mount Etna: preserve recognizability of a sizeable steep-gabled chalet with brown vertical wooden siding on upper two floors, pale cream gray plaster ground floor, rows of rectangular dark shuttered windows, tall Etna pine forest, rustic dark X-braced wooden railings and dark volcanic stone. Compose a straight level side-view arena: cabin occupying middle-left background among large pines, little basalt-stone circular well with simple wooden uprights on far right behind combat area, sunny clear air and dappled golden light. Adapt viewpoints intentionally for a usable arena. Bottom30percent must be continuous flat empty lava-stone paved terrace, footbaseline at87percent height. Well, railing, rocks and trees entirely behind the fighting strip; no foreground rails cutting fighters. Scene level and horizontal. No fighters, nopeople, noHUD, nocaptions, noborders, nowatermarks. Original scene with the reference chalet's character, no dojo interior or mats.",
+      "sourcePages": [
+        "https://www.etnanatura.it/paginasentiero.php?nome=rifugio_san_giovanni_gualberto"
+      ]
+    },
+    {
+      "id": "anfiteatro-turi-ferro",
+      "file": "anfiteatro-turi-ferro.webp",
+      "prompt": "Use case: stylized-concept. Produce a finished widescreen16:9 2D fighting game backdrop,1536x864 or equivalent16:9. First attached dojo is STYLE REFERENCE ONLY: match highquality handpainted anime fighting game scenery with subtle crisp ink linework, textured colors and warm light. Second photo is actual Anfiteatro Turi Ferro at Parco Borsellino, Gravina di Catania. Preserve unmistakable curved concentric gray concrete spectator tiers with molded seats arranged as GREEN WHITE RED Italian-flag sections, metal railings above, mature umbrella pine trees behind, a small pale Etna silhouette far left. Recompose from the level stone performance stage looking toward the curved seating so the rows arc across the midground. A small section of the pale stone wall with round arches may appear at far left as a recognizable side detail. Golden late afternoon sunlight, soft shadows. Mandatory the whole bottom30percent is wide uninterrupted LEVEL pale warm stone performance floor, no steps orrails in fightingstrip; fighterfeetbaseline87percentheight. All seating, shrubs andarchitecture behind that floor. Horizontal side-on fighting gamecamera, no tilted perspective, no fighters, noclosepeople, noUI,nocaptions, nobrandlogos,noborders. Fullbleedbackground only.",
+      "sourcePages": [
+        "https://www.comune.gravina-di-catania.ct.it/it/vivere/anfiteatro-turi-ferro-parco-borsellino"
+      ]
+    },
+    {
+      "id": "parco-gioeni",
+      "file": "parco-gioeni.webp",
+      "prompt": "Use case: stylized-concept. Produce one finished widescreen16:9 2D fighting game backdrop,1536x864 or equivalent16:9. First attacheddojo is STYLE REFERENCE ONLY: match the highquality handpainted anime fighting game scenery, subtle crisp ink outlines, texturedcolors, warmlightand grounded perspective. Secondphoto is actual Parco Gioeni overlook in Catania. Preserve its recognizable terracotta paved terrace with narrow darkbasalt strips, basalt retainingwalls, darkrailingswithrepeatedbowedverticalbars, small fan palms in a raisedbed toleft, matureMediterraneangreentrees, panorama down Via Etnea through midrise Catania buildings towardblueIoniansea horizon. Broadstepsdescendingawayonrightonly BEHINDfightingarea. Sunnygoldenafternoon, clearblue sky, detailed butquietdistance. Recomposecarefully as straight level 2D side-on fightingstage: wholebottom30percent is uninterrupted LEVEL emptyterracotta plaza running horizontallyfromlefttoright, thinbasaltpavinglines, footbaseline87percentimageheight. Stepsandgardenmustendbehindtheforegroundfightingstrip, norailingscuttingacrossfighters, noobjectsorpeopleinforeground. Panoramiccityandseainmiddistanceupperhalf, NOEtnaonsouthernseahorizon, nofictionalmonumentalfountain. NoUI,nofighters,nocaptions,nologos,nowatermarks,noborders. Onlyoriginalfullbleedbackdrop.",
+      "sourcePages": [
+        "https://qds.it/parco-gioeni-riapertura-bonifica-orari-servizi-sicurezza-catania-riqualificazione-ambiente/"
+      ]
+    }
+  ]
+}

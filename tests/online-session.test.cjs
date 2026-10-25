@@ -2,10 +2,13 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { OnlineSession } = require('../scripts/online-session.js');
+const previousStages = global.DojoStages;
+const stages = require('../scripts/stages.js');
+global.DojoStages = previousStages;
 const tick = async () => { await Promise.resolve(); await Promise.resolve(); };
 const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no; }); return { promise, resolve, reject }; };
 const clone = value => JSON.parse(JSON.stringify(value));
-function fixture(role = 'host', prepare = async () => {}) {
+function fixture(role = 'host', prepare = async () => {}, options = {}) {
   const calls = { lobby: 0, prepare: [], versus: [], start: [], pause: [], clients: [], engines: [] }, timers = new Map(); let timerId = 0;
   const initial = { code: 'AB23XY', mode: 'versus', role, revision: 1, status: 'paired', players: [{ slot: 0, name: 'Andrea', fighter: 'angelo', ready: false }, { slot: 1, name: 'Marco', fighter: 'samuel', ready: false }] };
   class UI {
@@ -35,7 +38,7 @@ function fixture(role = 'host', prepare = async () => {}) {
     dispose() { this.disposed = true; } pause() {} clearInput() {} setInput() {} update() { this.updates++; }
     setReconnecting(value) { this.reconnecting = value; }
   }
-  const session = new OnlineSession({ UI, Client, Engine, roster: { angelo: {}, samuel: {} }, endpoint: 'https://example.test', game: { getState: () => ({ fighters: [] }) },
+  const session = new OnlineSession({ UI, Client, Engine, stages: options.stages, roster: { angelo: {}, samuel: {} }, endpoint: 'https://example.test', game: { getState: () => ({ fighters: [] }) },
     setTimeout(fn, ms) { const id = ++timerId; timers.set(id, { fn, ms }); return id; }, clearTimeout(id) { timers.delete(id); },
     onOpen() {}, onBack() {}, onLobby() { calls.lobby++; }, onPrepare(info) { calls.prepare.push(clone(info)); return prepare(info); },
     onVersus(info) { calls.versus.push(clone(info)); }, onStart(info) { calls.start.push(clone(info)); }, onPause(...args) { calls.pause.push(args); }
@@ -171,4 +174,68 @@ test('return-to-room acknowledgment is retried after recovery without changing r
   assert.equal(f.session.roomReset.complete, false); assert.equal(f.session.ui.busy, true);
   client.connected = true; f.session.connection('connected'); assert.equal(client.sent.at(-1).type, 'online-room-reset');
   assert.equal(f.session.ui.busy, false); assert.ok(f.session.room.players.every(player => !player.ready));
+});
+
+test('host stage choice crosses the loading barrier and stays identical through rematch', async () => {
+  const f = fixture('host', undefined, { stages }), client = await f.enter();
+  assert.deepEqual(client.sent[0], { type: 'online-stages', ids: stages.list.map(stage => stage.id) });
+  f.session.receive({ type: 'online-stages', ids: stages.list.map(stage => stage.id) });
+  f.session.ui.options.onStage('parco-gioeni');
+  assert.equal(f.session.room.stageId, 'parco-gioeni');
+  assert.deepEqual(client.sent.at(-1), { type: 'online-stage', epoch: 0, stageId: 'parco-gioeni' });
+  f.ready(); await tick();
+  assert.equal(f.calls.prepare[0].stageId, 'parco-gioeni');
+  assert.equal(client.sent.find(packet => packet.type === 'online-prepare').stageId, 'parco-gioeni');
+  f.session.receive({ type: 'online-loaded', epoch: 1 }); f.runTimer(1400);
+  assert.equal(f.calls.start[0].stageId, 'parco-gioeni');
+  f.session.showResult(); f.session.rematch(); f.session.receive({ type: 'online-rematch', epoch: 1 }); await tick();
+  assert.equal(f.calls.prepare[1].stageId, 'parco-gioeni');
+});
+test('guest displays host arena and rejects a start for a different arena', async () => {
+  const f = fixture('guest', undefined, { stages }); await f.enter();
+  f.session.receive({ type: 'online-stage', epoch: 0, stageId: 'spiaggia-libera-3' });
+  assert.equal(f.session.ui.room.stageId, 'spiaggia-libera-3');
+  f.session.ui.options.onStage('parco-gioeni'); assert.equal(f.session.stageId, 'spiaggia-libera-3');
+  f.session.receive({ ...preparePacket(), stageId: 'spiaggia-libera-3' }); await tick();
+  assert.equal(f.calls.prepare[0].stageId, 'spiaggia-libera-3');
+  f.session.receive({ type: 'online-versus', epoch: 1 });
+  f.session.receive(startPacket()); f.session.receive({ ...startPacket(), stageId: 'parco-gioeni' });
+  assert.equal(f.calls.start.length, 0);
+  f.session.receive({ ...startPacket(), stageId: 'spiaggia-libera-3' });
+  assert.equal(f.calls.start.length, 1);
+});
+test('older or limited peers use an arena supported by both without changing room protocol', async () => {
+  for (const ids of [null, ['dojo']]) {
+    const f = fixture('host', undefined, { stages }); await f.enter(); f.session.changeStage('torneo-kyokushin');
+    if (ids) f.session.receive({ type: 'online-stages', ids });
+    f.ready(); await tick(); assert.equal(f.calls.prepare[0].stageId, 'dojo');
+  }
+  const guest = fixture('guest', undefined, { stages }); await guest.enter();
+  guest.session.receive(preparePacket()); await tick();
+  guest.session.receive({ type: 'online-versus', epoch: 1 }); guest.session.receive(startPacket());
+  assert.equal(guest.calls.start[0].stageId, 'dojo');
+});
+test('stale, unsupported and guest stage selections cannot change a prepared arena', async () => {
+  const f = fixture('host', undefined, { stages }), client = await f.enter();
+  f.session.receive({ type: 'online-stages', ids: ['dojo', 'parco-gioeni'] });
+  for (const id of ['constructor', 'random', 'torneo-kyokushin']) f.session.changeStage(id);
+  f.session.receive({ type: 'online-stage', epoch: 0, stageId: 'parco-gioeni' });
+  assert.equal(f.session.stageId, 'dojo');
+  await f.session.change({ ready: true }); f.session.changeStage('parco-gioeni');
+  assert.equal(f.session.stageId, 'dojo');
+  const guest = fixture('guest', undefined, { stages }); await guest.enter();
+  guest.session.receive({ type: 'online-stage', epoch: 9, stageId: 'parco-gioeni' });
+  guest.session.receive({ ...preparePacket(), stageId: 'constructor' });
+  assert.equal(guest.session.stageId, 'dojo'); assert.equal(guest.session.phase, 'room');
+  assert.equal(client.updates.length, 1);
+});
+test('stage selection survives polling and return to room but resets when leaving', async () => {
+  const f = fixture('host', undefined, { stages }), client = await f.enter();
+  f.session.receive({ type: 'online-stages', ids: stages.list.map(stage => stage.id) });
+  f.session.changeStage('rifugio-gualberto'); f.session.roomChanged(client.room);
+  assert.equal(f.session.ui.room.stageId, 'rifugio-gualberto');
+  f.ready(); await tick(); f.session.receive({ type: 'online-loaded', epoch: 1 }); f.runTimer(1400);
+  await f.session.returnToRoom();
+  assert.equal(f.session.ui.room.stageId, 'rifugio-gualberto');
+  f.session.leave(); assert.equal(f.session.stageId, 'dojo'); assert.equal(f.session.remoteStageIds, null);
 });

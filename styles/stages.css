@@ -1,0 +1,29 @@
+/* Arena choice stays in the same scrollable panel as the match controls. */
+#selection-panel .select-footer{grid-template-columns:minmax(0,1.25fr) minmax(95px,.42fr) minmax(150px,.8fr) minmax(115px,.5fr);gap:14px}
+#selection-panel .select-footer>*{min-width:0}
+#selection-panel .select-footer .stage-field{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:9px;margin:0;color:#a5aeb7;font:700 7px/1.3 Arial,sans-serif;letter-spacing:1.4px}
+#selection-panel .select-footer .stage-field select{width:100%;min-width:0;min-height:36px;padding:8px;color:#f3deb7;background:#243344;border:1px solid #687d9244;border-radius:0;font:700 11px Arial,sans-serif;letter-spacing:0;text-overflow:ellipsis}
+#selection-panel .select-footer .stage-field select:disabled{opacity:.4}
+.versus-heading #versus-stage{display:block;margin-top:8px;color:#f3d28d;font:700 10px/1.4 Arial,sans-serif;letter-spacing:1.5px;text-transform:uppercase}
+.versus-heading #stage-load-note{display:block;margin:5px auto 0;max-width:420px;color:#d9c7aa;font:10px/1.4 Arial,sans-serif;letter-spacing:0}
+.versus-heading #stage-load-note[hidden]{display:none}
+@media(max-width:1000px){
+ #selection-panel .select-footer{grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(110px,.8fr);gap:10px}
+ #selection-panel .select-footer .mode-side{grid-column:1/-1}
+ #selection-panel .select-footer .mode-select button{flex:1}
+}
+@media(max-width:650px){
+ #selection-panel .select-footer{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:10px}
+ #selection-panel .select-footer .stage-field{font-size:6px;gap:6px;letter-spacing:1px}
+ #selection-panel .select-footer .stage-field select{font-size:11px;min-height:44px;padding:7px}
+ #selection-panel .select-footer .start-button{grid-column:1/-1}
+ .versus-heading #versus-stage{font-size:9px;letter-spacing:.6px}
+}
+body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) #selection-panel .select-footer{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:7px 10px}
+body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) #selection-panel .select-footer .stage-field{font-size:6px;gap:4px;letter-spacing:1px}
+body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) #selection-panel .select-footer .stage-field select{font-size:10px;min-height:44px;padding:7px}
+body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) #selection-panel .select-footer .start-button{grid-column:1/-1}
+body.landscape-layout .versus-heading #versus-stage{font-size:8px;letter-spacing:.6px;margin-top:5px}
+body.landscape-short .versus-heading #stage-load-note{font-size:8px;margin-top:2px}
+
+body.landscape-layout #selection-panel .select-footer .mode-side{grid-column:1/-1}
