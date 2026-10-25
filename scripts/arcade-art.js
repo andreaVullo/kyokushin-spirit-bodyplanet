@@ -6,6 +6,7 @@
   const root = new URL('../assets/arcade/', document.currentScript.src);
   const images = new Map(), pending = new Map(), sources = new Map(), sheets = new Map();
   const appearances = new Map(), rendered = new Map(), states = new WeakMap(), collars = new WeakMap();
+  const MAX_RENDERED_FRAMES = 180;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const DEFAULT = { id: 'arcade-player', name: 'Karateka', gender: 'male', hair: 0, rank: { color: '#f1eee7', stripe: null, dan: 0 } };
 
@@ -15,29 +16,37 @@
     if (images.has(key)) return Promise.resolve(images.get(key));
     if (pending.has(key)) return pending.get(key);
     const promise = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
+      // HTTP pages can decode the original PNG directly. The JavaScript/base64
+      // envelope remains only for local files, whose canvases need clean origins.
+      const direct = root.protocol === 'https:' || root.protocol === 'http:';
+      const script = direct ? null : document.createElement('script');
       let settled = false;
       const finish = error => {
         if (settled) return;
-        settled = true; clearTimeout(timeout); script.remove(); sources.delete(key);
+        settled = true; clearTimeout(timeout); script?.remove(); sources.delete(key);
         if (error) reject(error);
       };
       const fail = () => finish(new Error('Impossibile caricare gli sprite Arcade: riprova.'));
       const timeout = setTimeout(fail, 45000);
-      script.onerror = fail;
-      script.onload = () => {
-        const source = sources.get(key);
-        if (!source) { fail(); return; }
-        const image = new Image();
-        image.onerror = fail;
-        image.onload = () => {
-          if (settled) return;
-          images.set(key, image); finish(); resolve(image);
-        };
-        image.src = source;
+      const image = new Image();
+      image.decoding = 'async';
+      image.onerror = fail;
+      image.onload = () => {
+        if (settled) return;
+        images.set(key, image); finish(); resolve(image);
       };
-      script.src = new URL(key + '.js', root).href;
-      document.head.append(script);
+      if (direct) image.src = new URL(key + '.png', root).href;
+      else {
+        script.onerror = fail;
+        script.onload = () => {
+          if (settled) return;
+          const source = sources.get(key);
+          if (!source) { fail(); return; }
+          image.src = source;
+        };
+        script.src = new URL(key + '.js', root).href;
+        document.head.append(script);
+      }
     }).finally(() => pending.delete(key));
     pending.set(key, promise);
     return promise;
@@ -56,13 +65,15 @@
     const ctx = canvas.getContext('2d', { willReadFrequently: true }); ctx.drawImage(image, 0, 0);
     const rgba = ctx.getImageData(0, 0, w, h).data;
     const labels = new Int32Array(w * h), queue = new Int32Array(w * h);
-    let label = 0;
+    let label = 0, tail = 0;
+    // One neighbour function per sheet, rather than one closure per opaque
+    // pixel. Large mobile sheets otherwise create millions of short-lived objects.
+    const add = n => { if (!labels[n] && rgba[n * 4 + 3] >= 120) { labels[n] = label; queue[tail++] = n; } };
     for (let p = 0; p < labels.length; p++) {
       if (labels[p] || rgba[p * 4 + 3] < 120) continue;
-      label++; let head = 0, tail = 1; queue[0] = p; labels[p] = label;
+      label++; let head = 0; tail = 1; queue[0] = p; labels[p] = label;
       while (head < tail) {
         const i = queue[head++], x = i % w, y = (i / w) | 0;
-        const add = n => { if (!labels[n] && rgba[n * 4 + 3] >= 120) { labels[n] = label; queue[tail++] = n; } };
         if (x) add(i - 1); if (x + 1 < w) add(i + 1);
         if (y) add(i - w); if (y + 1 < h) add(i + w);
       }
@@ -84,7 +95,11 @@
             (gy > 0 && labels[at - w] === frame.component) ||
             (gy + 1 < h && labels[at + w] === frame.component);
         }
-        if (belongs) pixels.data.set(rgba.subarray(at * 4, at * 4 + 4), (y * sw + x) * 4);
+        if (belongs) {
+          const from = at * 4, to = (y * sw + x) * 4;
+          pixels.data[to] = rgba[from]; pixels.data[to + 1] = rgba[from + 1];
+          pixels.data[to + 2] = rgba[from + 2]; pixels.data[to + 3] = rgba[from + 3];
+        }
       }
       if (frame.neckBlend) {
         // Each modular portrait ends in an inked cut across the neck. That cut
@@ -121,8 +136,6 @@
 
   function setCharacter(value) {
     const result = appearance(value); appearances.set(result.id, result);
-    // Keep the cache bounded when advancing through all twenty ranks.
-    if (rendered.size > 180) rendered.clear();
     return result;
   }
 
@@ -144,7 +157,7 @@
     let top = height, bottom = 0;
     const rowCounts = new Uint32Array(height);
     for (let i = 0; i < pixels.length; i += 4) {
-      const [r, g, b, a] = pixels.subarray(i, i + 4);
+      const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2], a = pixels[i + 3];
       if (a > 0 && g > 45 && b > 45 && g - r > 32 && b - r > 32 && g > r * 1.9 && b > r * 1.9 && b / g > .70 && b / g < 1.32) {
         const y = Math.floor(i / 4 / width);
         rowCounts[y]++; mask.push(i);
@@ -201,7 +214,11 @@
     let body = sheets.get(meta.sheet)?.get(meta.component);
     if (!body) return null;
     const key = [model.gender, model.hair, model.rank.color, model.rank.stripe, model.rank.dan, index, facing === -1 ? -1 : 1].join(':');
-    if (rendered.has(key)) return rendered.get(key);
+    if (rendered.has(key)) {
+      const result = rendered.get(key);
+      rendered.delete(key); rendered.set(key, result);
+      return result;
+    }
     if (global.GiBranding?.arcadeOptions) {
       body = global.GiBranding.apply(body, global.GiBranding.arcadeOptions(model.gender, index, meta));
       body = global.GiBranding.forFacing(body, facing);
@@ -233,7 +250,20 @@
     restoreCollar(ctx, body, meta, border);
     const floor = global.FighterGeometry?.measure(body)?.floor ?? (meta.bounds[1] + meta.bounds[3] - meta.region[1]);
     const result = { canvas, meta, offsetX: meta.region[0] - meta.anchor[0] - border, offsetY: -floor - border };
-    rendered.set(key, result); return result;
+    rendered.set(key, result);
+    // Evict old belts/hairstyles incrementally. Clearing the complete cache at
+    // a promotion made the next match build every animation during live play.
+    if (rendered.size > MAX_RENDERED_FRAMES) rendered.delete(rendered.keys().next().value);
+    return result;
+  }
+
+  async function prepareCharacter(model) {
+    // The loading screen pays the composition cost, including the opposite
+    // chest mark. Yield between poses so touch UI and online heartbeats run.
+    for (let index = 0; index < atlas[model.gender].length; index++) {
+      await new Promise(resolve => setTimeout(resolve, 0));
+      frameFor(model, index, 1); frameFor(model, index, -1);
+    }
   }
 
   const attackFrames = { tsuki: 6, gyaku: 8, shita: 10, kagi: 12, gedan: 14, mae: 16, mawashi: 18, ushiro: 20, kaiten: 22 };
@@ -316,6 +346,7 @@
       const custom = ids.filter(id => appearances.has(id));
       await Promise.all([previous.loadFighters(ids.filter(id => !appearances.has(id))),
         ...[...new Set(custom.map(id => appearances.get(id).gender))].map(gender => load({ gender }))]);
+      for (const id of new Set(custom)) await prepareCharacter(appearances.get(id));
     }, draw, drawSelectionPortrait, strikePoint,
     drawPortrait: (ctx, id, x, y, width, height) => drawSelectionPortrait(ctx, id, x, y, width, height, { bust: true }),
     get ready() { return previous.ready; }, height: previous.height };

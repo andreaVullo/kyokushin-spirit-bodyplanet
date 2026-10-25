@@ -6,6 +6,7 @@
       this.win = win; this.doc = doc; this.element = element; this.hostOrigin = hostOrigin;
       this.onChange = onChange; this.onInputReset = onInputReset;
       this.requested = false; this.hostManaged = false; this.hostPending = false;
+      this.layoutOnly = false;
       this.nativePending = false; this.nativeOwned = false; this.serial = 0;
       this.message = event => this.receive(event);
       this.fullscreen = () => this.fullscreenChanged();
@@ -22,9 +23,9 @@
     clearTimers() {
       this.win.clearTimeout(this.hostTimer); this.win.clearTimeout(this.nativeTimer);
     }
-    open() {
+    open({ native = true } = {}) {
       this.clearTimers(); const serial = ++this.serial;
-      this.requested = true; this.nativePending = false;
+      this.requested = true; this.nativePending = false; this.layoutOnly = !native;
       if (this.send('landscape')) {
         this.hostPending = !this.hostManaged;
         // Older launchers may ignore the display protocol. Do not wait forever.
@@ -36,6 +37,7 @@
         return;
       }
       this.changed();
+      if (!native) return;
       // The layout fallback is already active. Fullscreen only hides browser UI;
       // it never decides whether portrait is playable and never locks the device.
       if (!this.element.requestFullscreen || this.doc.fullscreenElement) return;
@@ -61,11 +63,16 @@
     close(notifyHost = true) {
       this.serial++; this.clearTimers();
       this.requested = false; this.hostPending = false; this.nativePending = false;
+      this.layoutOnly = false;
       this.nativeOwned = false;
       if (notifyHost) this.send('exit');
       this.exitNative(); this.changed();
     }
-    toggle() { this.requested || this.doc.fullscreenElement === this.element ? this.close() : this.open(); }
+    toggle() {
+      // Automatic fitting must not turn the first fullscreen tap into an exit.
+      if (this.layoutOnly) this.open();
+      else this.requested || this.doc.fullscreenElement === this.element ? this.close() : this.open();
+    }
     fullscreenChanged() {
       if (this.doc.fullscreenElement === this.element) {
         this.nativeOwned = true; this.nativePending = false;

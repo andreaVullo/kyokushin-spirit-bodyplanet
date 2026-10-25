@@ -14,7 +14,9 @@ test('room codes normalize case while accepting only six alphanumeric characters
   for (const value of ['AB12XY', 'AB02XY', 'ABI2XY', 'ABO2XY']) assert.throws(() => cleanCode(value), /senza I, O, 0 e 1/);
 });
 test('an invitation contains only a room code, never a local player session or embedded display parameters', () => {
-  assert.equal(inviteURL('AB23XY', 'https://example.test/Gioca.html?token=secret&embed=1&hostdisplay=1#settings'), 'https://example.test/Gioca.html?room=AB23XY');
+  assert.equal(inviteURL('AB23XY', 'https://example.test/Gioca.html?token=secret&embed=1&hostdisplay=1#settings'), 'https://example.test/online.html?room=AB23XY');
+  assert.equal(inviteURL('', 'https://example.test/game/Gioca.html?token=secret'), 'https://example.test/game/online.html');
+  assert.equal(inviteURL('AB23XY', 'file:///local/Gioca.html'), 'https://andreavullo.github.io/kyokushin-spirit-bodyplanet/online.html?room=AB23XY');
 });
 test('the graphical code keyboard is uppercase, six-character and excludes spaces or accents', () => {
   const draft = new NameDraft('', { maxLength: 6, code: true });

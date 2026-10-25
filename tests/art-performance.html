@@ -1,0 +1,28 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><title>Verifica prestazioni sprite</title>
+<style>body{font:16px system-ui;background:#111926;color:#eee;padding:24px}button{font:inherit;padding:12px}pre{white-space:pre-wrap}canvas{background:#243143;max-width:100%}</style>
+<h1>Prestazioni sprite Arcade</h1><p>Verifica le 36 pose, entrambe le direzioni, pixel invariati e composizione anticipata prima del combattimento.</p>
+<button id="run">Esegui verifica</button><pre id="report">Pronto</pre><canvas id="preview" width="240" height="280"></canvas>
+<script>window.FighterArt={height:228,ready:true,load:async()=>{},loadFighters:async()=>{},draw(){},drawSelectionPortrait(){}};</script>
+<script src="../scripts/fighter-geometry.js"></script><script src="../scripts/gi-branding.js"></script><script src="../scripts/portrait-framing.js"></script>
+<script src="../scripts/game.js"></script><script src="../scripts/arcade-atlas.js"></script><script src="../scripts/arcade-art.js"></script>
+<script>
+const report=document.getElementById('report'),button=document.getElementById('run'),canvas=document.getElementById('preview'),ctx=canvas.getContext('2d');
+const rawRead=CanvasRenderingContext2D.prototype.getImageData;
+let reads=0;CanvasRenderingContext2D.prototype.getImageData=function(...args){reads++;return rawRead.apply(this,args)};
+function check(ok,message){if(!ok)throw new Error(message)}
+function hashFrame(){const data=rawRead.call(ctx,0,0,canvas.width,canvas.height).data;let hash=2166136261;for(let i=0;i<data.length;i++)hash=Math.imul(hash^data[i],16777619);return hash>>>0}
+function drawAll(profile){let drawMs=0;const before=reads,hashes=[];for(let pose=0;pose<36;pose++)for(const facing of [1,-1]){ctx.clearRect(0,0,canvas.width,canvas.height);const start=performance.now();ArcadeArt.drawPreview(ctx,profile,0,0,canvas.width,canvas.height,{pose,facing,bust:true,full:false});drawMs+=performance.now()-start;hashes.push(hashFrame())}return{drawMs,reads:reads-before,hashes}}
+button.onclick=async()=>{button.disabled=true;report.textContent='Caricamento immagini originali…';try{
+ await ArcadeArt.load();const profile={id:'perf-a',gender:'female',hair:2,rank:{color:'#ee792b',stripe:'#2964c1'}};
+ report.textContent='Composizione iniziale…';await new Promise(resolve=>setTimeout(resolve,0));const cold=drawAll(profile),warm=drawAll(profile);
+ check(JSON.stringify(cold.hashes)===JSON.stringify(warm.hashes),'I pixel delle pose memorizzate sono cambiati');check(warm.reads===0,'Il rendering ripete scansioni dei pixel');
+ const prepared=ArcadeArt.setCharacter({...profile,id:'perf-b',gender:'male',hair:3});report.textContent='Preparazione delle pose per il combattimento…';const start=performance.now();await FighterArt.loadFighters(['perf-b']);const preloadMs=performance.now()-start;const first=drawAll(prepared);
+ check(first.reads===0,'Il primo combattimento ricompone i frame');const requests=performance.getEntriesByType('resource').filter(item=>/assets\/arcade\//.test(item.name));check(requests.length>0&&requests.every(item=>item.name.endsWith('.png')),'Sono stati caricati gli envelope base64 online');
+ report.textContent='PASS · 72 pose/direzioni identiche pixel per pixel tra primo e successivi disegni.\n'+
+ `Composizione e primo disegno: ${cold.drawMs.toFixed(1)} ms, ${cold.reads} letture pixel.\n`+
+ `Disegno dalla cache: ${warm.drawMs.toFixed(1)} ms, ${warm.reads} letture pixel.\n`+
+ `Preparazione nuovo karateka: ${preloadMs.toFixed(1)} ms distribuiti prima del combattimento.\n`+
+ `Primo disegno dopo preparazione: ${first.drawMs.toFixed(1)} ms, ${first.reads} letture pixel.\n`+
+ `${requests.length} atlanti PNG originali; nessun envelope JavaScript online.`;
+}catch(error){report.textContent='FAIL · '+error.message;button.disabled=false}};
+</script></html>

@@ -9,18 +9,24 @@ const vm = require('node:vm');
 // event surfaces. Real ArcadeUI methods run against a minimal DOM; only visual
 // construction, rendering/audio, and the asynchronous network port are inert.
 // The real online session stays off throughout these offline Arcade flows.
-async function fixture() {
+async function fixture(options = {}) {
   const elements = new Map(), selectors = new Map(), nodes = [], events = new Map(), frames = new Map(), timers = new Map();
-  let serial = 0, now = 0, ui;
-  const context2d = new Proxy({}, { get: (target, key) => key in target ? target[key] : () => {}, set: (target, key, value) => (target[key] = value, true) });
+  let serial = 0, now = 0, ui, online;
+  const work = { draws: 0, hudWrites: [], audioUpdates: 0 };
+  const hudNode = /^(?:p[12]-(?:health|ghost|ki|rounds|ki-label|combo(?:-count|-moves|-damage)?)|timer|round-label|announcer)$/;
+  const mutation = (item, field) => { if (hudNode.test(item.id || '')) work.hudWrites.push(item.id + ':' + field); };
+  const drawing = new Set(['drawImage', 'fillRect', 'clearRect', 'strokeRect', 'fill', 'stroke', 'fillText', 'strokeText']);
+  const context2d = new Proxy({}, { get: (target, key) => key in target ? target[key] : (...args) => { if (drawing.has(key)) work.draws++; }, set: (target, key, value) => (target[key] = value, true) });
   const document = { hidden: false, activeElement: null };
   function node(tag = 'div') {
     const listeners = new Map(), children = [], classes = new Set(), attributes = new Map(), subnodes = new Map();
-    const item = { tagName: tag.toUpperCase(), textContent: '', dataset: {}, style: { setProperty() {} }, children, childNodes: children,
+    let content = '';
+    const item = { tagName: tag.toUpperCase(), get textContent() { return content; }, set textContent(value) { content = String(value); mutation(item, 'textContent'); }, dataset: {},
+      style: new Proxy({ setProperty() {} }, { set(target, key, value) { mutation(item, 'style.' + key); target[key] = value; return true; } }), children, childNodes: children,
       hidden: false, disabled: false, inert: false, open: false, value: 'normal', width: 800, height: 600,
-      classList: { add: (...names) => names.forEach(name => classes.add(name)), remove: (...names) => names.forEach(name => classes.delete(name)), contains: name => classes.has(name), toggle(name, enabled) { enabled = enabled ?? !classes.has(name); enabled ? classes.add(name) : classes.delete(name); return enabled; } },
-      setAttribute(name, value) { attributes.set(name, String(value)); }, getAttribute: name => attributes.get(name),
-      append(...items) { children.push(...items); }, replaceChildren(...items) { children.splice(0, children.length, ...items); },
+      classList: { add: (...names) => { mutation(item, 'classList.add'); names.forEach(name => classes.add(name)); }, remove: (...names) => { mutation(item, 'classList.remove'); names.forEach(name => classes.delete(name)); }, contains: name => classes.has(name), toggle(name, enabled) { mutation(item, 'classList.toggle'); enabled = enabled ?? !classes.has(name); enabled ? classes.add(name) : classes.delete(name); return enabled; } },
+      setAttribute(name, value) { mutation(item, 'attribute.' + name); attributes.set(name, String(value)); }, getAttribute: name => attributes.get(name),
+      append(...items) { mutation(item, 'append'); children.push(...items); }, replaceChildren(...items) { mutation(item, 'replaceChildren'); children.splice(0, children.length, ...items); },
       querySelector(selector) { if (!subnodes.has(selector)) subnodes.set(selector, node(selector === '.close-dialog' ? 'button' : 'div')); return subnodes.get(selector); },
       querySelectorAll() { return []; }, closest() { return null; },
       getContext: () => context2d, getBoundingClientRect: () => ({ left: 0, top: 0, right: 800, bottom: 600 }),
@@ -57,7 +63,7 @@ async function fixture() {
     setInterval(callback, delay) { const id = ++serial; timers.set(id, { callback, delay, repeat: true }); return id; }, clearInterval: id => timers.delete(id),
     Image: class { complete = true; naturalWidth = 1280; decode() { return Promise.resolve(); } },
     __kyokushinAsset: value => value,
-    DojoAudio: class { enabled = false; status = {}; init() { return Promise.resolve(); } effect() {} update() {} },
+    DojoAudio: class { enabled = false; status = {}; init() { return Promise.resolve(); } effect() {} update() { work.audioUpdates++; } },
     DojoControls: class { clear() {} press() {} release() {} },
     DojoDisplay: class { requested = false; hostManaged = false; toggle() {} open() {} },
     DojoOrientation: { resolve: () => ({ width: 1280, height: 720, logicalWidth: 1280, logicalHeight: 720, left: 0, top: 0, blocked: false, virtual: false }) },
@@ -65,8 +71,11 @@ async function fixture() {
     ArcadeArt: { load: async () => {}, setCharacter() {} }, DojoLeaderboard: leaderboard,
     DojoOnlineUI: class { hide() {} hideResult() {} renderPreviews() {} },
   };
+  if (options.assetsReady) browser.__kyokushinAssetsReady = options.assetsReady;
   const context = vm.createContext(browser); context.window = context; context.self = context; context.top = context; context.parent = context;
   for (const file of ['roster.js', 'game.js', 'arcade.js', 'arcade-ui.js', 'online-session.js']) vm.runInContext(fs.readFileSync(path.join(__dirname, '../scripts', file), 'utf8'), context, { filename: file });
+  const OnlineSession = context.DojoOnlineSession;
+  context.DojoOnlineSession = function(options) { online = new OnlineSession(options); return online; };
   const ArcadeUI = context.ArcadeUI;
   context.ArcadeUI = function(options) {
     ui = Object.create(ArcadeUI.prototype);
@@ -91,9 +100,83 @@ async function fixture() {
     state.fighters[0].hp = winner === 0 ? 800 : 0;
     for (let count = 0; count < 36; count++) frame();
   }
-  await settle(); assert.equal(context.dojo.ready, true);
-  return { context, document, get, ui, timers, createRun, finishMatch, frame, key, settle };
+  await settle(); if (options.expectReady !== false) assert.equal(context.dojo.ready, true);
+  function resetWork() { work.draws = 0; work.hudWrites.length = 0; work.audioUpdates = 0; }
+  return { context, document, get, ui, online, timers, createRun, finishMatch, frame, key, settle, work, resetWork };
 }
+
+test('idle title, selection and Arcade creation do not redraw the hidden arena or rewrite its HUD', async () => {
+  const f = await fixture();
+  for (const [screen, enter] of [
+    ['title', () => {}], ['select', () => f.context.dojo.menu()], ['create', () => f.get('arcade-title-button').dispatch('click')],
+  ]) {
+    enter(); await f.settle(); f.frame(); f.resetWork();
+    for (let count = 0; count < 6; count++) f.frame();
+    assert.equal(f.context.dojo.screen, screen);
+    assert.equal(f.work.draws, 0, screen + ' must not paint an arena hidden behind its menu');
+    assert.deepEqual(f.work.hudWrites, [], screen + ' must not rewrite hidden health, timer or combo displays');
+    assert.equal(f.work.audioUpdates, 6, 'audio scene state still updates');
+  }
+});
+
+test('combat keeps rendering and advancing after pause without rewriting an unchanged HUD', async () => {
+  const f = await fixture(); f.context.dojo.config.mode = 'versus'; f.context.dojo.startMatch();
+  for (let count = 0; count < 40; count++) f.frame();
+  assert.equal(f.context.dojo.game.getState().phase, 'fight');
+  f.get('pause-button').dispatch('click'); f.frame(); f.resetWork();
+  const timer = f.context.dojo.game.getState().timer;
+  for (let count = 0; count < 6; count++) f.frame();
+  assert.ok(f.work.draws > 0, 'the visible paused arena remains drawn');
+  assert.deepEqual(f.work.hudWrites, [], 'paused values must cause no repeated DOM writes');
+  assert.equal(f.context.dojo.game.getState().timer, timer);
+  f.get('resume-button').dispatch('click'); f.resetWork();
+  for (let count = 0; count < 6; count++) f.frame();
+  assert.ok(f.context.dojo.game.getState().timer < timer, 'resuming must keep the real combat clock advancing');
+  assert.ok(f.work.draws > 0);
+});
+
+test('health and Spirit updates skip imperceptible precision changes while preserving displayed values', async () => {
+  const f = await fixture(); f.context.dojo.startMatch(); f.get('pause-button').dispatch('click');
+  const fighter = f.context.dojo.game.getState().fighters[0];
+  fighter.hp = fighter.maxHp * .8326; fighter.ki = 30.1234; f.frame();
+  assert.equal(f.get('p1-health').style.width, '83.3%');
+  assert.equal(f.get('p1-ghost').style.width, '83.3%');
+  assert.equal(f.get('p1-ki').style.width, '30.1%');
+  f.resetWork(); fighter.hp = fighter.maxHp * .83261; fighter.ki = 30.124; f.frame();
+  assert.deepEqual(f.work.hudWrites, []);
+  fighter.hp = fighter.maxHp * .827; fighter.ki = 31.4; f.frame();
+  assert.equal(f.get('p1-health').style.width, '82.7%'); assert.equal(f.get('p1-ki').style.width, '31.4%');
+});
+
+test('a hidden page skips arena, HUD and help drawings while maintaining audio state', async () => {
+  const f = await fixture(); f.context.dojo.startMatch(); f.frame();
+  f.get('help-dialog').showModal(); f.document.hidden = true; f.resetWork();
+  for (let count = 0; count < 6; count++) f.frame();
+  assert.equal(f.work.draws, 0); assert.deepEqual(f.work.hudWrites, []); assert.equal(f.work.audioUpdates, 6);
+  f.document.hidden = false; f.get('help-dialog').close(); f.frame();
+  assert.ok(f.work.draws > 0, 'the arena must reappear after returning to the page');
+});
+
+test('suppressing hidden graphics still pumps the online session on every frame', async () => {
+  const f = await fixture(); let ticks = 0, elapsed = 0;
+  f.context.dojo.startMatch(); f.online.phase = 'playing';
+  f.online.engine = { update(dt) { ticks++; elapsed += dt; } };
+  f.document.hidden = true; f.resetWork();
+  for (let count = 0; count < 6; count++) f.frame();
+  assert.equal(ticks, 6); assert.ok(Math.abs(elapsed - .3) < 1e-10);
+  assert.equal(f.work.draws, 0); assert.deepEqual(f.work.hudWrites, []); assert.equal(f.work.audioUpdates, 6);
+});
+
+test('boot waits for the extracted core images before enabling a match', async () => {
+  let release;
+  const assetsReady = new Promise(resolve => { release = resolve; });
+  const f = await fixture({ assetsReady, expectReady: false });
+  assert.equal(f.context.dojo.ready, false); assert.equal(f.get('title-start-button').disabled, true);
+  f.context.dojo.startMatch(); assert.equal(f.context.dojo.active, false);
+  release(); await f.settle();
+  assert.equal(f.context.dojo.ready, true); assert.equal(f.get('title-start-button').disabled, false);
+  f.context.dojo.startMatch(); assert.equal(f.context.dojo.active, true);
+});
 
 test('an intermediate Arcade victory remains playable and does not publish a resumable run', async () => {
   const f = await fixture(); await f.createRun(); f.context.dojo.startMatch(); f.finishMatch(0);

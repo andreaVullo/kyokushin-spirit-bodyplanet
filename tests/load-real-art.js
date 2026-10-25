@@ -5,7 +5,7 @@ window.loadRealFighterArt = async function () {
   const gameURL = new URL('../Gioca.html', location.href);
   const html = await fetch(gameURL, { cache: 'no-store' }).then(response => response.text());
   const gameDocument = new DOMParser().parseFromString(html, 'text/html');
-  const allowed = /scripts\/(?:roster|game|strike-point|fighter-geometry|gi-branding|portrait-framing|karateka-atlas|karateka-art|arcade-atlas|arcade-art)\.js$/;
+  const allowed = /scripts\/(?:core-assets|roster|game|strike-point|fighter-geometry|gi-branding|portrait-framing|karateka-atlas|karateka-art|arcade-atlas|arcade-art)\.js$/;
   const loaded = [];
   for (const node of gameDocument.querySelectorAll('script')) {
     const path = node.getAttribute('src');

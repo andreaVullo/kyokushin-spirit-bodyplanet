@@ -1,0 +1,52 @@
+{
+  "assets/attacks-angelo.png": {
+    "file": "assets/core/attacks-angelo.png",
+    "bytes": 1626430,
+    "sha256": "498b73f3bed485812ef07f1ddf84a1b2903637d9f5a0306e149d453c8eed6320"
+  },
+  "assets/attacks-samuel.png": {
+    "file": "assets/core/attacks-samuel.png",
+    "bytes": 1597793,
+    "sha256": "6098978783f1a48af963abc5767296d9faa98ca8025f934538fceb3a3a1a14a5"
+  },
+  "assets/dojo-mirror.png": {
+    "file": "assets/core/dojo-mirror.png",
+    "bytes": 1906852,
+    "sha256": "981ed067d118171e3cd6634ceea05b80b66efa58d6dd8c60e4fc7125ad2f60ac"
+  },
+  "assets/fighters-angelo.png": {
+    "file": "assets/core/fighters-angelo.png",
+    "bytes": 1496980,
+    "sha256": "ad4785b6584ed389fec1715a29b020760725bec26ff0ebe82b06258117f4cc55"
+  },
+  "assets/fighters-samuel.png": {
+    "file": "assets/core/fighters-samuel.png",
+    "bytes": 1447698,
+    "sha256": "df106c6b139252b503745aff9a3b21f6b0e85b40ccce1e8d34d98c35773b5fbe"
+  },
+  "assets/guards.png": {
+    "file": "assets/core/guards.png",
+    "bytes": 994945,
+    "sha256": "0e60d491fda062014e0b37712140cec161d1262a81cc7c4a804ce9827972055e"
+  },
+  "assets/kyokushin-logo.png": {
+    "file": "assets/core/kyokushin-logo.png",
+    "bytes": 426623,
+    "sha256": "794d94617e51112d881f3e4494fd2c87e058f4ffc209f4c98586c212f39ed93a"
+  },
+  "assets/motion-angelo.png": {
+    "file": "assets/core/motion-angelo.png",
+    "bytes": 1172415,
+    "sha256": "f99298f9e89d5af1191f69b8026566c33dadfc136922f9ce7c98fa84bcf97e2f"
+  },
+  "assets/motion-samuel.png": {
+    "file": "assets/core/motion-samuel.png",
+    "bytes": 1196766,
+    "sha256": "05a5f38b15aeb0ee5f906ef85f8071d2066cc5c9afe12df84d42e17c3b10f955"
+  },
+  "assets/portraits.png": {
+    "file": "assets/core/portraits.png",
+    "bytes": 2485162,
+    "sha256": "a2998d26e305793e64c69a119f6abebdb7bd2d33b5e3554519d27f88bbad591f"
+  }
+}

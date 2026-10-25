@@ -2,6 +2,16 @@
 
 Il gioco offre incontri 1 contro 1, allenamento con un'altra persona, stanze private con codice di sei caratteri e ricerca di un avversario. I partecipanti scelgono un nome e uno dei dieci karateka del roster; non serve un account. L'host determina la modalità della stanza, anche quando l'ospite entra tramite codice o invito.
 
+## Inviti dalle app di messaggistica
+
+Gli inviti puntano a `online.html?room=ABC234`; senza `room`, la pagina apre il menu Online. La pagina d’ingresso non carica gli sprite, non chiama le API delle stanze e non occupa posti quando un’app genera l’anteprima del link. Il codice viene validato e conservato nel passaggio a `Gioca.html`; token personali, parametri dell’iframe e impostazioni di debug non vengono condivisi.
+
+Il gioco apre gli inviti a tutta area. Su touch, `display.open({native:false})` adatta il campo alle dimensioni del viewport visibile senza chiedere fullscreen o blocco dell’orientamento; ridimensionamenti della finestra della chat e rotazioni aggiornano lo stesso campo. La prima pressione esplicita di Schermo intero può ancora richiedere il fullscreen nativo. Gli inviti diretti precedenti con `room` ricevono lo stesso adattamento.
+
+La pagina controlla soltanto che il browser possa creare un canale WebRTC: non è una prova della rete. Se manca il supporto, propone il passaggio al browser completo. Su Android l’azione usa un intent HTTPS con fallback; su iOS spiega il menu dell’app senza promettere un’apertura forzata di Safari. Le barre e le dimensioni massime della finestra restano sotto il controllo dell’app ospitante. Una condivisione non cambia stanza; spostare davvero l’host in un altro browser avvia invece una sessione distinta, perché il suo token resta in memoria.
+
+`tests/invite-entry-layout.html` controlla la pagina d’ingresso; `tests/invite-game-layout.html` verifica il gioco con invito in finestre ridotte, rotazioni, ridimensionamento della stessa pagina e tastiere. Le app native Telegram e WhatsApp devono essere collaudate su dispositivo: simulare la loro area visibile non verifica il comportamento del loro menu esterno.
+
 ## Architettura e hosting
 
 Il gioco e gli sprite restano sul sito statico GitHub Pages. Le API delle stanze utilizzano il servizio Sites già impiegato per la classifica:
@@ -9,6 +19,8 @@ Il gioco e gli sprite restano sul sito statico GitHub Pages. Le API delle stanze
 `https://kyokushin-dojo-classifica.flazio1.chatgpt.site`
 
 `scripts/online-config.js` configura questo indirizzo. `scripts/online-client.js` gestisce la stanza e la connessione WebRTC; `scripts/online-session.js` coordina preparazione, caricamento, incontro e rivincita. Il servizio salva in D1 solo partecipanti, disponibilità e messaggi necessari a stabilire la connessione. Input e stato della partita viaggiano nel DataChannel WebRTC e non passano dal database. Il browser dell'host esegue la simulazione del combattimento; quello dell'ospite invia i propri comandi e riceve gli aggiornamenti.
+
+Gli aggiornamenti di combattimento restano a 30 al secondo. Durante una pausa il motore invia il cambio di stato e mantiene heartbeat e controlli di presenza, saltando gli snapshot identici. La codifica copia direttamente i campi previsti dal protocollo, evitando una serializzazione/deserializzazione completa prima dell’effettivo invio. Le prove controllano uguaglianza del protocollo, ripresa, congestione e assenza di riferimenti mutabili allo stato autorevole.
 
 GitHub Pages è un servizio statico e da solo non può eseguire il matchmaking o ricevere connessioni server persistenti. Il codice del servizio è archiviato in `server/sites`; la copia operativa del progetto Sites si mantiene separata e viene pubblicata con il workflow ufficiale Sites. Non è necessario attivare un nuovo servizio per stanze e signaling.
 

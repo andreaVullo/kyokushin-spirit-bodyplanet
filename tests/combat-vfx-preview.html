@@ -10,7 +10,7 @@
  const load=(src)=>new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=new URL('../'+src,location.href);s.onload=resolve;s.onerror=reject;document.head.append(s)});
  for(const source of parsed.querySelectorAll('script')){
   const src=source.getAttribute('src');
-  if(src&&/scripts\/(roster|game|strike-point|fighter-geometry|gi-branding|portrait-framing|karateka-atlas|karateka-art|arcade-atlas|arcade-art)\.js/.test(src))await load(src);
+  if(src&&/scripts\/(core-assets|roster|game|strike-point|fighter-geometry|gi-branding|portrait-framing|karateka-atlas|karateka-art|arcade-atlas|arcade-art)\.js/.test(src))await load(src);
   else if(!src&&(source.textContent.includes('const assets = Object.freeze')||source.textContent.includes('/* renderer.js */'))){const s=document.createElement('script');s.textContent=source.textContent;document.head.append(s);}
  }
  for(const gender of ['male','female'])ArcadeArt.setCharacter({id:'qa-'+gender,name:'Arcade '+gender,gender,hair:2,rank:{color:'#ee792b'}});

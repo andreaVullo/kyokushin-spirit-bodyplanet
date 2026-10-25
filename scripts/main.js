@@ -3,7 +3,8 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const pageOptions = new URLSearchParams(location.search);
-  const standaloneGame = pageOptions.get('standalone') === '1' && window.self === window.top;
+  const onlineIntent = pageOptions.has('room') || pageOptions.get('online') === '1';
+  const standaloneGame = (pageOptions.get('standalone') === '1' || onlineIntent) && window.self === window.top;
   const touchMedia = window.matchMedia('(any-pointer: coarse)');
   const portraitMedia = window.matchMedia('(orientation: portrait)');
   let touchPreference = pageOptions.get('touch') === '1' ? true : null;
@@ -21,7 +22,7 @@
   let online = null, onlinePreviousConfig = null;
   let regularConfig = { ...config }, arcadeRun = null, arcadeMatch = null, arcadeStats = null, arcadePreviewToken = 0;
   let selectionTarget = 'player', matchLoading = false, matchLoadId = 0, selectionError = '';
-  const bg = new Image(); bg.src = window.__kyokushinAsset("assets/dojo-mirror.png");
+  const bg = new Image();
   let ready = false, active = false, paused = false, lastTime = performance.now(), clock = 0;
   let screen = 'title', versusTimeout = null, transitionId = 0, loadFailed = false;
   const heldKeys = new Map();
@@ -472,21 +473,25 @@
     if(online?.active){$('p1-tag').textContent=online.localSlot===0?'TU':'AVVERSARIO';$('p2-tag').textContent=online.localSlot===1?'TU':'AVVERSARIO';}
     $('mode-label').textContent='TURBO 1.30× / '+modeName();
   }
+  function hudText(id,value){const el=$(id),next=String(value);if(el.textContent!==next)el.textContent=next;}
+  function hudWidth(id,value){const el=$(id),next=(Math.round(value*10)/10)+'%';if(el.style.width!==next)el.style.width=next;}
   function updateHud(dt) {
     const s=game.getState();
     s.fighters.forEach((f,i)=>{
-      const p='p'+(i+1),hp=Math.max(0,f.hp/f.maxHp*100)+'%';$(p+'-health').style.width=hp;$(p+'-ghost').style.width=hp;$(p+'-ki').style.width=f.ki+'%';
-      $(p+'-rounds').textContent=(f.wins>0?'●':'○')+' '+(f.wins>1?'●':'○');$(p+'-ki-label').textContent=f.ki>=45?'KAITEN READY':'SPIRIT';$(p+'-ki-label').classList.toggle('ready',f.ki>=45);
+      const p='p'+(i+1),hp=Math.max(0,f.hp/f.maxHp*100);hudWidth(p+'-health',hp);hudWidth(p+'-ghost',hp);hudWidth(p+'-ki',f.ki);
+      hudText(p+'-rounds',(f.wins>0?'●':'○')+' '+(f.wins>1?'●':'○'));hudText(p+'-ki-label',f.ki>=45?'KAITEN READY':'SPIRIT');
+      const kiLabel=$(p+'-ki-label');if(kiLabel.classList.contains('ready')!==(f.ki>=45))kiLabel.classList.toggle('ready',f.ki>=45);
       const display=comboDisplay[i],comboEl=$(p+'-combo');
       if(!paused)display.life=Math.max(0,display.life-dt);
       const showCombo=active&&!resultShown&&display.count>=2&&display.life>0;
-      comboEl.classList.toggle('visible',showCombo);comboEl.setAttribute('aria-hidden',!showCombo);
-      $(p+'-combo-count').textContent=display.count;
-      $(p+'-combo-moves').textContent=display.moves.map(m=>window.KyokushinMoves[m]?.shortName||m.toUpperCase()).join(' › ');
-      $(p+'-combo-damage').textContent=display.damage+' DANNI';
+      if(comboEl.classList.contains('visible')!==showCombo)comboEl.classList.toggle('visible',showCombo);
+      if(comboEl.getAttribute('aria-hidden')!==String(!showCombo))comboEl.setAttribute('aria-hidden',!showCombo);
+      hudText(p+'-combo-count',display.count);
+      hudText(p+'-combo-moves',display.moves.map(m=>window.KyokushinMoves[m]?.shortName||m.toUpperCase()).join(' › '));
+      hudText(p+'-combo-damage',display.damage+' DANNI');
     });
-    $('timer').textContent=s.timer===Infinity?'∞':Math.ceil(s.timer).toString().padStart(2,'0');
-    $('round-label').textContent=config.mode==='training'?'TRAINING':'ROUND '+s.round.toString().padStart(2,'0');
+    hudText('timer',s.timer===Infinity?'∞':Math.ceil(s.timer).toString().padStart(2,'0'));
+    hudText('round-label',config.mode==='training'?'TRAINING':'ROUND '+s.round.toString().padStart(2,'0'));
     const ann=active&&!paused&&!resultShown?(s.announcement||''):'';
     if(ann!==lastHud){lastHud=ann;$('announcer').replaceChildren();if(ann){$('announcer').append(document.createTextNode(ann));const small=document.createElement('small');small.textContent=s.announcementSub||'';$('announcer').append(small);}}
     if(active&&!paused&&s.phase==='matchOver'&&!resultShown){resultTimer+=dt;if(resultTimer>1.7)showResult();}
@@ -580,15 +585,21 @@
     const dt=Math.min((now-lastTime)/1000,.05);lastTime=now;clock+=dt;
     if(active&&!paused&&!resultShown&&arcadeRun&&arcadeStats&&game.getState().phase==='fight')arcadeStats.elapsed+=dt;
     if(online?.active)online.update(dt);else if(active&&!paused)game.update(dt);
-    ctx.save();
-    if(shake>0&&!reducedMotion){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake*.55);}shake=Math.max(0,shake-dt*45);
-    drawBackground(clock);
-    const renderState=online?.active?online.renderState:game.getState();
-    if(active)renderState.fighters.forEach(f=>drawFighter(f,clock));
-    drawEffects(paused?0:dt,renderState);ctx.restore();
-    if(flash>0){if(!reducedMotion){ctx.globalAlpha=flash;ctx.fillStyle='#fff7ca';ctx.fillRect(0,0,1280,720);ctx.globalAlpha=1;}flash=Math.max(0,flash-dt*.8);}
-    if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('move-toast').classList.remove('show');}
-    updateHud(dt);drawDefenseGuide(clock);drawMotionGuide(clock);sound.update(audioState());syncAudioButton();requestAnimationFrame(frame);
+    // Menus have their own portraits. Do not repaint the hidden arena or HUD,
+    // but keep audio scheduling and online liveness independent of rendering.
+    if(screen==='game'&&!document.hidden){
+      ctx.save();
+      if(shake>0&&!reducedMotion){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake*.55);}shake=Math.max(0,shake-dt*45);
+      drawBackground(clock);
+      const renderState=online?.active?online.renderState:game.getState();
+      if(active)renderState.fighters.forEach(f=>drawFighter(f,clock));
+      drawEffects(paused?0:dt,renderState);ctx.restore();
+      if(flash>0){if(!reducedMotion){ctx.globalAlpha=flash;ctx.fillStyle='#fff7ca';ctx.fillRect(0,0,1280,720);ctx.globalAlpha=1;}flash=Math.max(0,flash-dt*.8);}
+      if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('move-toast').classList.remove('show');}
+      updateHud(dt);
+    }
+    if(!document.hidden){drawDefenseGuide(clock);drawMotionGuide(clock);}
+    sound.update(audioState());syncAudioButton();requestAnimationFrame(frame);
   }
 
   const p1={KeyA:'left',KeyD:'right',KeyW:'jump',Space:'block',KeyF:'legBlock',KeyJ:'tsuki',KeyH:'shita',KeyN:'kagi',KeyK:'mae',KeyL:'mawashi',KeyU:'ushiro',KeyI:'gedan',KeyO:'kaiten'};
@@ -690,7 +701,7 @@
   window.addEventListener('click',e=>{if(!audioButtonTarget(e))unlockAudio();},{capture:true});
   window.addEventListener('keydown',e=>{if(!e.repeat&&!audioButtonTarget(e))unlockAudio();},{capture:true});
   function syncFullscreenButton(){
-    const expanded=display.requested||document.fullscreenElement===$('game-shell');
+    const expanded=(display.requested&&!display.layoutOnly)||document.fullscreenElement===$('game-shell');
     const label=expanded?'Esci da schermo intero':'Schermo intero';
     $('fullscreen-button').setAttribute('aria-label',label);$('fullscreen-button').title=label;
   }
@@ -716,17 +727,22 @@
     $('title-start-button').disabled=true;$('start-button').disabled=true;$('title-load-label').textContent='CARICAMENTO…';
     syncAudioButton();showTitle(false);
     try{
+      await window.__kyokushinAssetsReady;
+      bg.src=window.__kyokushinAsset('assets/dojo-mirror.png');
       await Promise.all([bg.decode(),window.FighterArt.load()]);ready=true;
       $('title-start-button').disabled=false;$('title-load-label').textContent='INIZIA';
       $('arcade-title-button').disabled=false;
       $('start-button').disabled=false;$('start-label').textContent='COMBATTI';
       updateSelection();showTitle(false);online.ui.renderPreviews();
-      if(pageOptions.get('room'))showOnline();
+      // Chat browsers often open a short sheet and deny native fullscreen.
+      // Fit the live visible area immediately, without requiring either API.
+      if(onlineIntent&&(touchPreference??touchDetected))display.open({native:false});
+      if(onlineIntent)showOnline();
       // Prepare the first arena frame before revealing it. A hidden loading
       // iframe may not receive animation frames, so readiness must not await one.
       drawBackground(clock);
       window.DojoLoading?.report('ready');
-      (document.body.classList.contains('orientation-blocked')?$('rotate-fullscreen-button'):$('title-start-button'))?.focus({preventScroll:true});
+      if(!onlineIntent)(document.body.classList.contains('orientation-blocked')?$('rotate-fullscreen-button'):$('title-start-button'))?.focus({preventScroll:true});
     }
     catch(err){
       console.error('Asset loading failed',err);loadFailed=true;ready=false;

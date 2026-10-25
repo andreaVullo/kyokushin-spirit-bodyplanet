@@ -16,9 +16,15 @@ Per la nuova scalata premi **Arcade** dal titolo o dalla scelta della modalità:
 
 Per giocare a distanza apri il gioco pubblicato e premi **Online**: scegli nome e karateka, poi **Cerca avversario**, **Crea stanza privata** oppure inserisci un codice. Sono disponibili **1 vs 1** e **Allenamento**. Quando la connessione è pronta, entrambi premono **Sono pronto**. La rivincita richiede due conferme; tornando in stanza potete cambiare personaggio. Alcune reti mobili o protette possono impedire la connessione diretta: [hosting e limiti di rete](docs/ONLINE.md).
 
+**Condividi invito** apre la condivisione del telefono, oppure copia il link quando non è disponibile. Gli inviti passano da `online.html`: una pagina leggera che conserva il codice e offre le indicazioni per aprire il browser completo. Nel gioco l’invito usa tutta l’area visibile, anche nelle finestre ridotte delle app di chat; su touch la vista si adatta automaticamente, senza dipendere dal fullscreen o dal blocco rotazione. I controlli del browser interno restano gestiti dall’app: una pagina web non può rimuoverli o imporre l’apertura di Safari.
+
 Nella selezione, **Esc** o la freccia **Titolo** riportano alla schermata iniziale. Durante il combattimento, **Esc** apre la pausa. Nelle modalità classiche puoi riprendere, ricominciare o tornare alla scelta del personaggio; al termine dell’incontro, **Rivincita** permette di rigiocare. In Arcade puoi riprendere o terminare la scalata: non si ricomincia lo stesso incontro per conservare l’avanzamento. L’audio si attiva dopo un clic, un tasto o un tocco completo dentro il gioco. Il pulsante **Audio** in alto permette di silenziarlo, riattivarlo o ritentarne l’avvio dopo un’interruzione.
 
 **`index.html`** reindirizza a `Gioca.html`, conservando i parametri per incorporamento e touch. La cartella può essere pubblicata su GitHub Pages senza compilazione. Le immagini vengono caricate dal sito stesso e funzionano anche offline.
+
+La pagina principale contiene circa 180 kB di HTML anziché 19,3 MB: i dieci PNG originali sono separati in `assets/core/` e possono restare nella cache tra gli aggiornamenti della pagina. Il primo caricamento deve ancora scaricare le immagini necessarie, circa 14,4 MB per questo gruppo. `assets/core/manifest.json` ne registra byte e SHA-256; `assets/core/offline.js` contiene gli stessi PNG per l’apertura da disco e non viene scaricato online. Anche gli atlanti Arcade/VFX usano direttamente i PNG online e mantengono gli involucri JavaScript per `file://`.
+
+Nei menu il motore non ridisegna l’arena nascosta; gli elementi HUD cambiano solo quando cambia il valore visualizzato. Le pose del karateka Arcade vengono preparate prima dell’incontro, lasciando respirare l’interfaccia fra una posa e la successiva, e conservate in una cache limitata. Durante una pausa online rimangono attivi i controlli di presenza, senza reinviare trenta volte al secondo lo stesso stato. Le regole, le immagini originali e la frequenza degli aggiornamenti durante il combattimento restano identiche.
 
 Per eseguire il gioco con un server locale, dalla cartella del progetto:
 
@@ -65,6 +71,7 @@ I comandi touch compaiono automaticamente sui dispositivi touch. Il pulsante del
 - Si possono tenere premuti più comandi contemporaneamente, per esempio movimento e attacco. È possibile scorrere il dito tra i pulsanti per collegare le tecniche.
 - **Su mobile si gioca in orizzontale.** Con il launcher Flazio V8, **Entra nel dojo** adatta subito la stessa partita allo spazio visibile. Il telefono può restare verticale con il blocco rotazione attivo. Quando il browser diventa orizzontale, il gioco rimuove la rotazione aggiunta: non occorre cambiare le impostazioni del dispositivo.
 - **Aprendo `Gioca.html` direttamente o in un iframe generico**, premi **Gioca in orizzontale** o **Schermo intero** per adattare il gioco anche con la rotazione bloccata. Il fullscreen nativo è facoltativo: se il browser lo rifiuta, resta disponibile la vista adattata. In un iframe generico lo spazio resta quello concesso dalla pagina ospitante; il launcher Flazio gestisce invece l’intera area visibile del sito. Le barre del browser possono restare visibili.
+- **Da un invito Online**, l’adattamento parte automaticamente. Il pulsante **Schermo intero** resta disponibile per chiedere al browser di nascondere le sue barre, quando lo consente.
 - Pausa, cambio app, cambio orientamento e rilascio/interruzione del tocco azzerano i comandi: nessuna direzione rimane bloccata.
 - **Arcade**, **VS CPU** e **Allenamento** sono giocabili interamente su touch. La modalità **2 giocatori** richiede una tastiera per il secondo giocatore.
 

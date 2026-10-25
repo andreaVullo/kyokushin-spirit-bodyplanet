@@ -38,19 +38,20 @@
     const rgba = context.getImageData(0, 0, w, h).data;
     const labels = new Int32Array(w * h), queue = new Int32Array(w * h);
     const components = [];
-    let label = 0;
+    let label = 0, tail = 0;
+    // Reuse the neighbour visitor for every pixel of this decoded sheet.
+    const add = n => {
+      if (!labels[n] && rgba[n * 4 + 3] >= 100) { labels[n] = label; queue[tail++] = n; }
+    };
     for (let at = 0; at < labels.length; at++) {
       if (labels[at] || rgba[at * 4 + 3] < 100) continue;
       label++;
-      let head = 0, tail = 1, left = w, top = h, right = 0, bottom = 0;
-      queue[0] = at; labels[at] = label;
+      let head = 0, left = w, top = h, right = 0, bottom = 0;
+      tail = 1; queue[0] = at; labels[at] = label;
       while (head < tail) {
         const i = queue[head++], x = i % w, y = (i / w) | 0;
         left = Math.min(left, x); right = Math.max(right, x + 1);
         top = Math.min(top, y); bottom = Math.max(bottom, y + 1);
-        const add = n => {
-          if (!labels[n] && rgba[n * 4 + 3] >= 100) { labels[n] = label; queue[tail++] = n; }
-        };
         if (x) add(i - 1);
         if (x + 1 < w) add(i + 1);
         if (y) add(i - w);
@@ -82,7 +83,11 @@
             (gy > 0 && labels[pos - w] === component.label) ||
             (gy + 1 < h && labels[pos + w] === component.label);
         }
-        if (belongs) pixels.data.set(rgba.subarray(pos * 4, pos * 4 + 4), (y * sw + x) * 4);
+        if (belongs) {
+          const from = pos * 4, to = (y * sw + x) * 4;
+          pixels.data[to] = rgba[from]; pixels.data[to + 1] = rgba[from + 1];
+          pixels.data[to + 2] = rgba[from + 2]; pixels.data[to + 3] = rgba[from + 3];
+        }
       }
       ctx.putImageData(pixels, 0, 0);
       const branding = window.GiBranding;

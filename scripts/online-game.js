@@ -14,10 +14,20 @@
   const moves = () => global.KyokushinMoves || (typeof require === 'function' ? require('./game.js').KyokushinMoves : {});
 
   function encodeState(state) {
-    const encoded = clone(state);
-    // Definitions are versioned game code, never data supplied by the other player.
-    for (const fighter of encoded.fighters) if (fighter.attack) delete fighter.attack.def;
-    return encoded;
+    // The transport serializes once. Copy only mutable state here instead of
+    // stringifying and parsing the entire match on every network frame.
+    return { ...state, timer: Number.isFinite(state.timer) ? state.timer : null,
+      fighters: state.fighters.map(fighter => {
+        const encoded = { ...fighter, comboMoves: fighter.comboMoves.slice(),
+          inputQueue: fighter.inputQueue.map(item => ({ ...item })),
+          buffer: fighter.buffer ? { ...fighter.buffer } : null };
+        if (fighter.attack) {
+          // Definitions are versioned game code, never data supplied by a peer.
+          const { def, ...attack } = fighter.attack;
+          encoded.attack = { ...attack, hitTime: Number.isFinite(attack.hitTime) ? attack.hitTime : null };
+        }
+        return encoded;
+      }) };
   }
 
   function decodeState(raw, game, expectedIds) {
@@ -130,6 +140,7 @@
       this.frameSeq = 0; this.remoteFrameSeq = -1; this.controlSeq = 0; this.remoteControlSeq = -1;
       this.eventSeq = 0; this.remoteEventSeq = 0; this.events = []; this.snapshots = [];
       this.localHeld = held(); this.pauseVotes = [false, false]; this.frameElapsed = 0;
+      this.lastFramePaused = false;
       this.lastSeen = this.lastHeartbeat = this.lastRemoteInput = this.now();
       this.ended = false; this.game.clearInput();
     }
@@ -243,8 +254,12 @@
     _frame(force = false) {
       if (this.role !== 'host' || (!force && this.frameElapsed < 1 / 30)) return false;
       this.frameElapsed %= 1 / 30;
-      const sent = this._send('game-frame', { seq: ++this.frameSeq, ackInput: this.remoteControlSeq, state: encodeState(this.state), events: this.events.slice(0, 256) });
-      if (sent) this.events.splice(0, 256);
+      const state = this.state;
+      // A paused simulation is immutable. Its first frame must get through;
+      // subsequent liveness still uses heartbeats, without 30 duplicate frames/s.
+      if (!force && state.paused && this.lastFramePaused && !this.events.length) return false;
+      const sent = this._send('game-frame', { seq: ++this.frameSeq, ackInput: this.remoteControlSeq, state: encodeState(state), events: this.events.slice(0, 256) });
+      if (sent) { this.events.splice(0, 256); this.lastFramePaused = state.paused; }
       return sent;
     }
     _matchEnd() {

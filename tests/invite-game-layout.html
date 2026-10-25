@@ -1,0 +1,65 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Inviti · browser delle app</title>
+<style>body{margin:16px;font:14px system-ui;background:#e9edf0;color:#182a38}h1{font-size:24px}iframe{display:block;border:1px solid #6e7c84;margin:10px 0 22px;max-width:none}#fixtures{display:flex;flex-wrap:wrap;align-items:flex-start;gap:24px}h2{font-size:14px}#report{white-space:pre-wrap}button{padding:10px 16px}</style>
+<h1>Inviti · browser delle app e ridimensionamenti</h1><button id="run">VERIFICA INVITI</button><p id="summary" role="status">Pronto.</p><details><summary>Risultati</summary><pre id="report"></pre></details><div id="fixtures"></div>
+<script>
+const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms)),cases=[{w:390,h:500},{w:320,h:420},{w:568,h:240}],reports=[];
+const root=document.querySelector('#fixtures'),report=document.querySelector('#report'),summary=document.querySelector('#summary');
+const tick=win=>new Promise(resolve=>win.requestAnimationFrame(()=>win.requestAnimationFrame(resolve)));
+const rect=element=>element.getBoundingClientRect();
+const contained=(inner,outer)=>inner.left>=outer.left-2&&inner.right<=outer.right+2&&inner.top>=outer.top-2&&inner.bottom<=outer.bottom+2;
+function publish(name,errors,metrics){reports.push({case:name,pass:!errors.length,errors,...(errors.length?{metrics}:{})});report.textContent=JSON.stringify(reports,null,2);summary.textContent=reports.filter(item=>item.pass).length+'/'+reports.length+' verifiche superate';}
+async function inspect(frame,c,label){
+ const win=frame.contentWindow,d=frame.contentDocument,errors=[],expect=(condition,message)=>{if(!condition)errors.push(message);};
+ await tick(win);const panel=d.querySelector('#online-lobby'),viewport=d.querySelector('#viewport'),area=d.querySelector('.online-scroll'),footer=d.querySelector('.online-footer'),cabinet=d.querySelector('#arcade');
+ expect(win.dojo?.ready,'gioco non pronto');expect(d.body.dataset.screen==='online'&&!panel.hidden&&!panel.inert,'invito non apre automaticamente Online');
+ expect(d.querySelector('#online-code').value==='ABC234','codice stanza perso');
+ expect(!d.body.classList.contains('orientation-blocked'),'orientamento bloccato sopra la lobby');
+ expect(d.body.classList.contains('virtual-landscape')===(c.h>c.w),'rotazione virtuale non coerente con lo spazio disponibile');
+ const bounds={left:0,top:0,right:c.w,bottom:c.h},cabinetBox=rect(cabinet);
+ expect(contained(cabinetBox,bounds),'il gioco esce dalla finestra dell’app');
+ expect(Math.abs(cabinetBox.width-c.w)<=2&&Math.abs(cabinetBox.height-c.h)<=2,'il gioco non riempie lo spazio dell’app');
+ expect(panel.offsetWidth<=viewport.clientWidth+1&&panel.offsetHeight<=viewport.clientHeight+1,'lobby fuori dal viewport');
+ expect(area.scrollWidth<=area.clientWidth+1,'opzioni tagliate orizzontalmente: '+area.scrollWidth+'>'+area.clientWidth);
+ expect(d.documentElement.scrollWidth<=c.w+1,'pagina con scorrimento orizzontale');
+ expect(area.offsetTop+area.offsetHeight<=footer.offsetTop+1,'footer sopra le opzioni');
+ expect(footer.offsetTop+footer.offsetHeight<=panel.offsetHeight+1,'footer fuori dalla lobby');
+ for(const selector of ['#online-profile-art','#online-search','#online-create','#online-join','[data-online-fighter]:last-child']){
+  const element=d.querySelector(selector);expect(!!element,selector+': assente');if(!element)continue;
+  element.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});await tick(win);
+  expect(contained(rect(element),rect(area)),selector+': non raggiungibile scorrendo le opzioni');
+ }
+ area.scrollTop=0;await tick(win);
+ const name=d.querySelector('#online-name');name.dispatchEvent(new win.PointerEvent('pointerdown',{pointerType:'touch',bubbles:true}));d.querySelector('#online-name-keys').click();await tick(win);
+ const dialog=d.querySelector('#online-name-keyboard'),box=rect(dialog),keys=rect(dialog.querySelector('.name-keys')),editing=rect(dialog.querySelector('.name-editing')),buttons=rect(dialog.querySelector('footer'));
+ expect(dialog.open,'tastiera grafica non aperta');expect(contained(box,bounds),'tastiera fuori dalla finestra dell’app');
+ expect(editing.top>=keys.bottom-1&&buttons.top>=editing.bottom-1,'righe tastiera sovrapposte');expect(buttons.bottom<=box.bottom+1,'conferma tastiera tagliata');
+ expect(name.readOnly&&name.inputMode==='none','tastiera nativa non esclusa');
+ const keyArea=dialog.querySelector('.name-keys');keyArea.scrollTop=keyArea.scrollHeight;const lastRow=dialog.querySelector('[data-page="letters"] .name-key-row:last-child');
+ expect(contained(rect(lastRow),rect(keyArea)),'ultima riga tastiera non raggiungibile');
+ dialog.querySelector('[data-key="cancel"]').click();expect(!dialog.open,'tastiera non si chiude');
+ expect(d.querySelector('#online-code').value==='ABC234','tastiera ha perso il codice stanza');
+ publish(label,errors,{scrollHeight:area.clientHeight,scrollWidth:area.clientWidth,profileHeight:d.querySelector('#online-profile-art').offsetHeight,cardHeight:d.querySelector('[data-online-fighter]:last-child').offsetHeight,footerHeight:footer.offsetHeight,headingHeight:d.querySelector('.online-heading').offsetHeight});
+}
+document.querySelector('#run').onclick=async()=>{
+ document.querySelector('#run').disabled=true;reports.length=0;root.replaceChildren();summary.textContent='Verifica in corso…';
+ try{
+  for(const c of cases){
+   const section=document.createElement('section'),heading=document.createElement('h2'),frame=document.createElement('iframe');heading.textContent='App '+c.w+'×'+c.h;frame.width=c.w;frame.height=c.h;frame.title=heading.textContent;section.append(heading,frame);root.append(section);
+   const loaded=new Promise(resolve=>frame.addEventListener('load',resolve,{once:true}));frame.src='../Gioca.html?online=1&fromInvite=1&room=ABC234&standalone=1&touch=1';await Promise.race([loaded,delay(1000)]);
+   const deadline=Date.now()+30000;while(!frame.contentWindow.dojo?.ready&&Date.now()<deadline)await delay(80);
+   await delay(200);await inspect(frame,c,heading.textContent);
+   if(c.w===390){
+    const identity=frame.contentWindow.dojo;
+    for(const size of [{w:390,h:700},{w:700,h:300},{w:320,h:420}]){
+     frame.width=size.w;frame.height=size.h;await delay(250);await inspect(frame,size,'Stesso invito → '+size.w+'×'+size.h);
+     if(frame.contentWindow.dojo!==identity)reports.at(-1).errors.push('il gioco è stato ricaricato al resize');
+     reports.at(-1).pass=!reports.at(-1).errors.length;
+    }
+    frame.width=c.w;frame.height=c.h;await delay(200);await tick(frame.contentWindow);
+   }
+  }
+  report.dataset.result=reports.every(item=>item.pass)?'PASS':'FAIL';report.textContent=JSON.stringify(reports,null,2);summary.textContent=reports.filter(item=>item.pass).length+'/'+reports.length+' verifiche superate';
+ }catch(error){report.dataset.result='ERROR';report.textContent=error.stack;summary.textContent='Errore durante la verifica';}
+ document.querySelector('#run').disabled=false;
+};
+</script></html>

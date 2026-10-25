@@ -101,6 +101,26 @@ test('snapshot round-trip restores Infinity and canonical attack definitions', (
   assert.equal(result.fighters[0].attack.def, KyokushinMoves.tsuki);
 });
 
+test('snapshot encoder preserves the wire state for every attack without retaining mutable arrays', () => {
+  const play = pair('training'); play.contact();
+  for (const move of Object.keys(KyokushinMoves)) {
+    const fighter = play.host.state.fighters[0];
+    fighter.attack = { move, def: KyokushinMoves[move], serial: 1, hitTime: Infinity,
+      linked: false, hitApplied: false, hitConfirmed: false, whiffEmitted: false, landingEmitted: false };
+    fighter.comboMoves = [move];
+    fighter.inputQueue = [{ move, ttl: .5 }]; fighter.buffer = fighter.inputQueue[0];
+    const expected = JSON.parse(JSON.stringify(play.host.state));
+    for (const item of expected.fighters) if (item.attack) delete item.attack.def;
+    const encoded = encodeState(play.host.state);
+    assert.deepEqual(encoded, expected);
+    fighter.attack.hitTime = 1; fighter.comboMoves.push('tsuki'); fighter.inputQueue[0].ttl = .1;
+    assert.equal(encoded.fighters[0].attack.hitTime, null);
+    assert.deepEqual(encoded.fighters[0].comboMoves, [move]);
+    assert.equal(encoded.fighters[0].inputQueue[0].ttl, .5);
+    assert.equal(encoded.fighters[0].buffer.ttl, .5);
+  }
+});
+
 test('clearing local input does not clear the other player', () => {
   const play = pair(); play.contact();
   play.host.setInput('left', true); play.guest.setInput('right', true); play.flush();
@@ -128,6 +148,30 @@ test('redundant resume request does not strand a held host direction', () => {
   assert.equal(play.hostGame.inputs[0].held.left, true);
   assert.equal(play.host.setInput('left', false), true);
   assert.equal(play.hostGame.inputs[0].held.left, false);
+});
+
+test('pause stops duplicate state traffic but keeps both peers alive and resumes at 30 snapshots/s', () => {
+  const play = pair(); play.contact(); play.host.pause(true); play.flush();
+  const pausedSequence = play.host.frameSeq, packetCount = play.sent.length;
+  play.advance(6);
+  assert.equal(play.host.frameSeq, pausedSequence);
+  assert.equal(play.host.connected, true); assert.equal(play.guest.connected, true);
+  assert.equal(play.guest.state.paused, true);
+  assert.ok(play.sent.slice(packetCount).filter(item => item.message.type === 'game-heartbeat').length >= 40);
+  play.host.pause(false); play.flush();
+  assert.equal(play.guest.state.paused, false);
+  const resumedSequence = play.host.frameSeq;
+  play.advance(1);
+  assert.ok(play.host.frameSeq - resumedSequence >= 29 && play.host.frameSeq - resumedSequence <= 31);
+});
+
+test('congestion cannot suppress an unsent pause transition', () => {
+  const play = pair(); play.contact(); play.dropFrames(true); play.host.pause(true); play.flush();
+  assert.equal(play.guest.state.paused, false);
+  play.advance(.1); play.dropFrames(false); play.advance(.05);
+  assert.equal(play.guest.state.paused, true);
+  const sequence = play.host.frameSeq;
+  play.advance(.2); assert.equal(play.host.frameSeq, sequence);
 });
 
 test('duplicate input, duplicate snapshots and replayed events are ignored', () => {

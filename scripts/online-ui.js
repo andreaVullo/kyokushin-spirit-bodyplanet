@@ -13,10 +13,13 @@
     return code;
   }
   function inviteURL(code, href) {
-    const url = new URL(href);
-    url.search = '';
-    url.hash = '';
-    url.searchParams.set('room', cleanCode(code));
+    const normalized = code ? cleanCode(code) : '';
+    if (global.DojoOnlineInvite) return global.DojoOnlineInvite.inviteURL(normalized, href);
+    // Keep standalone lobby previews usable without the optional entry-page script.
+    let source; try { source = new URL(href); } catch (_) {}
+    if (!source || source.protocol !== 'https:' && !(source.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(source.hostname))) source = new URL('https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html');
+    const url = new URL('online.html', source);
+    if (normalized) url.searchParams.set('room', normalized);
     return url.href;
   }
   class OnlineUI {
@@ -44,7 +47,7 @@
             <small class="online-account-note">Basta un nome. Nessun account richiesto.</small>
           </section>
           <section class="online-room" aria-label="Stanza online" hidden>
-            <div class="online-room-heading"><div><small id="online-room-mode">1 VS 1</small><strong id="online-room-code"></strong></div><div><button type="button" id="online-copy-code">COPIA CODICE</button><button type="button" id="online-copy-link">COPIA INVITO ↗</button></div></div>
+            <div class="online-room-heading"><div><small id="online-room-mode">1 VS 1</small><strong id="online-room-code"></strong></div><div><button type="button" id="online-copy-code">COPIA CODICE</button><button type="button" id="online-copy-link">CONDIVIDI INVITO ↗</button></div></div>
             <div class="online-players"></div>
             <p class="online-room-help">Scegli il tuo karateka e premi Pronto. Si parte quando siete pronti entrambi.</p>
           </section>
@@ -194,10 +197,19 @@
       });
     }
     async copy(link) {
-      if (!this.room?.code) return;
-      const value = link ? inviteURL(this.room.code, this.options.inviteBase || global.location.href) : this.room.code;
-      try { await global.navigator.clipboard.writeText(value); this.setStatus(link ? 'Invito copiato. Condividilo con un amico.' : 'Codice copiato. Condividilo con il secondo karateka.'); }
-      catch (_) { this.setStatus('Codice stanza: ' + this.room.code + '. Puoi comunicarlo direttamente al tuo amico.'); }
+      const room = this.room, code = room?.code;
+      if (!code) return;
+      const current = () => this.room === room && this.room.code === code;
+      const value = link ? inviteURL(code, this.options.inviteBase || global.location.href) : code;
+      if (link && typeof global.navigator?.share === 'function') {
+        try {
+          await global.navigator.share({ title: 'Kyokushin Spirit · Sfida online', text: 'Ti aspetto nel dojo. Codice stanza: ' + code, url: value });
+          if (current()) this.setStatus('Invito condiviso. Aspetto il secondo karateka.');
+          return;
+        } catch (error) { if (!current() || error?.name === 'AbortError') return; }
+      }
+      try { await global.navigator.clipboard.writeText(value); if (current()) this.setStatus(link ? 'Invito copiato. Condividilo con un amico.' : 'Codice copiato. Condividilo con il secondo karateka.'); }
+      catch (_) { if (current()) this.setStatus('Codice stanza: ' + code + '. Puoi comunicarlo direttamente al tuo amico.'); }
     }
     createResultActions() {
       const result = document.getElementById('result-panel'); if (!result) return;

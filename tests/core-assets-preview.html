@@ -1,0 +1,16 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><title>Verifica immagini base</title>
+<style>body{font:16px system-ui;background:#111926;color:#eee;padding:24px}button{font:inherit;padding:12px}pre{white-space:pre-wrap}canvas{background:#243143;max-width:100%}</style>
+<h1>Immagini base · caricamento e compatibilità</h1><p>Carica i 10 PNG originali e verifica che il canvas permetta ancora di leggerne i pixel.</p>
+<button id="run">Esegui verifica</button><pre id="report">Pronto</pre><canvas id="preview" width="640" height="384"></canvas>
+<script src="../scripts/core-assets.js"></script>
+<script>
+const names=['attacks-angelo','attacks-samuel','dojo-mirror','fighters-angelo','fighters-samuel','guards','kyokushin-logo','motion-angelo','motion-samuel','portraits'];
+const report=document.getElementById('report'),button=document.getElementById('run'),canvas=document.getElementById('preview'),ctx=canvas.getContext('2d');
+button.onclick=async()=>{button.disabled=true;report.textContent='Caricamento…';try{
+ await window.__kyokushinAssetsReady;const offline=location.protocol==='file:';let read=0;
+ for(let index=0;index<names.length;index++){const name=names[index],source=__kyokushinAsset('assets/'+name+'.png');if(offline?!source.startsWith('data:image/png;base64,'):!/^https?:/.test(source))throw new Error('Sorgente inattesa: '+name);
+ const image=new Image();await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=()=>reject(new Error('Immagine non caricata: '+name));image.src=source});const x=index%5*128,y=Math.floor(index/5)*192;ctx.drawImage(image,x,y,128,160);const pixels=ctx.getImageData(x,y,128,160).data;if(!pixels.some((value,index)=>index%4===3&&value>0))throw new Error('Immagine vuota: '+name);ctx.fillStyle='#fff';ctx.font='10px system-ui';ctx.fillText(name,x+3,y+175);read++}
+ const envelopes=Array.from(document.scripts).filter(script=>script.src.includes('/assets/core/offline.js')).length;if(envelopes!==(offline?1:0))throw new Error('Caricamento envelope inatteso');
+ report.textContent='PASS · '+(offline?'Apertura locale file:// con envelope origin-clean':'Apertura HTTP con PNG cacheabili')+'\n'+read+'/10 immagini decodificate e leggibili dal canvas.\nNessuna immagine vuota, nessun errore di origine.\nEnvelope offline caricati: '+envelopes;
+}catch(error){report.textContent='FAIL · '+error.message;button.disabled=false}};
+</script></html>

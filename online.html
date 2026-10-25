@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#131e2c">
+  <meta name="description" content="Un tatami, due karateka. Entra nel dojo online per una sfida privata, il matchmaking o l’allenamento con un amico.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Kyokushin Spirit · Sfida online">
+  <meta property="og:description" content="Un tatami, due karateka. Apri l’invito ed entra nella stanza del tuo amico.">
+  <meta name="twitter:card" content="summary">
+  <title>Dojo online · Kyokushin Spirit</title>
+  <link rel="stylesheet" href="styles/invite-entry.css?v=20261025-1">
+  <script defer src="scripts/invite-entry.js?v=20261025-1"></script>
+</head>
+<body>
+  <main id="dojo-invite">
+    <header><span>BODYPLANET / DOJO ONLINE</span><b aria-hidden="true">極真</b></header>
+    <p class="invite-eyebrow">KYOKUSHIN SPIRIT</p>
+    <h1 id="invite-title">ENTRA NEL DOJO ONLINE.</h1>
+    <p id="invite-description">Sfida un amico, cerca un avversario o allenatevi insieme.</p>
+    <div id="invite-room" hidden><span>STANZA PRIVATA</span><strong id="invite-code"></strong></div>
+    <p id="invite-message" role="status" hidden></p>
+    <div class="invite-actions">
+      <a id="invite-play" class="invite-primary" href="Gioca.html?online=1&amp;fromInvite=1&amp;standalone=1">GIOCA ONLINE ↗</a>
+      <a id="invite-browser" hidden>APRI NEL BROWSER ↗</a>
+      <button id="invite-copy" type="button" hidden>COPIA INVITO</button>
+    </div>
+    <p id="invite-feedback" role="status" aria-live="polite"></p>
+    <details id="invite-browser-help">
+      <summary>Hai aperto il link da un’app?</summary>
+      <p id="invite-browser-instructions">Dal menu dell’app scegli “Apri nel browser”. Il link conserva la stanza, senza dover riscrivere il codice.</p>
+    </details>
+    <noscript><p>Attiva JavaScript nel browser per entrare nella stanza indicata dall’invito.</p></noscript>
+    <footer>1 VS 1 · ALLENAMENTO · NESSUN ACCOUNT</footer>
+  </main>
+</body>
+</html>

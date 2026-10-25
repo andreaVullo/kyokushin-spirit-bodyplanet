@@ -86,6 +86,26 @@ function harness({ embedded = false, native = 'pending' } = {}) {
 
 async function settle() { await Promise.resolve(); await Promise.resolve(); await Promise.resolve(); }
 
+test('a chat invitation fits shrinking and rotating viewports without requesting native fullscreen', () => {
+  const h = harness();
+  h.display.open({ native: false });
+  assert.equal(h.display.requested, true);
+  assert.equal(h.display.nativePending, false);
+  assert.equal(h.requests.length, 0);
+  for (const [w, height] of [[390, 500], [390, 700], [700, 300], [320, 420]]) {
+    const layout = h.layout(w, height);
+    assert.equal(layout.blocked, false);
+    assert.equal(layout.virtual, height > w);
+    assert.equal(layout.logicalWidth, Math.max(w, height));
+    assert.equal(layout.logicalHeight, Math.min(w, height));
+  }
+  assert.equal(h.locks, 0);
+  h.display.toggle();
+  assert.equal(h.display.layoutOnly, false);
+  assert.equal(h.display.requested, true);
+  assert.equal(h.requests.length, 1, 'an explicit later gesture can still request native fullscreen');
+});
+
 for (const native of ['unavailable', 'throw', 'reject', 'undefined']) {
   test(`${native} native fullscreen still leaves portrait playable through the local layout`, async () => {
     const h = harness({ native });
