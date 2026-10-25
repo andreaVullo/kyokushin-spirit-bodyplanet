@@ -78,6 +78,15 @@
     "variant": "FOTO DI GRUPPO",
     "assetId": "07-marco-tabacco-foto-gruppo"
   },
+  "andrea-barbagallo": {
+    "name": "ANDREA BARBAGALLO",
+    "short": "ANDREA BARBAGALLO",
+    "rank": "KARATEKA · 9 KYU",
+    "belt": "CINTURA ARANCIONE",
+    "beltColor": "orange",
+    "variant": "",
+    "assetId": "09-andrea-barbagallo"
+  },
   "andrea-vullo": {
     "name": "ANDREA VULLO",
     "short": "ANDREA VULLO",

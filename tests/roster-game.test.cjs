@@ -25,6 +25,7 @@ const names = {
   'oscar-gueli': 'OSCAR GUELI',
   'marco-tabacco-foto-gruppo': 'MARCO TABACCO',
   'andrea-vullo': 'ANDREA VULLO',
+  'andrea-barbagallo': 'ANDREA BARBAGALLO',
 };
 const ids = Object.keys(names);
 const damages = { tsuki: 65, gyaku: 95, shita: 90, kagi: 110, gedan: 90, mae: 120, mawashi: 145, ushiro: 185, kaiten: 235 };
@@ -63,7 +64,7 @@ test('all named characters are present and the two Marco variants retain distinc
 });
 
 for (const mode of ['cpu', 'training', 'versus']) {
-  test(`${mode}: every one of the 100 pairings survives restart and a new round`, () => {
+  test(`${mode}: every one of the ${ids.length ** 2} pairings survives restart and a new round`, () => {
     for (const player of ids) {
       for (const opponent of ids) {
         const label = `${player} vs ${opponent}`;

@@ -28,11 +28,11 @@ Poi apri [http://127.0.0.1:8765](http://127.0.0.1:8765).
 
 ## Nuovi karateka
 
-Oltre ad Angelo Pierino e Samuel Villani sono disponibili Marco Tabacco, Gabriele Carbonaro, Leonardo Cappellani, Gabriele Randazzo, Matteo Spata, Oscar Gueli e Andrea Vullo. Marco Tabacco ha due versioni selezionabili, **collage** e **foto di gruppo**. I colori e le strisce delle cinture seguono i riferimenti forniti.
+Oltre ad Angelo Pierino e Samuel Villani sono disponibili Marco Tabacco, Gabriele Carbonaro, Leonardo Cappellani, Gabriele Randazzo, Matteo Spata, Oscar Gueli, Andrea Vullo e **Andrea Barbagallo (9 Kyu, cintura arancione)**. Marco Tabacco ha due versioni selezionabili, **collage** e **foto di gruppo**. I colori e le strisce delle cinture seguono i riferimenti forniti.
 
 Tutti possono combattere su entrambi i lati nelle modalità VS CPU, 2 giocatori e Allenamento, anche contro lo stesso personaggio. Entrano inoltre nel gruppo degli avversari della scalata Arcade, dove il giocatore usa il karateka creato. Ogni nuovo riferimento include pugni, calci, kaiten, passi, scatto, salto, parate, reazioni, caduta, KO, ripresa e vittoria. Il volto aggiornato di Gabriele Carbonaro è usato in tutte le sue sequenze.
 
-I 40 PNG sono conservati senza ricompressione dentro piccoli file JavaScript separati in `assets/karateka/`: questo permette di ritagliare correttamente le sagome anche aprendo il gioco da disco. Si caricano inizialmente solo i ritratti; le altre mosse si caricano per i due combattenti scelti, prima della presentazione VS. In caso di errore si può premere **Riprova**. Le animazioni degli incontri precedenti vengono liberate dalla memoria.
+I 45 PNG sono conservati senza ricompressione dentro piccoli file JavaScript separati in `assets/karateka/`: questo permette di ritagliare correttamente le sagome anche aprendo il gioco da disco. Si caricano inizialmente solo i ritratti; le altre mosse si caricano per i due combattenti scelti, prima della presentazione VS. In caso di errore si può premere **Riprova**. Le animazioni degli incontri precedenti vengono liberate dalla memoria.
 
 La selezione, le tessere e il VS usano una stessa inquadratura per tutti: testa allineata, dimensioni proporzionate e centro del busto coerente. Il creatore Arcade mantiene la figura intera con i piedi allineati. `scripts/portrait-framing.js` gestisce queste viste senza modificare scala o animazioni in combattimento.
 
@@ -44,7 +44,7 @@ Verifica automatica del motore e del renderer:
 node --test tests/*.test.cjs
 ```
 
-La pagina `tests/render-preview.html`, con server locale, carica tutti i 40 fogli e mostra 144 pose nelle due direzioni per il controllo visivo. `assets/karateka/checksums.json` documenta l’impronta SHA-256 dei PNG sorgenti. Per misurare nuovamente i PNG, usa `python3 tools/measure-karateka.py CARTELLA_SPRITE coordinate.json` (richiede Pillow e NumPy); poi `python3 tools/import-karateka.py CARTELLA_SPRITE coordinate.json` rigenera gli involucri senza alterare le immagini.
+La pagina `tests/render-preview.html`, con server locale, carica tutti i 45 fogli e mostra 162 pose nelle due direzioni per il controllo visivo. `assets/karateka/checksums.json` documenta l’impronta SHA-256 dei PNG sorgenti. Per misurare nuovamente i PNG, usa `python3 tools/measure-karateka.py CARTELLA_SPRITE coordinate.json` (richiede Pillow e NumPy); poi `python3 tools/import-karateka.py CARTELLA_SPRITE coordinate.json` rigenera gli involucri senza alterare le immagini. Per aggiungere soltanto un personaggio senza riscrivere gli altri, usa `--merge`.
 
 ## Comandi
 
@@ -115,6 +115,8 @@ Nelle sfide vince chi conquista **due round**. Ogni round dura **60 secondi real
 ### Arcade: il tuo karateka, dalla bianca al 10° Dan
 
 Il creatore permette di scegliere **uomo o donna**, **cinque capigliature per ciascuno** e un nome da 2 a 24 caratteri. Sono ammessi lettere, numeri, spazi, punti, apostrofi e trattini. La scelta estetica non cambia danni o regole del combattimento. L’anteprima parte dalla cintura bianca; la cintura del personaggio cambia con le promozioni.
+
+Su telefono il nome si inserisce con la **tastiera grafica del gioco**, senza aprire la tastiera del sistema: lettere accentate, numeri, spazio, maiuscole/minuscole, cursore e cancellazione. **Conferma nome** riporta al creatore ed evidenzia **Entra nel tatami**; **Annulla** conserva il nome precedente. Il pannello resta verticale e leggibile anche quando il gioco ruota con il blocco rotazione attivo. Sul computer si può continuare a usare la tastiera fisica o aprire quella grafica.
 
 La partenza è **bianca, senza grado (mukyu)**, prima del 10 Kyu. Questo ordine segue le indicazioni introduttive del [Kyokushinkaikan Honbu Daikanyama Dojo](https://branch.kyokushinkaikan.org/daikanyamadojo/english-information).
 

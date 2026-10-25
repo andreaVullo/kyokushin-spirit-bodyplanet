@@ -8,10 +8,13 @@ import json
 parser = argparse.ArgumentParser()
 parser.add_argument("sprites", type=Path)
 parser.add_argument("bounds", type=Path)
+parser.add_argument("--merge", action="store_true", help="Add characters without replacing the existing atlas or checksums")
 args = parser.parse_args()
 project = Path(__file__).resolve().parents[1]
 atlas = json.loads(args.bounds.read_text())
 checksums = {}
+if args.merge:
+    checksums = json.loads((project / "assets/karateka/checksums.json").read_text())
 for character, sheets in atlas.items():
     folder = project / "assets" / "karateka" / character
     folder.mkdir(parents=True, exist_ok=True)
@@ -31,6 +34,11 @@ for character, sheets in atlas.items():
         for frame in meta["frames"]:
             for detail in ["original_region", "component", "opaque_pixels", "row", "col", "anchor_mode"]:
                 frame.pop(detail, None)
+if args.merge:
+    existing = (project / "scripts/karateka-atlas.js").read_text()
+    previous = json.loads(existing.split("window.KyokushinSpriteAtlas = ", 1)[1].rstrip(";\n"))
+    previous.update(atlas)
+    atlas = previous
 (project / "scripts" / "karateka-atlas.js").write_text(
     "/* Measured silhouettes and floor anchors; source PNGs remain unchanged. */\n"
     "window.KyokushinSpriteAtlas = " + json.dumps(atlas, separators=(",", ":")) + ";\n"

@@ -29,6 +29,13 @@
           <button id="arcade-create-submit" type="submit" class="start-button" disabled>PREPARO IL KARATEKA…</button>
         </form>`;
       $('versus-screen').before(creator);
+      const nameKeys = document.createElement('button'); nameKeys.id = 'arcade-name-keyboard'; nameKeys.type = 'button'; nameKeys.className = 'name-keyboard-trigger'; nameKeys.textContent = '⌨ TASTIERA A SCHERMO';
+      $('arcade-name').after(nameKeys);
+      this.nameKeyboard = new global.DojoNameKeyboard({
+        input: $('arcade-name'), trigger: nameKeys, host: $('game-shell'), next: $('arcade-create-submit'),
+        validate: name => global.DojoArcade.validateCharacter({ ...this.appearance, name }).name,
+        onConfirm: name => { this.appearance.name = name; this.error(); this.renderAppearance(); }
+      });
       const dialog = document.createElement('dialog'); dialog.id = 'leaderboard-dialog'; dialog.className = 'leaderboard-dialog';
       dialog.innerHTML = '<button class="close-dialog" aria-label="Chiudi la classifica">×</button><span class="eyebrow">ARCADE / CLASSIFICA COMMUNITY</span><h2>IL MURO DEL DOJO.</h2><p>Le scalate concluse, dal grado più alto al punteggio migliore.</p><p id="leaderboard-run-summary" hidden></p><p id="leaderboard-save-status" role="status" hidden></p><p id="leaderboard-status" role="status">Carico la classifica…</p><div class="leaderboard-scroll"><table id="leaderboard-table"><caption class="sr-only">Risultati Arcade</caption><thead><tr><th>#</th><th>KARATEKA</th><th>GRADO</th><th>PUNTI</th><th>VITTORIE</th></tr></thead><tbody id="leaderboard-body"></tbody></table></div><p id="leaderboard-note"></p><div class="leaderboard-actions"><button type="button" id="leaderboard-retry-save" class="secondary-button" hidden>RIPROVA IL SALVATAGGIO</button><button type="button" id="leaderboard-reload" class="secondary-button">AGGIORNA CLASSIFICA</button></div>';
       $('game-shell').append(dialog);
@@ -65,7 +72,7 @@
         event.preventDefault();
         if (!this.ready) { if (this.failed) onRetry?.(); return; }
         try { onCreate(global.DojoArcade.validateCharacter(this.appearance)); }
-        catch (error) { this.error(error.message || 'Controlla il nome del karateka.'); $('arcade-name').focus(); }
+        catch (error) { this.error(error.message || 'Controlla il nome del karateka.'); if (this.nameKeyboard.touch) this.nameKeyboard.open(); else $('arcade-name').focus(); }
       });
       $('leaderboard-reload').addEventListener('click', () => this.loadLeaderboard(true));
       $('leaderboard-retry-save').addEventListener('click', () => this.publishRecord());
@@ -85,6 +92,7 @@
     setBusy(busy, message = '') {
       $('arcade-form').setAttribute('aria-busy', String(busy));
       $('arcade-name').disabled = busy;
+      $('arcade-name-keyboard').disabled = busy;
       $('arcade-form').querySelectorAll('[data-arcade-gender],[data-arcade-hair]').forEach(button => { button.disabled = busy; });
       $('arcade-create-submit').disabled = busy || !this.ready;
       $('arcade-create-submit').textContent = busy ? 'PREPARO LA SFIDA…' : 'ENTRA NEL TATAMI ↗';

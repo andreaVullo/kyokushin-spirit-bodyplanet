@@ -19,6 +19,7 @@
     '06-oscar-gueli': [145, 2, 63, 65],
     '07-marco-tabacco-foto-gruppo': [145, 2, 68, 68],
     '08-andrea-vullo': [148, 2, 67, 72],
+    '09-andrea-barbagallo': [175, 2, 77, 79],
   };
   let initialLoad;
   let activeAssets = new Set();

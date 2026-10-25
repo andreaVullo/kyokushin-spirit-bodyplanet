@@ -19,7 +19,7 @@
 #selection-panel .roster-targets button{border:1px solid #657285;background:#263345;color:#b7c1cb;font-size:9px;font-weight:800;letter-spacing:.8px;padding:9px 12px;min-height:32px}
 #selection-panel .roster-targets button.selected{color:#1d2938;background:#f4cb79;border-color:#f4cb79}
 #selection-panel .roster-targets button[data-selection-target="opponent"].selected{background:#89d1e4;border-color:#89d1e4}
-#selection-panel .fighter-select{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;width:100%}
+#selection-panel .fighter-select{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;width:100%}
 #selection-panel .fighter-option{height:85px;min-height:65px;min-width:0;transform:none;overflow:hidden;border-width:1px;border-radius:2px;text-align:left}
 #selection-panel .fighter-option:before{background:linear-gradient(90deg,transparent 25%,#152131a8 55%,#152131e8)}
 #selection-panel .fighter-option.selected{border:2px solid #f4cb79;box-shadow:0 0 0 1px #f4cb7933}
@@ -95,7 +95,7 @@
   body.landscape-layout #selection-panel .roster-instruction>small{display:none}
   body.landscape-layout #selection-panel .roster-targets{gap:5px;flex-wrap:nowrap;width:100%}
   body.landscape-layout #selection-panel .roster-targets button{font-size:7px;letter-spacing:.3px;padding:6px 8px;min-height:28px;flex:1}
-  body.landscape-layout #selection-panel .fighter-select{gap:6px;width:100%;grid-template-columns:repeat(5,minmax(0,1fr))}
+  body.landscape-layout #selection-panel .fighter-select{gap:6px;width:100%;grid-template-columns:repeat(6,minmax(0,1fr))}
   body.landscape-layout #selection-panel .fighter-option{height:66px;min-height:60px}
   body.landscape-layout #selection-panel .fighter-option canvas{width:100%;height:100%;left:0}
   body.landscape-layout #selection-panel .fighter-option:before{background:linear-gradient(transparent 15%,#142134eb 88%)}

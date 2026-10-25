@@ -1,6 +1,6 @@
 <!doctype html><meta charset="utf-8"><title>Verifica animazioni karateka</title>
 <style>body{margin:0;padding:24px;background:#18222b;color:#fff;font:16px Arial}canvas{display:block;width:100%;background:#e8e0d4;margin:12px 0 30px}h2{font-size:20px}#status{position:sticky;top:0;background:#18222b;padding:12px}</style>
-<div id="status">Caricamento e verifica dei 40 fogli…</div>
+<div id="status">Caricamento e verifica dei fogli…</div>
 <script>window.FighterArt={height:228,ready:true,load:()=>Promise.resolve()};</script>
 <script src="../scripts/portrait-framing.js"></script>
 <script src="../scripts/roster.js"></script><script src="../scripts/karateka-atlas.js"></script><script src="../scripts/game.js"></script><script src="../scripts/karateka-art.js"></script>
@@ -8,7 +8,8 @@
 (async()=>{
  const types=['tsuki','gyaku','shita','kagi','gedan','mae','mawashi','ushiro','kaiten'];
  let verified=0;
- for(const [id,c] of Object.entries(KyokushinRoster).filter(([id,c])=>c.assetId)){
+ const entries=Object.entries(KyokushinRoster).filter(([id,c])=>c.assetId);
+ for(const [id,c] of entries){
   await FighterArt.loadFighters([id]);
   const h=document.createElement('h2');h.textContent=c.name+(c.variant?' · '+c.variant:'');document.body.append(h);
   const canvas=document.createElement('canvas');canvas.width=1500;canvas.height=860;document.body.append(canvas);const ctx=canvas.getContext('2d');
@@ -23,8 +24,8 @@
    const rgba=ctx.getImageData(x,y+25,250,230).data;let count=0;for(let k=3;k<rgba.length;k+=4)if(rgba[k]>100)count++;
    if(count<300)throw new Error(id+' '+(p.move||p.state)+' invisibile');
   });
-  verified++;document.getElementById('status').textContent=verified+' / 8 karateka verificati';
+  verified++;document.getElementById('status').textContent=verified+' / '+entries.length+' karateka verificati';
  }
- document.getElementById('status').textContent='PASS · 40 fogli caricati · 144 pose renderizzate · entrambe le direzioni';
+ document.getElementById('status').textContent='PASS · '+verified*5+' fogli caricati · '+verified*18+' pose renderizzate · entrambe le direzioni';
 })().catch(e=>{document.getElementById('status').textContent='ERRORE · '+e.message;console.error(e);});
 </script>
