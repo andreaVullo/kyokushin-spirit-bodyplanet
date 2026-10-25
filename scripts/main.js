@@ -94,6 +94,7 @@
   });
   const arcadeUI = new window.ArcadeUI({
     onCreate: beginArcade, onBack: ()=>showTitle(), onLeaderboard: openLeaderboard,
+    onFinalLeaderboard: ()=>showDialog('leaderboard-dialog'),
     onRetry: loadArcadePreview
   });
   function syncLandscapeLayout(){
@@ -177,7 +178,7 @@
       if(i){const divider=document.createElement('span');divider.className='hint-divider';divider.textContent='/';$('bottom-hint').append(divider);}
       const kbd=document.createElement('kbd');kbd.textContent=key;$('bottom-hint').append(kbd,document.createTextNode(' '+label+' '));
     });
-    if(focusId)requestAnimationFrame(()=>{if(screen===next)$(focusId)?.focus({preventScroll:true});});
+    if(focusId)requestAnimationFrame(()=>{if(screen===next&&!document.querySelector('dialog[open]'))$(focusId)?.focus({preventScroll:true});});
   }
   function clearMatchPresentation() {
     window.ArcadeVFX?.clear();
@@ -287,6 +288,7 @@
     $('stage-tip').textContent='CATANIA, ITALIA ●';
   }
   function showTitle(focus=true) {
+    if(arcadeRun&&!arcadeRun.getState().finished){finishArcade();return;}
     leaveArcade();arcadePreviewToken++;
     cancelMatchLoading();
     if(ready&&screen!=='title')sound.effect('menuBack');
@@ -386,7 +388,9 @@
   }
   function finishArcade() {
     if(!arcadeRun)return;
-    cancelMatchLoading();renderArcadeResult(arcadeRun.finish());
+    cancelMatchLoading();
+    if(screen!=='game')setScreen('game');
+    renderArcadeResult(arcadeRun.finish());
   }
   function renderArcadeResult(progress) {
     resultShown=true;paused=false;game.pause(true);clearCombatInput();showPanel('pause-panel',false);showPanel('result-panel',true);
@@ -399,8 +403,9 @@
     $('rematch-button').textContent=progress.finished?'NUOVA SCALATA ↗':'PROSSIMA SFIDA ↗';$('rematch-button').disabled=false;
     $('result-menu-button').textContent=progress.finished?'SCELTA PERSONAGGIO':'TERMINA SCALATA';
     $('status-label').textContent=progress.finished?'ARCADE · RISULTATO FINALE':'ARCADE · PROMOZIONE A '+progress.rank.label;
-    arcadeUI.showResult(progress,arcadeRun.finalRecord());arcadeUI.showRun(progress,arcadeMatch);
     sound.effect('victory',{winner:progress.lastMatch?.won?0:1});syncControlSurface();$('rematch-button').focus({preventScroll:true});
+    arcadeUI.showRun(progress,arcadeMatch);
+    arcadeUI.showResult(progress,arcadeRun.finalRecord());
   }
   async function beginVersus(duration=1400) {
     if(arcadeRun){if(arcadeRun.getState().finished)showArcadeCreator();else prepareArcadeMatch();return;}
@@ -559,7 +564,7 @@
     if(document.querySelector('dialog[open]')||document.body.classList.contains('orientation-blocked')||e.ctrlKey||e.metaKey||e.altKey)return;
     if(e.code==='Escape'&&!e.repeat){
       if(screen==='select'){e.preventDefault();showTitle();}
-      else if(screen==='versus'){e.preventDefault();arcadeRun?showArcadeCreator():showSelection();}
+      else if(screen==='versus'){e.preventDefault();arcadeRun?finishArcade():showSelection();}
       else if(screen==='game'){e.preventDefault();togglePause();}
       return;
     }

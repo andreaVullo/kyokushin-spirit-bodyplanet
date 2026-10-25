@@ -240,3 +240,36 @@ test('live service pagination and GitHub archive fallback preserve real result p
   const archived = await fallback.load();
   assert.equal(archived.archive, true); assert.equal(archived.entries.length, 1);
 });
+
+test('post-save refresh waits for an older request and fetches again instead of caching its stale list', async () => {
+  let resolveOlder;
+  const older = new Promise(resolve => { resolveOlder = resolve; });
+  let reads = 0;
+  const client = new DojoLeaderboard({ endpoint: 'https://scores.example.org/records', fetch: async (_, options) => {
+    if (options.method === 'POST') return response({ id: record().id, stored: true,
+      archiveUrl: 'https://github.com/andreaVullo/kyokushin-spirit-bodyplanet/blob/main/data/arcade-leaderboard.json' });
+    reads++;
+    assert.equal(options.cache, 'no-store');
+    if (reads === 1) return older;
+    return response({ version: 1, records: [record()], nextCursor: null });
+  } });
+  const oldRead = client.load();
+  await client.submit(record());
+  const afterSave = client.load({ force: true });
+  resolveOlder(response({ version: 1, records: [], nextCursor: null }));
+  assert.equal((await oldRead).entries.length, 0);
+  const refreshed = await afterSave;
+  assert.equal(reads, 2);
+  assert.equal(refreshed.entries[0].id, record().id);
+  assert.equal(client.cached, refreshed);
+});
+
+test('user-facing leaderboard failures do not expose hosting or repository names', async () => {
+  for (const status of [403, 404, 429, 500]) {
+    const client = new DojoLeaderboard({ fetch: async () => response([], { status }) });
+    await assert.rejects(client.load(), error => {
+      assert.doesNotMatch(error.message, /github|repository|d1|cloudflare/i);
+      return true;
+    });
+  }
+});

@@ -1,16 +1,16 @@
 # Classifica Arcade: solo nome, senza account
 
-Il giocatore sceglie il nome del karateka e può pubblicare il risultato finale senza account, email o password. Il [servizio del dojo](https://kyokushin-dojo-classifica.flazio1.chatgpt.site) conserva il risultato in un database D1 e lo rende subito leggibile. Un workflow nel repository del gioco ne copia periodicamente l’archivio su GitHub.
+Il giocatore sceglie il nome del karateka e il risultato finale viene salvato automaticamente senza account, email o password. Il [servizio del dojo](https://kyokushin-dojo-classifica.flazio1.chatgpt.site) conserva il risultato in un database D1 e lo rende subito leggibile. Un workflow nel repository del gioco ne copia periodicamente l’archivio su GitHub.
 
 **Il servizio è attivo.** `scripts/leaderboard-config.js` contiene l’endpoint HTTPS `/records`. Il codice del servizio distribuito è versionato in `server/sites/`. Non sono necessari token GitHub nel browser, nel codice Flazio o nel servizio.
 
 ## Pubblicare un risultato
 
 1. Concludi la sfida Arcade: sconfitta, abbandono o raggiungimento del 10° Dan.
-2. Premi **Salva in classifica**. Nome, aspetto del personaggio, grado, punti, vittorie e durata vengono inviati al servizio del dojo.
-3. La conferma compare dopo la scrittura nel database. **Verifica in classifica** permette di ricontrollarne la presenza.
+2. Nome, aspetto del personaggio, grado, punti, vittorie e durata vengono inviati automaticamente al servizio del dojo. Si apre subito la classifica con lo stato del salvataggio.
+3. La conferma compare dopo la scrittura nel database e la classifica aggiornata evidenzia il risultato nella sua posizione reale. In caso di errore usa **Riprova il salvataggio**. **Vedi classifica** permette di riaprirla dopo averla chiusa.
 
-Nome e risultato sono pubblici. La pubblicazione è facoltativa; la partita funziona anche offline. I nomi non sono riservati e possono essere scelti da più persone. Un reinvio dello stesso risultato non crea duplicati.
+Nome e risultato sono pubblici: il creatore lo indica prima di iniziare. Il gioco funziona anche offline; se l’invio non riesce, il risultato resta disponibile per riprovare finché la pagina rimane aperta. I nomi non sono riservati e possono essere scelti da più persone. Un reinvio dello stesso risultato non crea duplicati.
 
 **Il salvataggio online è immediato; la copia su GitHub è differita.** Il workflow `sync-arcade-leaderboard.yml` è programmato ogni 15 minuti e può subire ritardi. La conferma online non dichiara già completata la copia. Il file pubblico è [data/arcade-leaderboard.json](data/arcade-leaderboard.json), inizialmente vuoto e senza risultati dimostrativi.
 
@@ -18,7 +18,7 @@ Nome e risultato sono pubblici. La pubblicazione è facoltativa; la partita funz
 
 La partita in corso rimane soltanto in memoria. Non viene scritta in localStorage, sessionStorage, IndexedDB, D1 o GitHub. Chiudere o ricaricare il gioco perde la sfida. I record finali non contengono lo stato necessario a ripristinare un incontro e non sono importabili come salvataggi.
 
-La classifica ordina prima per grado raggiunto, poi per punti, vittorie e durata minore. Il percorso è bianca → 10 Kyu fino a 1 Kyu → 1 Dan fino a 10 Dan. La pagina mostra al massimo 50 risultati. Il client controlla fino a 20.000 record per individuare anche una propria sfida fuori dai primi 50; se resta altro materiale, segnala che la lettura è parziale.
+La classifica ordina prima per grado raggiunto, poi per punti, vittorie e durata minore. Il percorso è bianca → 10 Kyu fino a 1 Kyu → 1 Dan fino a 10 Dan. La pagina mostra i primi 50 risultati più quello della propria scalata appena conclusa, se si trova più in basso. Il client controlla fino a 20.000 record per individuare anche una propria sfida fuori dai primi 50; se resta altro materiale, segnala che la lettura è parziale.
 
 È una classifica amatoriale: il browser calcola i risultati. Formato e limiti numerici vengono controllati anche dal servizio, ma non certificano che la partita sia stata giocata senza modifiche. Un sistema anti-cheat richiederebbe verifica degli incontri lato server.
 
@@ -44,7 +44,7 @@ const result = await DojoLeaderboard.submit(run.finalRecord());
 // { id, stored: true, duplicate, githubSynced: false, archiveUrl }
 ```
 
-`submit` va chiamato soltanto alla pressione di **Salva in classifica**. Restituisce conferma dopo la risposta validata del servizio; senza endpoint restituisce `not-configured`. Per verificare, cercare l’id in `metadata.entries` dopo un aggiornamento riuscito. `metadata.archive` indica il ripiego sulla copia GitHub; trovare il record lì conferma anche la sincronizzazione. Inserire i nomi nell’interfaccia tramite `textContent`.
+`submit` viene chiamato automaticamente soltanto quando la scalata è conclusa (sconfitta, 10 Dan o abbandono esplicito), una volta per identificativo. Un errore espone il comando di riprova sullo stesso identificativo. Le vittorie intermedie non inviano record. Restituisce conferma dopo la risposta validata del servizio; senza endpoint restituisce `not-configured`. Per verificare, cercare l’id in `metadata.entries` dopo un aggiornamento riuscito. `metadata.archive` indica il ripiego sulla copia GitHub; trovare il record lì conferma anche la sincronizzazione. Inserire i nomi nell’interfaccia tramite `textContent`.
 
 ## Verifica
 

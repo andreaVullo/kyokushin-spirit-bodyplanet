@@ -25,7 +25,7 @@ body.landscape-short .creator-field small,body.landscape-short .creator-journey{
 
 .creator-form [disabled]{cursor:wait}
 
-/* Keep the four final-result actions reachable even on a 320px-high phone. */
+/* Keep final-result actions reachable even on a 320px-high phone. */
 .result-actions{display:flex;flex-direction:column;align-items:center;gap:10px}
 #result-panel.arcade-result{box-sizing:border-box;overflow-y:auto;justify-content:flex-start;justify-content:safe center;gap:6px;padding:12px}
 .arcade-result .result-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:min(460px,100%);gap:6px}
@@ -39,3 +39,8 @@ body.landscape-tiny #result-panel.arcade-result .result-actions>button{font-size
 body.landscape-tiny #arcade-publish-status{margin-top:2px}
 .leaderboard-dialog .secondary-button{color:#27352f;border-color:#8d9888;background:#e4e4d7;font-weight:700}
 .leaderboard-dialog .secondary-button:hover{background:#d3dacb}
+.leaderboard-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.leaderboard-actions .secondary-button{min-height:44px;flex:1}
+#leaderboard-run-summary{padding:10px 12px;background:#ddc88c3b;border-left:3px solid #9c7933;font-weight:700}
+#leaderboard-save-status{font-weight:700;color:#355b37}
+#leaderboard-retry-save[hidden],#leaderboard-run-summary[hidden],#leaderboard-save-status[hidden]{display:none!important}
+body.landscape-short .leaderboard-dialog{padding:14px 20px}body.landscape-short .leaderboard-dialog h2{font-size:24px;margin:5px 0}body.landscape-short .leaderboard-dialog p{font-size:10px;line-height:1.35;margin:6px 0}body.landscape-short .leaderboard-scroll{max-height:30vh}body.landscape-short .leaderboard-dialog td,body.landscape-short .leaderboard-dialog th{padding:8px}

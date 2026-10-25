@@ -243,24 +243,24 @@
     options = { ...value, ...options };
     const model = appearance(value), art = frameFor(model, options.pose ?? 0);
     if (!art) return false;
-    const source = art.canvas;
-    let sx = 0, sy = 0, sw = source.width, sh = source.height;
-    if (options.bust) {
-      const [hx, hy, headSize] = art.meta.head;
-      sw = headSize * 1.8; sh = headSize * 1.65;
-      sx = hx - art.meta.region[0] + 30 - sw * .5;
-      sy = hy - art.meta.region[1] + 30 - headSize * 1.13;
-    }
-    const scale = Math.min(width / sw, height / sh), dw = sw * scale, dh = sh * scale;
-    ctx.save(); ctx.beginPath(); ctx.rect(x, y, width, height); ctx.clip();
-    ctx.translate(x + width / 2, y + height - dh); if (options.facing === -1) ctx.scale(-1, 1);
-    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(source, sx, sy, sw, sh, -dw / 2, 0, dw, dh); ctx.restore(); return true;
+    const [hx, hy, headSize, , back = 0] = art.meta.head;
+    const head = atlas.heads[(model.gender === 'female' ? 10 : 0) + (back ? 5 : 0) + model.hair];
+    const scale = headSize / 240;
+    const profile = {
+      // The anatomical neck anchor stays fixed when a ponytail changes the
+      // silhouette width; hairstyles must not move the face across a card.
+      center: hx - art.meta.region[0] + 30,
+      top: hy - art.meta.region[1] + 30 + (head.bounds[1] - head.anchor[1]) * scale,
+      headHeight: headSize * .85,
+      headWidth: head.bounds[2] * scale,
+    };
+    return global.FighterPortraits.draw(ctx, art.canvas, profile, x, y, width, height,
+      { ...options, full: options.full ?? (!options.bust && !options.hero) });
   }
 
   function drawSelectionPortrait(ctx, id, x, y, width, height, options = {}) {
     const model = appearances.get(id);
-    return model ? drawPreview(ctx, model, x, y, width, height, options) : previous.drawSelectionPortrait(ctx, id, x, y, width, height, options);
+    return model ? drawPreview(ctx, model, x, y, width, height, { ...options, hero: true }) : previous.drawSelectionPortrait(ctx, id, x, y, width, height, options);
   }
 
   global.ArcadeArt = { load, setCharacter, drawPreview, getCharacter: id => appearances.get(id),

@@ -115,6 +115,7 @@
       this.timeout = options.timeout === undefined ? 10000 : Math.max(1, options.timeout);
       this.cached = null;
       this.pending = null;
+      this.cacheVersion = 0;
       this.mode = 'github';
       this.repositoryUrl = `https://github.com/${this.owner}/${this.repository}`;
       this.endpoint = options.endpoint === undefined ? (global.KYOKUSHIN_LEADERBOARD_ENDPOINT || '') : options.endpoint;
@@ -133,7 +134,7 @@
 
     async submit(input) {
       const record = validateRecord(input);
-      if (!this.endpoint) throw new LeaderboardError('not-configured', 'La pubblicazione della classifica non è ancora attiva. Il servizio del dojo deve essere collegato.');
+      if (!this.endpoint) throw new LeaderboardError('not-configured', 'Il salvataggio in classifica non è disponibile al momento.');
       if (!this.fetch) throw new LeaderboardError('offline', 'Connessione alla classifica non disponibile.');
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       const timer = controller ? setTimeout(() => controller.abort(), this.timeout * 3) : null;
@@ -153,12 +154,14 @@
         if (result && result.id === record.id && result.stored === true &&
             result.archiveUrl === `${this.repositoryUrl}/blob/main/data/arcade-leaderboard.json`) {
           this.cached = null;
+          this.cacheVersion++;
           return Object.freeze({ id: result.id, stored: true, duplicate: result.duplicate === true,
             githubSynced: result.githubSynced === true, archiveUrl: result.archiveUrl });
         }
         if (!result || result.id !== record.id || !integer(result.issueNumber, 1, Number.MAX_SAFE_INTEGER) ||
             result.url !== `${this.repositoryUrl}/issues/${result.issueNumber}`) throw new LeaderboardError('invalid-response', 'La conferma della classifica non è valida.');
         this.cached = null;
+        this.cacheVersion++;
         return Object.freeze({ id: result.id, issueNumber: result.issueNumber, url: result.url, duplicate: result.duplicate === true });
       } catch (error) {
         if (error instanceof LeaderboardError) throw error;
@@ -167,11 +170,22 @@
     }
 
     async load({ force = false } = {}) {
-      if (this.pending) return this.pending;
+      if (this.pending) {
+        if (!force || this.pendingVersion === this.cacheVersion) return this.pending;
+        // A save can finish while an older list is still being fetched. The
+        // post-save refresh must start after that request, not reuse its data.
+        await this.pending.catch(() => {});
+        return this.load({ force });
+      }
       if (!force && this.cached && Date.now() - this.cached.fetchedAt < this.ttl) return this.cached;
       if (!this.fetch) throw new LeaderboardError('offline', 'La classifica online non è disponibile in questo browser.');
+      const version = this.pendingVersion = this.cacheVersion;
       this.pending = this.endpoint ? this.readService().catch(() => this.readArchive()) : this.readIssues();
-      try { this.cached = await this.pending; return this.cached; }
+      try {
+        const result = await this.pending;
+        if (version === this.cacheVersion) this.cached = result;
+        return result;
+      }
       finally { this.pending = null; }
     }
 
@@ -179,7 +193,7 @@
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       const timer = controller ? setTimeout(() => controller.abort(), this.timeout) : null;
       try {
-        const response = await this.fetch(url, { method: 'GET', credentials: 'omit',
+        const response = await this.fetch(url, { method: 'GET', credentials: 'omit', cache: 'no-store',
           headers: { Accept: 'application/json' }, signal: controller ? controller.signal : undefined });
         if (!response.ok) throw new LeaderboardError('unavailable', 'Classifica non disponibile. Riprova tra poco.');
         return await response.json();
@@ -232,12 +246,12 @@
             headers: { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
           });
           if (!response.ok) {
-            if (response.status === 403 || response.status === 429) throw new LeaderboardError('rate-limit', 'GitHub ha limitato temporaneamente le richieste. Riprova più tardi.');
-            if (response.status === 404 || response.status === 410) throw new LeaderboardError('not-enabled', 'La classifica GitHub non è ancora disponibile.');
+            if (response.status === 403 || response.status === 429) throw new LeaderboardError('rate-limit', 'La classifica ha ricevuto troppe richieste. Riprova più tardi.');
+            if (response.status === 404 || response.status === 410) throw new LeaderboardError('not-enabled', 'La classifica non è ancora disponibile.');
             throw new LeaderboardError('unavailable', 'Impossibile caricare la classifica. Riprova.');
           }
           const issues = await response.json();
-          if (!Array.isArray(issues)) throw new LeaderboardError('invalid-response', 'GitHub ha restituito una classifica non valida.');
+          if (!Array.isArray(issues)) throw new LeaderboardError('invalid-response', 'La classifica ricevuta non è valida.');
           for (const issue of issues) { const record = parseIssue(issue); if (record) entries.push(record); }
           const link = response.headers && response.headers.get ? response.headers.get('link') || '' : '';
           const next = /rel="next"/.test(link);

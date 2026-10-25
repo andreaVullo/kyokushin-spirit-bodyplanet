@@ -4,9 +4,12 @@
   const $ = id => document.getElementById(id);
   const escapeKey = event => event.key === 'Escape';
   class ArcadeUI {
-    constructor({ onCreate, onBack, onLeaderboard, onAppearance, onRetry }) {
+    constructor({ onCreate, onBack, onLeaderboard, onFinalLeaderboard, onAppearance, onRetry }) {
       this.appearance = { name: '', gender: 'male', hairstyle: 0 };
       this.ready = false;
+      this.onFinalLeaderboard = onFinalLeaderboard;
+      this.finalSaves = new Map();
+      this.leaderboardVersion = 0;
       const links = document.createElement('div'); links.className = 'title-extra-actions';
       links.innerHTML = '<button id="arcade-title-button" type="button" disabled>ARCADE <span>DA BIANCA A 10 DAN</span></button><button id="leaderboard-title-button" type="button">CLASSIFICA <span>IL MURO DEL DOJO</span></button>';
       $('title-start-button').after(links);
@@ -21,19 +24,21 @@
           <fieldset><legend>02 / IL TUO KARATEKA</legend><div class="creator-genders"><button type="button" data-arcade-gender="male" aria-pressed="true">UOMO</button><button type="button" data-arcade-gender="female" aria-pressed="false">DONNA</button></div></fieldset>
           <fieldset><legend>03 / CAPIGLIATURA</legend><div id="arcade-hair-options" class="creator-hair"></div></fieldset>
           <div class="creator-journey"><span>BIANCA</span><div id="arcade-rank-trail" aria-label="Progressione delle cinture"></div><strong>10º DAN</strong></div>
-          <p class="creator-rules">20 sfide. Una promozione per vittoria. Una sconfitta termina la scalata. <strong>Nessun salvataggio della partita.</strong></p>
+          <p class="creator-rules">20 sfide. Una promozione per vittoria. Una sconfitta termina la scalata. <strong>Nome e risultato finale vengono salvati automaticamente nella classifica pubblica.</strong> Nessun account richiesto. La partita non può essere ripresa.</p>
           <p id="arcade-create-error" class="arcade-message" role="alert"></p>
           <button id="arcade-create-submit" type="submit" class="start-button" disabled>PREPARO IL KARATEKA…</button>
         </form>`;
       $('versus-screen').before(creator);
       const dialog = document.createElement('dialog'); dialog.id = 'leaderboard-dialog'; dialog.className = 'leaderboard-dialog';
-      dialog.innerHTML = '<button class="close-dialog" aria-label="Chiudi la classifica">×</button><span class="eyebrow">ARCADE / CLASSIFICA COMMUNITY</span><h2>IL MURO DEL DOJO.</h2><p>Le scalate concluse, dal grado più alto al punteggio migliore.</p><p id="leaderboard-status" role="status">Carico la classifica…</p><div class="leaderboard-scroll"><table id="leaderboard-table"><caption class="sr-only">Risultati Arcade</caption><thead><tr><th>#</th><th>KARATEKA</th><th>GRADO</th><th>PUNTI</th><th>VITTORIE</th></tr></thead><tbody id="leaderboard-body"></tbody></table></div><p id="leaderboard-note"></p><button type="button" id="leaderboard-reload" class="secondary-button">AGGIORNA CLASSIFICA</button>';
+      dialog.innerHTML = '<button class="close-dialog" aria-label="Chiudi la classifica">×</button><span class="eyebrow">ARCADE / CLASSIFICA COMMUNITY</span><h2>IL MURO DEL DOJO.</h2><p>Le scalate concluse, dal grado più alto al punteggio migliore.</p><p id="leaderboard-run-summary" hidden></p><p id="leaderboard-save-status" role="status" hidden></p><p id="leaderboard-status" role="status">Carico la classifica…</p><div class="leaderboard-scroll"><table id="leaderboard-table"><caption class="sr-only">Risultati Arcade</caption><thead><tr><th>#</th><th>KARATEKA</th><th>GRADO</th><th>PUNTI</th><th>VITTORIE</th></tr></thead><tbody id="leaderboard-body"></tbody></table></div><p id="leaderboard-note"></p><div class="leaderboard-actions"><button type="button" id="leaderboard-retry-save" class="secondary-button" hidden>RIPROVA IL SALVATAGGIO</button><button type="button" id="leaderboard-reload" class="secondary-button">AGGIORNA CLASSIFICA</button></div>';
       $('game-shell').append(dialog);
+      dialog.addEventListener('close', () => this.dismissLeaderboard());
+      dialog.addEventListener('cancel', () => this.dismissLeaderboard());
       const summary = document.createElement('div'); summary.id = 'arcade-result-summary'; summary.hidden = true;
       summary.innerHTML = '<div id="arcade-result-belt" class="arcade-belt" role="img"></div><p id="arcade-result-stats"></p>';
       $('result-text').after(summary);
-      const publish = document.createElement('button'); publish.type = 'button'; publish.id = 'arcade-publish'; publish.className = 'secondary-button'; publish.textContent = 'SALVA IN CLASSIFICA ↗'; publish.hidden = true;
-      const check = document.createElement('button'); check.id = 'arcade-check-result'; check.className = 'secondary-button'; check.textContent = 'VERIFICA IN CLASSIFICA'; check.hidden = true;
+      const publish = document.createElement('button'); publish.type = 'button'; publish.id = 'arcade-publish'; publish.className = 'secondary-button'; publish.textContent = 'RIPROVA IL SALVATAGGIO'; publish.hidden = true;
+      const check = document.createElement('button'); check.id = 'arcade-check-result'; check.className = 'secondary-button'; check.textContent = 'VEDI CLASSIFICA'; check.hidden = true;
       const notice = document.createElement('p'); notice.id = 'arcade-publish-status'; notice.className = 'arcade-message'; notice.setAttribute('role', 'status');
       $('result-menu-button').after(publish, check, notice);
       const actions = document.createElement('div'); actions.className = 'result-actions';
@@ -63,6 +68,7 @@
         catch (error) { this.error(error.message || 'Controlla il nome del karateka.'); $('arcade-name').focus(); }
       });
       $('leaderboard-reload').addEventListener('click', () => this.loadLeaderboard(true));
+      $('leaderboard-retry-save').addEventListener('click', () => this.publishRecord());
       $('arcade-check-result').addEventListener('click', () => this.checkRecord());
       publish.addEventListener('click', () => this.publishRecord());
       creator.addEventListener('keydown', event => { if (escapeKey(event)) { event.stopPropagation(); onBack(); } });
@@ -102,80 +108,140 @@
       if (state) $('arcade-run-badge').textContent = `ARCADE · ${state.rank.label} · SFIDA ${match?.number || state.matches + 1}/20 · ${state.score.toLocaleString('it-IT')} PT`;
     }
     showResult(state, finalRecord) {
+      const previousId = this.record?.id;
       this.record = finalRecord || null;
-      this.publicationVersion = (this.publicationVersion || 0) + 1;
-      this.publishedId = null;
+      this.finalSaves ||= new Map();
+      if (previousId !== this.record?.id) this.dismissLeaderboard();
       $('arcade-result-summary').hidden = !state;
       $('result-panel').classList.toggle('arcade-result', !!state);
-      $('arcade-publish').hidden = !finalRecord; $('arcade-check-result').hidden = !finalRecord;
-      $('arcade-publish').disabled = false;
-      $('arcade-publish').textContent = 'SALVA IN CLASSIFICA ↗';
+      $('arcade-check-result').hidden = !finalRecord;
       $('arcade-check-result').disabled = false;
-      $('arcade-publish-status').textContent = '';
-      if (!state) return;
-      ArcadeUI.belt($('arcade-result-belt'), state.rank);
-      $('arcade-result-stats').textContent = `${state.score.toLocaleString('it-IT')} PUNTI · ${state.wins}/20 VITTORIE`;
-      if (finalRecord) {
-        const submission = global.DojoLeaderboard.submission(finalRecord);
-        $('arcade-publish').disabled = !submission.configured;
-        $('arcade-publish-status').textContent = submission.configured ? 'Salva il tuo nome e il risultato nella classifica pubblica. Nessun account richiesto.' : 'La classifica è consultabile. L’invio dei risultati deve ancora essere attivato.';
+      $('leaderboard-run-summary').hidden = !finalRecord;
+      if (state) {
+        ArcadeUI.belt($('arcade-result-belt'), state.rank);
+        $('arcade-result-stats').textContent = `${state.score.toLocaleString('it-IT')} PUNTI · ${state.wins}/20 VITTORIE`;
       }
+      if (!finalRecord) { this.renderSaveState(); return; }
+      $('leaderboard-run-summary').textContent = `${finalRecord.name} · ${state.rank.label} · ${state.score.toLocaleString('it-IT')} PUNTI`;
+      let save = this.finalSaves.get(finalRecord.id);
+      if (!save) {
+        const configured = global.DojoLeaderboard.submission(finalRecord).configured;
+        save = { status: configured ? 'new' : 'unavailable', opened: false };
+        this.finalSaves.set(finalRecord.id, save);
+      }
+      this.renderSaveState();
+      if (!save.opened) {
+        save.opened = true;
+        this.leaderboardDismissed = false;
+        $('leaderboard-body').replaceChildren();
+        $('leaderboard-note').textContent = '';
+        $('leaderboard-status').textContent = save.status === 'new' ? 'La classifica apparirà dopo il salvataggio…' : 'Carico la classifica…';
+        this.onFinalLeaderboard?.();
+      }
+      if (save.status === 'new') return this.publishRecord();
+      if (save.status === 'saving') return save.promise;
+      if ($('leaderboard-dialog').open && !this.leaderboardDismissed) return this.loadLeaderboard(true);
     }
-    async publishRecord() {
-      if (!this.record || $('arcade-publish').disabled) return;
-      const record = this.record;
-      this.publicationVersion = (this.publicationVersion || 0) + 1;
-      $('arcade-publish').disabled = true;
-      $('arcade-check-result').disabled = true;
-      $('arcade-publish').textContent = 'SALVO IL RISULTATO…';
-      $('arcade-publish-status').textContent = 'Invio il risultato alla classifica…';
-      try {
-        await global.DojoLeaderboard.submit(record);
-        if (this.record !== record) return;
-        this.publishedId = record.id;
-        $('arcade-publish').textContent = 'RISULTATO SALVATO ✓';
-        $('arcade-publish-status').textContent = 'RISULTATO SALVATO. OSU! La copia su GitHub si aggiorna periodicamente. La partita non viene salvata.';
-      } catch (error) {
-        if (this.record !== record) return;
-        $('arcade-publish').disabled = false;
-        $('arcade-publish').textContent = 'RIPROVA IL SALVATAGGIO';
-        $('arcade-publish-status').textContent = error.message || 'Non riesco a salvare il risultato. Riprova.';
-      } finally { if (this.record === record) $('arcade-check-result').disabled = false; }
+    dismissLeaderboard() {
+      this.leaderboardVersion = (this.leaderboardVersion || 0) + 1;
+      this.leaderboardDismissed = true;
+    }
+    renderSaveState() {
+      const save = this.record && this.finalSaves?.get(this.record.id);
+      const saved = save?.status === 'saved', failed = save?.status === 'error';
+      this.publishedId = saved ? this.record.id : null;
+      const message = !save ? '' : saved ? 'RISULTATO SALVATO. OSU!' : failed ?
+        (save.error || 'Salvataggio non confermato. Controlla la connessione e riprova.') : save.status === 'unavailable' ?
+        'Salvataggio non disponibile al momento. Puoi consultare la classifica.' : 'Salvo automaticamente il risultato…';
+      if (!failed) {
+        const focused = document.activeElement;
+        const nextFocus = focused === $('leaderboard-retry-save') && !focused.hidden ? $('leaderboard-dialog').querySelector('.close-dialog') :
+          focused === $('arcade-publish') && !focused.hidden ? $('arcade-check-result') : null;
+        if (nextFocus && !nextFocus.hidden && !nextFocus.disabled) nextFocus.focus({ preventScroll: true });
+      }
+      $('arcade-publish').hidden = !failed;
+      $('arcade-publish').disabled = !failed;
+      $('arcade-publish').textContent = 'RIPROVA IL SALVATAGGIO';
+      $('leaderboard-retry-save').hidden = !failed;
+      $('leaderboard-retry-save').disabled = !failed;
+      $('arcade-publish-status').textContent = message;
+      $('leaderboard-save-status').hidden = !save;
+      $('leaderboard-save-status').textContent = message;
+    }
+    publishRecord() {
+      if (!this.record) return Promise.resolve();
+      const record = this.record, save = this.finalSaves.get(record.id);
+      if (!save || save.status === 'saved' || save.status === 'unavailable') return Promise.resolve();
+      if (save.status === 'saving') return save.promise;
+      save.status = 'saving'; save.error = '';
+      this.renderSaveState();
+      // The same immutable run id is retained on retry, including an uncertain
+      // connection failure after the server may already have stored the result.
+      save.promise = (async () => {
+        try {
+          const confirmation = await global.DojoLeaderboard.submit(record);
+          if (confirmation?.id !== record.id) throw new Error('La conferma del salvataggio non è valida. Riprova.');
+          save.status = 'saved';
+        } catch (error) {
+          save.status = 'error';
+          save.error = error.message || 'Salvataggio non confermato. Controlla la connessione e riprova.';
+        }
+        if (this.record?.id !== record.id) return;
+        this.renderSaveState();
+        // A closed dialog stays closed, even if a slow save completes later.
+        if ($('leaderboard-dialog').open && !this.leaderboardDismissed) await this.loadLeaderboard(true);
+      })();
+      return save.promise;
     }
     async loadLeaderboard(force = false) {
-      const status = $('leaderboard-status'); status.textContent = 'Carico i risultati pubblici…'; $('leaderboard-reload').disabled = true;
+      const version = this.leaderboardVersion = (this.leaderboardVersion || 0) + 1;
+      const recordId = this.record?.id;
+      this.leaderboardDismissed = false;
+      const current = () => version === this.leaderboardVersion && recordId === this.record?.id && !this.leaderboardDismissed;
+      const status = $('leaderboard-status');
+      status.textContent = 'Carico i risultati pubblici…';
+      $('leaderboard-reload').disabled = true;
+      $('leaderboard-note').textContent = '';
       try {
         const records = await global.DojoLeaderboard.load({ force });
-        const body = $('leaderboard-body'); body.replaceChildren();
-        records.forEach((record, i) => {
-          const row = document.createElement('tr');
-          for (const value of [i + 1, record.name, record.rankLabel, record.score.toLocaleString('it-IT'), record.wins + '/20']) {
-            const cell = document.createElement('td'); cell.textContent = value; row.append(cell);
-          }
-          if (record.id === this.record?.id) row.classList.add('own-record'); body.append(row);
-        });
-        status.textContent = records.length ? `${records.length} risultati in classifica.` : 'Il muro è ancora vuoto. La prima scalata può essere la tua.';
-        const details = global.DojoLeaderboard.details?.();
-        const sourceNote = details?.archive ? 'Mostro la copia su GitHub: i risultati più recenti potrebbero arrivare dopo.' : 'Risultati salvati nella classifica online. La copia su GitHub si aggiorna periodicamente.';
-        $('leaderboard-note').textContent = (details?.partial ? 'Mostro una parte dei risultati disponibili. ' : '') + sourceNote + ' Nessuna partita può essere ripresa dalla classifica.';
-        return records;
-      } catch (error) { status.textContent = error.message || 'Classifica non disponibile. Riprova tra poco.'; return null; }
-      finally { $('leaderboard-reload').disabled = false; }
-    }
-    async checkRecord() {
-      if (!this.record || $('arcade-check-result').disabled) return;
-      const record = this.record, version = this.publicationVersion; $('arcade-check-result').disabled = true;
-      $('arcade-publish-status').textContent = 'Verifico la pubblicazione…';
-      try {
-        const records = await global.DojoLeaderboard.load({ force: true });
-        if (this.record !== record || this.publicationVersion !== version) return;
+        if (!current()) return null;
         const details = global.DojoLeaderboard.details?.();
         const entries = details?.entries || records;
-        const present = details?.archive ? 'RISULTATO PRESENTE ANCHE NELL’ARCHIVIO GITHUB. OSU!' : 'RISULTATO IN CLASSIFICA. OSU! La copia su GitHub si aggiorna periodicamente.';
-        const pending = details?.archive ? 'Risultato salvato. La copia su GitHub si sta aggiornando.' : 'Risultato salvato. La classifica si sta aggiornando.';
-        $('arcade-publish-status').textContent = entries.some(r => r.id === record.id) ? present : this.publishedId === record.id ? pending : 'Risultato non ancora trovato. Salvalo in classifica e riprova tra poco.';
-      } catch (error) { if (this.record === record && this.publicationVersion === version) $('arcade-publish-status').textContent = error.message || 'Verifica non disponibile.'; }
-      finally { if (this.record === record && this.publicationVersion === version) $('arcade-check-result').disabled = false; }
+        const ownIndex = recordId ? entries.findIndex(record => record.id === recordId) : -1;
+        // Keep the real ranking number when the current run is below the top 50.
+        const visible = entries.slice(0, 50).map((record, index) => ({ record, index }));
+        if (ownIndex >= 50) visible.push({ record: entries[ownIndex], index: ownIndex });
+        const body = $('leaderboard-body'); body.replaceChildren();
+        let ownRow;
+        visible.forEach(({ record, index }) => {
+          const row = document.createElement('tr');
+          for (const value of [index + 1, record.name, record.rankLabel, record.score.toLocaleString('it-IT'), record.wins + '/20']) {
+            const cell = document.createElement('td'); cell.textContent = value; row.append(cell);
+          }
+          if (record.id === recordId) { ownRow = row; row.classList.add('own-record'); row.setAttribute('aria-label', `Il tuo risultato, posizione ${index + 1}`); }
+          body.append(row);
+        });
+        ownRow?.scrollIntoView?.({ block: 'nearest' });
+        const saved = this.publishedId === recordId && !!recordId;
+        status.textContent = ownIndex >= 0 ? `Il tuo risultato è al ${ownIndex + 1}º posto su ${entries.length}.` :
+          saved ? 'Risultato salvato. La classifica si sta aggiornando: premi Aggiorna tra poco.' :
+          entries.length ? `${entries.length} ${entries.length === 1 ? 'risultato' : 'risultati'} in classifica.` : 'Il muro è ancora vuoto. La prima scalata può essere la tua.';
+        const sourceNote = details?.archive ? 'Mostro l’ultima classifica disponibile: i risultati più recenti potrebbero non essere ancora presenti.' : 'Risultati salvati nella classifica online.';
+        $('leaderboard-note').textContent = (details?.partial ? 'Mostro una parte dei risultati disponibili. ' : '') + sourceNote + ' Nessuna partita può essere ripresa dalla classifica.';
+        return records;
+      } catch (error) {
+        if (!current()) return null;
+        $('leaderboard-body').replaceChildren();
+        status.textContent = (this.publishedId === recordId && recordId ? 'Il risultato è salvato. ' : '') + (error.message || 'Classifica non disponibile. Riprova tra poco.');
+        return null;
+      } finally { if (current()) $('leaderboard-reload').disabled = false; }
+    }
+    checkRecord() {
+      if (!this.record) return Promise.resolve();
+      this.leaderboardDismissed = false;
+      if (!$('leaderboard-dialog').open) this.onFinalLeaderboard?.();
+      this.renderSaveState();
+      return this.loadLeaderboard(true);
     }
     static belt(element, rank) {
       element.replaceChildren(); element.style.setProperty('--belt-color', rank.color); element.setAttribute('aria-label', rank.label);

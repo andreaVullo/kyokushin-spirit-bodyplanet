@@ -34,6 +34,8 @@ Tutti possono combattere su entrambi i lati nelle modalità VS CPU, 2 giocatori 
 
 I 40 PNG sono conservati senza ricompressione dentro piccoli file JavaScript separati in `assets/karateka/`: questo permette di ritagliare correttamente le sagome anche aprendo il gioco da disco. Si caricano inizialmente solo i ritratti; le altre mosse si caricano per i due combattenti scelti, prima della presentazione VS. In caso di errore si può premere **Riprova**. Le animazioni degli incontri precedenti vengono liberate dalla memoria.
 
+La selezione, le tessere e il VS usano una stessa inquadratura per tutti: testa allineata, dimensioni proporzionate e centro del busto coerente. Il creatore Arcade mantiene la figura intera con i piedi allineati. `scripts/portrait-framing.js` gestisce queste viste senza modificare scala o animazioni in combattimento.
+
 `scripts/karateka-atlas.js` contiene i rettangoli reali, gli appoggi e le scale. Tre fogli difesa hanno due pose che si toccano: per il ritorno in guardia e la vittoria vengono usate pose integre dello stesso personaggio. Le immagini restano inalterate e il renderer esclude i frammenti dei fotogrammi vicini. Il contatto dei nove attacchi coincide con le finestre del motore; danni e regole restano quelli originali.
 
 Verifica automatica del motore e del renderer:
@@ -129,15 +131,15 @@ Colori, strisce e tacche seguono la sequenza pubblicata dalla [Kyokushin World F
 
 Dopo una vittoria scegli **Prossima sfida** per continuare oppure **Termina scalata** per chiudere con il risultato raggiunto. Gli avversari sono scelti dal roster del dojo e la difficoltà cresce durante il percorso. I punti premiano vittorie, vita rimasta, rapidità, colpi, parate e combinazioni; il completamento al 10° Dan assegna un bonus finale. Una sconfitta conserva nel risultato l’ultimo grado conquistato. **Nuova scalata** riparte dalla bianca.
 
-**Il progresso non è salvabile.** La sfida vive soltanto nella memoria della pagina: ricaricare, chiudere il gioco o chiudere il pannello Flazio perde l’avanzamento. Il cambio di orientamento mantiene invece la stessa partita aperta. Solo dopo sconfitta, abbandono o completamento si può pubblicare un risultato finale; la classifica non permette di riprendere la sfida.
+**Il progresso non è salvabile.** La sfida vive soltanto nella memoria della pagina: ricaricare, chiudere il gioco o chiudere il pannello Flazio perde l’avanzamento. Il cambio di orientamento mantiene invece la stessa partita aperta. Dopo sconfitta, abbandono esplicito o completamento, il risultato finale viene salvato automaticamente; la classifica non permette di riprendere la sfida.
 
-### Classifica pubblica e archivio GitHub
+### Classifica pubblica
 
-Dal risultato finale, **Salva in classifica** invia il nome scelto e il risultato al servizio del dojo. **Al giocatore non serve un account:** basta il nome del karateka. Nome e dati del risultato diventano pubblici. Il gioco conferma soltanto dopo la scrittura nel database online; **Verifica in classifica** ne ricontrolla la presenza.
+Al termine della scalata, nome e risultato vengono inviati automaticamente al servizio del dojo. **Al giocatore non serve un account:** basta il nome del karateka. Il creatore avvisa che nome e risultato finale diventano pubblici. Si apre direttamente la classifica, con conferma solo dopo la scrittura e il proprio risultato evidenziato nella posizione reale, anche fuori dai primi 50. In caso di errore compare **Riprova il salvataggio**, che conserva lo stesso risultato senza creare duplicati. Le promozioni intermedie mantengono la scalata in corso.
 
 Il risultato è visibile subito nella classifica online. **La copia su GitHub è periodica**, tramite il workflow `sync-arcade-leaderboard.yml`, programmato ogni 15 minuti; GitHub può ritardarne l’esecuzione. Il file pubblico è [data/arcade-leaderboard.json](data/arcade-leaderboard.json). La conferma di salvataggio non dichiara già completata questa copia.
 
-La classifica mostra i primi 50, ordinati per grado, punteggio e durata. Se il servizio non risponde, prova a leggere la copia GitHub e avverte che potrebbe essere meno recente. Un problema di rete non impedisce di giocare. È una classifica amatoriale: i risultati sono calcolati dal browser e controllati nel formato, non certificati contro modifiche del gioco.
+La classifica mostra i primi 50 e il proprio risultato finale, ordinati per grado, punteggio e durata. Se il servizio non risponde, prova a leggere la copia GitHub e avverte che potrebbe essere meno recente. Un problema di rete non impedisce di giocare. È una classifica amatoriale: i risultati sono calcolati dal browser e controllati nel formato, non certificati contro modifiche del gioco.
 
 Il [servizio pubblico del dojo](https://kyokushin-dojo-classifica.flazio1.chatgpt.site) è attivo su Sites, con database D1. L’endpoint è configurato in `scripts/leaderboard-config.js`; il sorgente completo è in `server/sites/`. Nessun token GitHub serve nel browser o nel servizio: la copia nel repository usa soltanto la credenziale temporanea di GitHub Actions. Dettagli e manutenzione: [CLASSIFICA.md](CLASSIFICA.md) e [server/README.md](server/README.md).
 

@@ -585,7 +585,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   
 <link rel="stylesheet" href="scripts/roster-ui.css?v=20261025-2">
 <link rel="stylesheet" href="scripts/orientation.css?v=20261025-2">
-<link rel="stylesheet" href="scripts/arcade-ui.css?v=20261025-2">
+<link rel="stylesheet" href="scripts/arcade-ui.css?v=20261025-4">
 </head>
 <body class="front-title boot-loading" data-screen="title" data-boot-state="loading">
   <section id="boot-screen" class="boot-screen" aria-label="Caricamento del gioco" aria-busy="true">
@@ -1410,35 +1410,23 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     ctx.restore();
   }
 
-  // Large character-select art. Original faces point inward: Angelo right,
-  // Samuel left. Optional facing requests an absolute direction, not a flip.
-  // bust crops at the upper waist for compact roster cards without distortion.
+  // Share the same portrait camera as the additional roster and Arcade.
+  // These two source illustrations already stop at the upper legs.
   function drawSelectionPortrait(ctx, id, x, y, width, height, options = {}) {
-    if (!ready || !portraitRegions[id] || width <= 0 || height <= 0) return;
-    const [sx, sy, sw, sh] = portraitRegions[id];
-    const sourceHeight = options.bust ? 650 : sh;
-    const ratio = Math.min(width / sw, height / sourceHeight);
-    const dw = sw * ratio, dh = sourceHeight * ratio;
-    const originalFacing = id === 'angelo' ? 1 : -1;
-    const desiredFacing = options.facing === 1 || options.facing === -1 ? options.facing : originalFacing;
-    const cutout = portraitTextures[id];
-    ctx.save();
-    ctx.beginPath(); ctx.rect(x, y, width, height); ctx.clip();
-    ctx.translate(x + width / 2, y + height - dh);
-    if (desiredFacing !== originalFacing) ctx.scale(-1, 1);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    if (cutout) ctx.drawImage(cutout, 0, 0, sw, sourceHeight, -dw / 2, 0, dw, dh);
-    else ctx.drawImage(portraitSheet, sx, sy, sw, sourceHeight, -dw / 2, 0, dw, dh);
-    ctx.restore();
+    if (!ready || !portraitTextures[id]) return;
+    const profile = id === 'angelo'
+      ? { center: 355, top: 7, headHeight: 222, headWidth: 184, facing: 1 }
+      : { center: 398, top: 7, headHeight: 239, headWidth: 201, facing: -1 };
+    return window.FighterPortraits.draw(ctx, portraitTextures[id], profile, x, y, width, height, options);
   }
 
   window.FighterArt = { load, draw, drawPortrait, drawSelectionPortrait, get ready() { return ready; }, height: HEIGHT };
 })();
 
 </script>
+<script src="scripts/portrait-framing.js?v=20261025-4"></script>
 <script src="scripts/karateka-atlas.js?v=20261025-2"></script>
-<script src="scripts/karateka-art.js?v=20261025-2"></script>
+<script src="scripts/karateka-art.js?v=20261025-4"></script>
 <script>
 /* audio.js */
 /* Original synthesized score and sound design for Kyokushin Spirit. */
@@ -2006,10 +1994,10 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <script src="scripts/display-controller.js?v=20261025-2"></script>
 <script src="scripts/arcade.js?v=20261025-2"></script>
 <script src="scripts/leaderboard-config.js?v=20261025-2"></script>
-<script src="scripts/leaderboard.js?v=20261025-2"></script>
+<script src="scripts/leaderboard.js?v=20261025-4"></script>
 <script src="scripts/arcade-atlas.js?v=20261025-3"></script>
-<script src="scripts/arcade-art.js?v=20261025-3"></script>
-<script src="scripts/arcade-ui.js?v=20261025-2"></script>
-<script src="scripts/main.js?v=20261025-2"></script>
+<script src="scripts/arcade-art.js?v=20261025-4"></script>
+<script src="scripts/arcade-ui.js?v=20261025-4"></script>
+<script src="scripts/main.js?v=20261025-4"></script>
 </body>
 </html>

@@ -8,6 +8,18 @@
   const cache = new Map(), pending = new Map(), sources = new Map();
   const visualStates = new WeakMap();
   const height = original.height;
+  // Measured hairline-to-chin geometry in each intact idle cutout. Full atlas
+  // rectangles include a wide stance, which must not shrink faces in cards.
+  const portraitHeads = {
+    '01-marco-tabacco-collage': [145, 2, 68, 68],
+    '02-gabriele-carbonaro': [153, 2, 66, 70],
+    '03-leonardo-cappellani': [150, 2, 68, 76],
+    '04-gabriele-randazzo': [153, 2, 68, 68],
+    '05-matteo-spata': [148, 2, 63, 74],
+    '06-oscar-gueli': [145, 2, 63, 65],
+    '07-marco-tabacco-foto-gruppo': [145, 2, 68, 68],
+    '08-andrea-vullo': [148, 2, 67, 72],
+  };
   let initialLoad;
   let activeAssets = new Set();
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -210,14 +222,9 @@
     if (!assetId) return original.drawSelectionPortrait(ctx, id, x, y, width, h, options);
     const art = resolvedFrame(assetId, 'base', 0);
     if (!art) return;
-    const sw = art.source.width, sh = options.bust ? art.source.height * .56 : art.source.height;
-    const ratio = Math.min(width / sw, h / sh), dw = sw * ratio, dh = sh * ratio;
-    ctx.save(); ctx.beginPath(); ctx.rect(x, y, width, h); ctx.clip();
-    ctx.translate(x + width / 2, y + h - dh);
-    if (options.facing === -1) ctx.scale(-1, 1);
-    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(art.source, 0, 0, sw, sh, -dw / 2, 0, dw, dh);
-    ctx.restore();
+    const [center, top, headHeight, headWidth] = portraitHeads[assetId] ||
+      [art.source.width / 2, 0, art.source.height * .19, art.source.height * .19];
+    return window.FighterPortraits.draw(ctx, art.source, { center, top, headHeight, headWidth }, x, y, width, h, options);
   }
 
   window.FighterArt = { load, loadFighters, draw, drawSelectionPortrait,
