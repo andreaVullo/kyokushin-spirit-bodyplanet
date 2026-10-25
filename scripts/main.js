@@ -4,13 +4,15 @@
   const $ = id => document.getElementById(id);
   const pageOptions = new URLSearchParams(location.search);
   const onlineIntent = pageOptions.has('room') || pageOptions.get('online') === '1';
-  const standaloneGame = (pageOptions.get('standalone') === '1' || onlineIntent) && window.self === window.top;
+  const installedApp = window.DojoAppMode?.installed(window) === true;
+  const standaloneGame = (installedApp || pageOptions.get('standalone') === '1' || onlineIntent) && window.self === window.top;
   const touchMedia = window.matchMedia('(any-pointer: coarse)');
   const portraitMedia = window.matchMedia('(orientation: portrait)');
   let touchPreference = pageOptions.get('touch') === '1' ? true : null;
   let touchDetected = touchMedia.matches || navigator.maxTouchPoints > 0;
   let viewportFrame = 0, viewportSettleTimer = 0, lastLayoutGeometry = null;
   document.body.classList.toggle('standalone-game', standaloneGame);
+  document.body.classList.toggle('installed-app', installedApp);
   document.body.classList.toggle('embedded', standaloneGame || pageOptions.get('embed') === '1' || window.self !== window.top);
   const canvas = $('game'), ctx = canvas.getContext('2d', { alpha: false });
   const characters = { ...(window.KyokushinRoster || {
@@ -759,7 +761,8 @@
   window.addEventListener('keydown',e=>{if(!e.repeat&&!audioButtonTarget(e))unlockAudio();},{capture:true});
   function syncFullscreenButton(){
     const expanded=(display.requested&&!display.layoutOnly)||document.fullscreenElement===$('game-shell');
-    const label=expanded?'Esci da schermo intero':'Schermo intero';
+    const homeScreen=window.DojoAppMode?.needsHomeScreen(window,$('game-shell'));
+    const label=homeScreen?'Gioca senza le barre di Safari':installedApp?'Adatta lo schermo':expanded?'Esci da schermo intero':'Schermo intero';
     $('fullscreen-button').setAttribute('aria-label',label);$('fullscreen-button').title=label;
   }
   function displayHostOrigin(){
@@ -771,7 +774,13 @@
     }catch{}
     return null;
   }
-  $('fullscreen-button').addEventListener('click',()=>display.toggle());
+  $('app-install-link').href=window.DojoAppMode.installationURL(document.baseURI);
+  $('fullscreen-button').addEventListener('click',()=>{
+    if(window.DojoAppMode.needsHomeScreen(window,$('game-shell'))){
+      display.open({native:false});showDialog('app-install-dialog');
+    }else if(installedApp){display.open({native:false});}
+    else display.toggle();
+  });
   $('rotate-fullscreen-button')?.addEventListener('click',()=>display.open());
   $('rotate-action-label').textContent='GIOCA IN ORIZZONTALE';
   $('rotate-description').textContent='Ruota il telefono oppure tocca il pulsante: il gioco si adatta anche con la rotazione bloccata.';
@@ -798,7 +807,7 @@
       updateSelection();showTitle(false);online.ui.renderPreviews();
       // Chat browsers often open a short sheet and deny native fullscreen.
       // Fit the live visible area immediately, without requiring either API.
-      if(onlineIntent&&(touchPreference??touchDetected))display.open({native:false});
+      if(installedApp||(onlineIntent&&(touchPreference??touchDetected)))display.open({native:false});
       if(onlineIntent)showOnline();
       // Prepare the first arena frame before revealing it. A hidden loading
       // iframe may not receive animation frames, so readiness must not await one.

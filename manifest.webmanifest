@@ -1,0 +1,14 @@
+{
+  "id": "./Gioca.html",
+  "name": "Kyokushin Spirit",
+  "short_name": "Kyokushin",
+  "lang": "it",
+  "start_url": "./Gioca.html?standalone=1&app=1",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#101923",
+  "theme_color": "#101923",
+  "icons": [{ "src": "assets/core/kyokushin-logo.png", "type": "image/png", "purpose": "any" }]
+}

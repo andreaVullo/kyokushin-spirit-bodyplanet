@@ -12,7 +12,7 @@
   // rectangles include a wide stance, which must not shrink faces in cards.
   const portraitHeads = {
     "10-emanuele-micalizzi": [183, 2, 75, 78],
-    "11-francesco-privitera-1": [185, 2, 75, 84],
+    "11-francesco-privitera-1": [169, 2, 83, 88],
     '01-marco-tabacco-collage': [145, 2, 75, 80],
     '02-gabriele-carbonaro': [153, 2, 66, 70],
     '03-leonardo-cappellani': [150, 2, 68, 76],
@@ -134,7 +134,7 @@
         };
         image.src = source;
       };
-      script.src = new URL(key + '.js?v=20261025-18', root).href;
+      script.src = new URL(key + '.js?v=20261025-20', root).href;
       document.head.append(script);
     }).finally(() => pending.delete(key));
     pending.set(key, promise);

@@ -1,0 +1,32 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><title>iPhone · Home Screen e guida Safari</title>
+<style>body{background:#0d1824;color:#eedbb6;font:14px system-ui;margin:16px}button{padding:12px;margin:4px;background:#eed195;border:0;color:#172330}iframe{display:block;border:1px solid #bd9b5b;margin-top:16px}pre{white-space:pre-wrap}</style>
+<h1>iPhone · simulazione layout (non un dispositivo fisico)</h1>
+<div id="cases"></div><pre id="report">Caricamento…</pre><div id="preview"></div>
+<script>
+(async()=>{
+  const url=new URL('../Gioca.html?standalone=1&touch=1',location.href),html=await fetch(url).then(r=>r.text());
+  const cases=[['App verticale',390,844,true],['App orizzontale',844,390,true],['App compatta',568,320,true],['Safari verticale',390,664,false],['Safari orizzontale',844,310,false]];
+  let generation=0;
+  async function run([label,width,height,installed]){
+    const serial=++generation;document.getElementById('report').textContent='Caricamento '+label;
+    const frame=document.createElement('iframe');frame.width=width;frame.height=height;
+    const setup=`<base href="${url.href}"><script>Object.defineProperty(navigator,'standalone',{value:${installed}});Object.defineProperty(navigator,'userAgent',{value:'iPhone'});Object.defineProperty(navigator,'maxTouchPoints',{value:5});Element.prototype.requestFullscreen=undefined;Element.prototype.webkitRequestFullscreen=undefined;<\/script>`;
+    frame.srcdoc=html.replace('<head>','<head>'+setup);document.getElementById('preview').replaceChildren(frame);
+    await new Promise(resolve=>frame.onload=resolve);
+    const win=frame.contentWindow,doc=frame.contentDocument;
+    for(let i=0;i<200&&!win.dojo?.ready;i++)await new Promise(r=>setTimeout(r,100));
+    if(serial!==generation)return;
+    const failures=[];if(!win.dojo?.ready)failures.push('game did not load');
+    if(!installed)doc.getElementById('fullscreen-button').click();
+    await new Promise(r=>setTimeout(r,300));
+    const box=doc.getElementById(installed?'game-shell':'app-install-dialog').getBoundingClientRect();
+    if(box.left< -2||box.top< -2||box.right>width+2||box.bottom>height+2)failures.push('content outside physical viewport');
+    if(installed&&!doc.body.classList.contains('landscape-layout'))failures.push('app did not expand automatically');
+    if(!installed&&!doc.getElementById('app-install-dialog').open)failures.push('Safari guide missing');
+    if(!installed){const dialog=doc.getElementById('app-install-dialog');if(dialog.scrollWidth>dialog.clientWidth+2)failures.push('guide overflows horizontally');}
+    document.getElementById('report').textContent=JSON.stringify({label,status:failures.length?'FAIL':'PASS',failures,box:{x:box.x,y:box.y,width:box.width,height:box.height},classes:doc.body.className},null,2);
+  }
+  for(const item of cases){const b=document.createElement('button');b.textContent=item[0];b.onclick=()=>run(item);document.getElementById('cases').append(b);}
+  run(cases[0]);
+})();
+</script></html>

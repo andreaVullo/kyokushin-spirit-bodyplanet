@@ -17,7 +17,7 @@ async function fixture(options = {}) {
   const mutation = (item, field) => { if (hudNode.test(item.id || '')) work.hudWrites.push(item.id + ':' + field); };
   const drawing = new Set(['drawImage', 'fillRect', 'clearRect', 'strokeRect', 'fill', 'stroke', 'fillText', 'strokeText']);
   const context2d = new Proxy({}, { get: (target, key) => key in target ? target[key] : (...args) => { if (drawing.has(key)) work.draws++; }, set: (target, key, value) => (target[key] = value, true) });
-  const document = { hidden: false, activeElement: null };
+  const document = { hidden: false, activeElement: null, baseURI: 'http://127.0.0.1:8765/Gioca.html' };
   function node(tag = 'div') {
     const listeners = new Map(), children = [], classes = new Set(), attributes = new Map(), subnodes = new Map();
     let content = '';
@@ -78,7 +78,7 @@ async function fixture(options = {}) {
   if (options.assetsReady) browser.__kyokushinAssetsReady = options.assetsReady;
   const context = vm.createContext(browser); context.window = context; context.self = context; context.top = context; context.parent = context;
   if (options.stages) vm.runInContext(fs.readFileSync(path.join(__dirname, '../scripts/stages.js'), 'utf8'), context, { filename: 'stages.js' });
-  for (const file of ['roster.js', 'game.js', 'arcade.js', 'arcade-ui.js', 'online-session.js']) vm.runInContext(fs.readFileSync(path.join(__dirname, '../scripts', file), 'utf8'), context, { filename: file });
+  for (const file of ['app-mode.js', 'roster.js', 'game.js', 'arcade.js', 'arcade-ui.js', 'online-session.js']) vm.runInContext(fs.readFileSync(path.join(__dirname, '../scripts', file), 'utf8'), context, { filename: file });
   const OnlineSession = context.DojoOnlineSession;
   context.DojoOnlineSession = function(options) { online = new OnlineSession(options); return online; };
   const ArcadeUI = context.ArcadeUI;

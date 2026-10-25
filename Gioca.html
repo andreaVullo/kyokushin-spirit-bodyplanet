@@ -4,7 +4,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#ede9df">
+  <meta name="theme-color" content="#101923">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Kyokushin">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/core/kyokushin-logo.png">
+  <script src="scripts/app-mode.js?v=20261025-20"></script>
   <meta name="description" content="Entra nel dojo Bodyplanet: un picchiaduro 2D arcade con tecniche Kyokushin, due karateka e sfide locali.">
   <title>Kyokushin Spirit — Bodyplanet Dojo</title>
   <script src="scripts/invite-entry.js?v=20261025-15"></script>
@@ -603,6 +610,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <link rel="stylesheet" href="scripts/name-keyboard.css?v=20261025-16">
 <link rel="stylesheet" href="styles/online.css?v=20261025-19">
 <link rel="stylesheet" href="styles/stages.css?v=20261025-17">
+<link rel="stylesheet" href="styles/app-mode.css?v=20261025-20">
 </head>
 <body class="front-title boot-loading" data-screen="title" data-boot-state="loading">
   <section id="boot-screen" class="boot-screen" aria-label="Caricamento del gioco" aria-busy="true">
@@ -790,6 +798,14 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   <article><span class="field-label">PASSI &amp; DASH</span><canvas id="walk-demo" width="400" height="280" aria-label="Dimostrazione animata di camminata e scatti avanti e indietro"></canvas><strong class="motion-caption" id="walk-demo-caption">PASSO AVANTI</strong><h3>ACCORCIA LA DISTANZA</h3><p>Premi due volte <kbd>D</kbd> o <kbd>A</kbd> rapidamente per scattare nella direzione scelta. Su touch, spingi due volte il joystick nella stessa direzione, tornando al centro tra i due flick. Da vicino puoi attraversare l’avversario e passare alle sue spalle.</p><small>Durante lo scatto sei esposto ai colpi. La parata di ginocchio resta su F. Non è prevista l’accovacciata.</small></article>
   <article><span class="field-label">TECNICA SPECIALE</span><canvas id="kaiten-demo" width="400" height="280" aria-label="Dimostrazione animata del kaiten geri"></canvas><strong class="motion-caption" id="kaiten-demo-caption">O · 45 SPIRIT</strong><h3>KAITEN GERI</h3><p>Preparazione, tuffo, calcio in rotazione e ritorno sul tatami. Chiudi la combinazione con <kbd>O</kbd>.</p><small>La rotazione colpisce in alto: scegli il momento per sorprendere l’avversario.</small></article>
 </div><div class="move-table"><div><b>TECNICA</b><b>P1 / P2</b><b>QUANDO USARLA</b></div><div><strong>Seiken tsuki</strong><span><kbd>J</kbd> / <kbd>1</kbd></span><span>Pugno al corpo. Ripeti J per il gyaku tsuki.</span></div><div><strong>Shita tsuki</strong><span><kbd>H</kbd> / <kbd>7</kbd></span><span>Montante al corpo: utile da distanza ravvicinata.</span></div><div><strong>Kagi tsuki</strong><span><kbd>N</kbd> / <kbd>8</kbd></span><span>Gancio al corpo per variare la combinazione.</span></div><div><strong>Mae geri</strong><span><kbd>K</kbd> / <kbd>2</kbd></span><span>Calcio frontale per tenere la distanza.</span></div><div><strong>Mawashi geri</strong><span><kbd>L</kbd> / <kbd>3</kbd></span><span>Calcio circolare alto, potente ma più lento.</span></div><div><strong>Ushiro geri</strong><span><kbd>U</kbd> / <kbd>4</kbd></span><span>Calcio all’indietro con rotazione e spinta.</span></div><div><strong>Gedan mawashi</strong><span><kbd>I</kbd> / <kbd>5</kbd></span><span>Calcio basso: si blocca alzando il ginocchio.</span></div><div><strong>Kaiten geri</strong><span><kbd>O</kbd> / <kbd>6</kbd></span><span>Calcio in rotolamento. Richiede 45 Spirit.</span></div></div><div class="combo-note"><b>COMBO PIÙ FLUIDE</b><span>J → J → K → L</span><p>Puoi inserire in anticipo fino a tre colpi: partono in sequenza, appena il precedente va a segno. Avvicinati prima di iniziare.</p><div class="combo-routes"><div><b>CAMBIA LIVELLO</b><span>J → J → I → K → L → O</span></div><div><b>GIRA E CHIUDI</b><span>I → K → U</span></div></div><p>Massimo sei colpi collegati, poi atterramento. Il finale con kaiten richiede 45 Spirit.</p></div><p class="small-note">Ritmo Turbo: azioni e spostamenti al 130%, round sempre di 60 secondi reali. In allenamento la vita si rigenera. Le tecniche sono interpretate in chiave arcade.</p></dialog>
+  <dialog id="app-install-dialog" aria-labelledby="app-install-title">
+    <button class="close-dialog" aria-label="Chiudi">×</button>
+    <h2 id="app-install-title">Senza le barre di Safari</h2>
+    <p>Su iPhone, avvia il gioco dalla schermata Home per usarlo come app a tutto schermo.</p>
+    <ol><li>Apri la pagina dell’app con il pulsante qui sotto.</li><li>In Safari, tocca <b>Condividi ↑ → Aggiungi alla schermata Home</b>.</li><li>Lascia attivo <b>Apri come app web</b>, se presente, e tocca <b>Aggiungi</b>.</li><li>Apri <b>Kyokushin</b> dalla Home.</li></ol>
+    <a id="app-install-link" href="app.html" target="_blank" rel="noopener">Apri la pagina dell’app ↗</a>
+    <p class="app-install-note">Aprila prima della partita: il combattimento in corso non viene trasferito. Puoi chiudere questo messaggio e continuare qui.</p>
+  </dialog>
   <dialog id="credits-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">STAGE 01 / LE NOSTRE RADICI</span><h2>IL DOJO BODYPLANET.</h2><p>Un omaggio arcade al karate Kyokushinkai e al dojo presso Fitness & Wellness BodyPlanet, a Catania.</p><p>I personaggi illustrati sono ispirati alle fotografie fornite: <b>Sensei Angelo Pierino, III Dan</b> e <b>Senpai Samuel Villani, 1 Kyu</b>. Angelo ha la testa rasata e la cintura nera con tre strisce; Samuel ha i capelli scuri e la cintura marrone con una striscia nera.</p><div id="source-links"></div><p class="small-note">Illustrazioni originali generate per questo progetto. Logo fornito dall’utente. Musica originale ed effetti sintetizzati nel browser, attivi dal primo tocco. Il pulsante ♪ controlla tutto l’audio. Il combattimento è un’interpretazione videoludica; nessuna affiliazione con Street Fighter o MUGEN.</p></dialog>
 <script src="scripts/core-assets.js?v=20261025-15"></script>
 <script src="scripts/roster.js?v=20261025-18"></script>
@@ -1477,8 +1493,8 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 
 </script>
 <script src="scripts/portrait-framing.js?v=20261025-11"></script>
-<script src="scripts/karateka-atlas.js?v=20261025-18"></script>
-<script src="scripts/karateka-art.js?v=20261025-18"></script>
+<script src="scripts/karateka-atlas.js?v=20261025-20"></script>
+<script src="scripts/karateka-art.js?v=20261025-20"></script>
 <script>
 /* audio.js */
 /* Original synthesized score and sound design for Kyokushin Spirit. */
@@ -2059,6 +2075,6 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <script src="scripts/online-ui.js?v=20261025-19"></script>
 <script src="scripts/online-session.js?v=20261025-17"></script>
 <script src="scripts/game-interaction.js?v=20261025-13"></script>
-<script src="scripts/main.js?v=20261025-19"></script>
+<script src="scripts/main.js?v=20261025-20"></script>
 </body>
 </html>
