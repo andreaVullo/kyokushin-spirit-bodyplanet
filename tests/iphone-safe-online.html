@@ -1,0 +1,60 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><title>iPhone 14 Pro · aree sicure online</title>
+<style>body{background:#101923;color:#f4dfb5;font:14px system-ui;margin:16px}button{padding:12px;margin:4px;border:1px solid #bea06c;background:#ead09d;color:#182637}iframe{border:1px solid #baa16b;display:block}pre{max-height:120px;overflow:auto;white-space:pre-wrap}.frame{position:relative;width:fit-content}.island{position:absolute;background:#050505;border-radius:30px;pointer-events:none;z-index:3}#cases{margin-bottom:10px}</style>
+<h1>iPhone 14 Pro · prova delle aree sicure (simulazione)</h1><div id="cases"></div><pre id="report">Caricamento…</pre><div id="preview"></div>
+<script>
+(async()=>{
+ const sourceURL=new URL('../Gioca.html?standalone=1&touch=1',location.href);
+ const template=await fetch(sourceURL,{cache:'no-store'}).then(r=>r.text());
+ const parsed=new DOMParser().parseFromString(template,'text/html'),styles=new Map();
+ await Promise.all([...parsed.querySelectorAll('link[rel=stylesheet]')].map(async node=>{const href=node.getAttribute('href');styles.set(href,await fetch(new URL(href,sourceURL),{cache:'no-store'}).then(r=>r.text()));}));
+ const cases=[
+  {name:'App verticale · Dynamic Island',w:393,h:852,safe:[59,0,34,0],installed:true},
+  {name:'App orizzontale',w:852,h:393,safe:[0,59,21,59],installed:true},
+  {name:'Chrome/Safari verticale',w:393,h:664,safe:[0,0,0,0]},
+  {name:'Chrome/Safari orizzontale',w:852,h:310,safe:[0,59,0,59]},
+  {name:'Zoom 150%',w:262,h:568,safe:[39,0,23,0],installed:true},
+  {name:'Zoom 200%',w:197,h:426,safe:[30,0,17,0],installed:true},
+ ];
+ let generation=0;const reports=[];const delay=ms=>new Promise(r=>setTimeout(r,ms));
+ async function run(c){
+  const serial=++generation;document.querySelector('#report').textContent='Caricamento '+c.name;
+  const documentCopy=new DOMParser().parseFromString(template,'text/html');
+  const values=Object.fromEntries(['top','right','bottom','left'].map((edge,i)=>[edge,c.safe[i]]));
+  const env=css=>css.replace(/env\(safe-area-inset-(top|right|bottom|left)(?:,\s*0px)?\)/g,(_,edge)=>values[edge]+'px');
+  for(const node of documentCopy.querySelectorAll('link[rel=stylesheet]')){const style=documentCopy.createElement('style');style.textContent=env(styles.get(node.getAttribute('href')));node.replaceWith(style);}
+  for(const node of documentCopy.querySelectorAll('style'))node.textContent=env(node.textContent);
+  const base=documentCopy.createElement('base');base.href=sourceURL.href;documentCopy.head.prepend(base);
+  const setup=documentCopy.createElement('script');setup.textContent=`Object.defineProperty(navigator,'standalone',{value:${!!c.installed}});Object.defineProperty(navigator,'userAgent',{value:'iPhone'});Object.defineProperty(navigator,'maxTouchPoints',{value:5});Element.prototype.requestFullscreen=undefined;Element.prototype.webkitRequestFullscreen=undefined;`;documentCopy.head.prepend(setup);
+  const frame=document.createElement('iframe');frame.width=c.w;frame.height=c.h;frame.srcdoc='<!doctype html>'+documentCopy.documentElement.outerHTML;
+  const wrapper=document.createElement('div');wrapper.className='frame';wrapper.append(frame);
+  if(c.safe[0]){const island=document.createElement('div');island.className='island';island.style.cssText=`left:${c.w/2-63}px;top:11px;width:126px;height:37px`;wrapper.append(island);}
+  document.querySelector('#preview').replaceChildren(wrapper);await new Promise(r=>frame.onload=r);
+  const win=frame.contentWindow,d=frame.contentDocument;
+  for(let i=0;i<250&&!win.dojo?.ready;i++)await delay(100);if(serial!==generation)return;
+  if(!c.installed)d.querySelector('#rotate-fullscreen-button').click();
+  d.querySelector('#online-title-button').click();await delay(200);
+  const errors=[];const box=el=>el.getBoundingClientRect();
+  const viewport=box(d.querySelector('#viewport')),panel=d.querySelector('#online-lobby'),scroll=d.querySelector('.online-scroll');
+  const bounds={left:c.safe[3],top:c.safe[0],right:c.w-c.safe[1],bottom:c.h-c.safe[2]};
+  for(const edge of ['left','top'])if(viewport[edge]<bounds[edge]-1)errors.push('viewport sotto area di sistema: '+edge);
+  for(const edge of ['right','bottom'])if(viewport[edge]>bounds[edge]+1)errors.push('viewport sotto area di sistema: '+edge);
+  if(panel.scrollWidth>panel.clientWidth+1||scroll.scrollWidth>scroll.clientWidth+1)errors.push('contenuto tagliato lateralmente');
+  const footer=d.querySelector('.online-footer');if(scroll.offsetTop+scroll.offsetHeight>footer.offsetTop+1)errors.push('footer sovrapposto');
+  const adjustment=win.getComputedStyle(d.querySelector('#game-shell')).webkitTextSizeAdjust;
+  if(adjustment!=='100%')errors.push('ingrandimento automatico testo non controllato: '+adjustment);
+  scroll.scrollTop=scroll.scrollHeight;await delay(40);
+  const last=d.querySelector('.online-fighters>button:last-child');const lastBox=box(last),scrollBox=box(scroll);
+  if(lastBox.left<scrollBox.left-1||lastBox.top<scrollBox.top-1||lastBox.right>scrollBox.right+1||lastBox.bottom>scrollBox.bottom+1)errors.push('ultimo karateka non raggiungibile scorrendo');
+  last.scrollIntoView({block:'nearest',inline:'nearest'});await delay(40);
+  const visible=box(last),viewBox=box(panel);if(visible.left<viewBox.left-1||visible.top<viewBox.top-1||visible.right>viewBox.right+1||visible.bottom>viewBox.bottom+1)errors.push('karateka fuori dal pannello dopo scorrimento');
+  scroll.scrollTop=0;panel.scrollTop=0;
+  const report={name:c.name,result:errors.length?'FAIL':'PASS',errors,viewport:{x:viewport.x,y:viewport.y,width:viewport.width,height:viewport.height},safe:bounds,textSizeAdjust:adjustment};reports.push(report);
+  document.querySelector('#report').textContent=JSON.stringify(report,null,2);
+  document.querySelector('#report').dataset.result=report.result;
+  document.querySelector('#history').textContent=JSON.stringify(reports,null,2);
+ }
+ const history=document.createElement('pre');history.id='history';history.hidden=true;document.body.append(history);
+ for(const c of cases){const b=document.createElement('button');b.textContent=c.name;b.onclick=()=>run(c);document.querySelector('#cases').append(b);}
+ run(cases[0]);
+})().catch(error=>document.querySelector('#report').textContent=error.stack);
+</script></html>

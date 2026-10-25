@@ -1,3 +1,6 @@
+/* Keep mobile text inflation from treating a CSS-rotated game as a wide web
+   article. This preserves the designed sizes without disabling page zoom. */
+#game-shell {-webkit-text-size-adjust:100%;text-size-adjust:100%}
 /* Physical safe areas become local edges when the cabinet rotates clockwise. */
 body.virtual-landscape {
   --safe-top:env(safe-area-inset-right);--safe-right:env(safe-area-inset-bottom);
@@ -33,7 +36,7 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested).playin
   height:min(var(--arena-height),calc((var(--layout-width) - var(--safe-left,env(safe-area-inset-left)) - var(--safe-right,env(safe-area-inset-right)))*9/16));
 }
 /* Front screens share the same safe rectangle, including their scrollable edges. */
-body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus,.front-create) #arcade>.viewport {
+body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus,.front-create,.front-online) #arcade>.viewport {
   width:calc(100% - var(--safe-left,env(safe-area-inset-left)) - var(--safe-right,env(safe-area-inset-right)));
   margin:0 var(--safe-right,env(safe-area-inset-right)) var(--safe-bottom,env(safe-area-inset-bottom)) var(--safe-left,env(safe-area-inset-left));
 }
