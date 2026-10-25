@@ -15,6 +15,8 @@ for (const file of ['scripts/roster.js', 'scripts/game.js']) {
 const { KyokushinGame, KyokushinRoster } = context;
 
 const names = {
+  'emanuele-micalizzi': 'EMANUELE MICALIZZI',
+  'francesco-privitera-1': 'FRANCESCO PRIVITERA 1',
   angelo: 'ANGELO',
   samuel: 'SAMUEL',
   'marco-tabacco-collage': 'MARCO TABACCO',
@@ -198,4 +200,10 @@ test('round and match wins announce the selected name on either side', () => {
       assert.equal(match.winner, winnerIndex);
     }
   }
+});
+
+test('named ranks follow the belt progression and both new characters are Mu kyu', () => {
+ for(const [id,rank,color] of [['marco-tabacco-collage','8 KYU','blue'],['gabriele-carbonaro','6 KYU','yellow'],['leonardo-cappellani','7 KYU','blue-yellow'],['gabriele-randazzo','9 KYU','orange-blue'],['andrea-barbagallo','10 KYU','orange'],['emanuele-micalizzi','MU KYU','white'],['francesco-privitera-1','MU KYU','white']]){
+  assert.equal(KyokushinRoster[id].rank,'KARATEKA · '+rank);assert.equal(KyokushinRoster[id].beltColor,color);
+ }
 });

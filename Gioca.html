@@ -281,7 +281,8 @@ body:is(.touch-active,.force-touch) .mobile-help-note{display:block;background:#
 body.embedded{background:#101820;overflow:hidden;overscroll-behavior:none}
 .standalone-return{display:none;align-items:center;min-height:44px;padding:0 8px;font:700 11px/1.2 Arial,Helvetica,sans-serif;letter-spacing:.1px;color:#f5ddb0;text-decoration:none;white-space:nowrap;touch-action:manipulation}
 body.standalone-game .standalone-return{display:inline-flex}
-body.standalone-game .arena-title{display:none}
+.arena-title{min-width:0;display:flex;align-items:center;gap:8px}.arena-title #arena-title-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.arena-topline .arena-utilities{flex-shrink:0;margin-left:auto}
+@media(max-width:900px){.arena-site-return{display:none!important}}
 .arena-site-return{flex-shrink:0;margin-left:-8px}
 .screen-site-return{position:absolute;z-index:1;top:max(8px,var(--safe-top,env(safe-area-inset-top)));left:max(14px,var(--safe-left,env(safe-area-inset-left)))}
 .standalone-return:hover{color:#fff3d6;background:#ffe5a60a}
@@ -682,7 +683,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 
     <div id="game-shell">
     <section class="arcade" id="arcade" aria-label="Arena di combattimento">
-      <div class="arena-topline"><span class="arena-title"><i></i> BODYPLANET ARENA</span><a class="standalone-return arena-site-return" href="https://kyokushinkaicataniadojo.it/play">← Torna al sito</a><span id="mode-label">TURBO EDITION / 02</span><div class="arena-utilities"><button id="mobile-sound-button" class="mobile-utility" title="Musica ed effetti" aria-label="Disattiva musica ed effetti" aria-pressed="true">♪</button><button id="mobile-help-button" class="mobile-utility" title="Come si gioca" aria-label="Apri la guida ai comandi">?</button><button id="touch-toggle-button" title="Mostra o nascondi i comandi touch" aria-label="Mostra i comandi touch" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M6 7h12c2 0 3 2 3 4v6c0 2-2 3-3.5 1.5L15 16H9l-2.5 2.5C5 20 3 19 3 17v-6c0-2 1-4 3-4Z" stroke="currentColor" stroke-width="1.6"/><path d="M8 10v5m-2.5-2.5h5" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="11" r="1" fill="currentColor"/><circle cx="18" cy="14" r="1" fill="currentColor"/></svg></button><button id="pause-button" title="Pausa (Esc)" aria-label="Pausa" disabled>Ⅱ</button><button id="fullscreen-button" title="Schermo intero" aria-label="Schermo intero">⛶</button></div></div>
+      <div class="arena-topline"><span class="arena-title"><i></i> <span id="arena-title-text">BODYPLANET DOJO</span></span><a class="standalone-return arena-site-return" href="https://kyokushinkaicataniadojo.it/play">← Torna al sito</a><span id="mode-label">TURBO EDITION / 02</span><div class="arena-utilities"><button id="mobile-sound-button" class="mobile-utility" title="Musica ed effetti" aria-label="Disattiva musica ed effetti" aria-pressed="true">♪</button><button id="mobile-help-button" class="mobile-utility" title="Come si gioca" aria-label="Apri la guida ai comandi">?</button><button id="touch-toggle-button" title="Mostra o nascondi i comandi touch" aria-label="Mostra i comandi touch" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true"><path d="M6 7h12c2 0 3 2 3 4v6c0 2-2 3-3.5 1.5L15 16H9l-2.5 2.5C5 20 3 19 3 17v-6c0-2 1-4 3-4Z" stroke="currentColor" stroke-width="1.6"/><path d="M8 10v5m-2.5-2.5h5" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="11" r="1" fill="currentColor"/><circle cx="18" cy="14" r="1" fill="currentColor"/></svg></button><button id="pause-button" title="Pausa (Esc)" aria-label="Pausa" disabled>Ⅱ</button><button id="fullscreen-button" title="Schermo intero" aria-label="Schermo intero">⛶</button></div></div>
       <div class="viewport" id="viewport">
         <canvas id="game" width="1280" height="720" tabindex="0" aria-label="Gioco Kyokushin. Usa A D per muoverti, doppio A o D per scattare, W per saltare, J H N per i pugni, K L U I O per i calci. Arretra per parare di braccia, F per alzare il ginocchio. Premi Esc per mettere in pausa."></canvas>
         <div class="arena-shade"></div>
@@ -791,7 +792,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 </div><div class="move-table"><div><b>TECNICA</b><b>P1 / P2</b><b>QUANDO USARLA</b></div><div><strong>Seiken tsuki</strong><span><kbd>J</kbd> / <kbd>1</kbd></span><span>Pugno al corpo. Ripeti J per il gyaku tsuki.</span></div><div><strong>Shita tsuki</strong><span><kbd>H</kbd> / <kbd>7</kbd></span><span>Montante al corpo: utile da distanza ravvicinata.</span></div><div><strong>Kagi tsuki</strong><span><kbd>N</kbd> / <kbd>8</kbd></span><span>Gancio al corpo per variare la combinazione.</span></div><div><strong>Mae geri</strong><span><kbd>K</kbd> / <kbd>2</kbd></span><span>Calcio frontale per tenere la distanza.</span></div><div><strong>Mawashi geri</strong><span><kbd>L</kbd> / <kbd>3</kbd></span><span>Calcio circolare alto, potente ma più lento.</span></div><div><strong>Ushiro geri</strong><span><kbd>U</kbd> / <kbd>4</kbd></span><span>Calcio all’indietro con rotazione e spinta.</span></div><div><strong>Gedan mawashi</strong><span><kbd>I</kbd> / <kbd>5</kbd></span><span>Calcio basso: si blocca alzando il ginocchio.</span></div><div><strong>Kaiten geri</strong><span><kbd>O</kbd> / <kbd>6</kbd></span><span>Calcio in rotolamento. Richiede 45 Spirit.</span></div></div><div class="combo-note"><b>COMBO PIÙ FLUIDE</b><span>J → J → K → L</span><p>Puoi inserire in anticipo fino a tre colpi: partono in sequenza, appena il precedente va a segno. Avvicinati prima di iniziare.</p><div class="combo-routes"><div><b>CAMBIA LIVELLO</b><span>J → J → I → K → L → O</span></div><div><b>GIRA E CHIUDI</b><span>I → K → U</span></div></div><p>Massimo sei colpi collegati, poi atterramento. Il finale con kaiten richiede 45 Spirit.</p></div><p class="small-note">Ritmo Turbo: azioni e spostamenti al 130%, round sempre di 60 secondi reali. In allenamento la vita si rigenera. Le tecniche sono interpretate in chiave arcade.</p></dialog>
   <dialog id="credits-dialog"><button class="close-dialog" aria-label="Chiudi">×</button><span class="eyebrow">STAGE 01 / LE NOSTRE RADICI</span><h2>IL DOJO BODYPLANET.</h2><p>Un omaggio arcade al karate Kyokushinkai e al dojo presso Fitness & Wellness BodyPlanet, a Catania.</p><p>I personaggi illustrati sono ispirati alle fotografie fornite: <b>Sensei Angelo Pierino, III Dan</b> e <b>Senpai Samuel Villani, 1 Kyu</b>. Angelo ha la testa rasata e la cintura nera con tre strisce; Samuel ha i capelli scuri e la cintura marrone con una striscia nera.</p><div id="source-links"></div><p class="small-note">Illustrazioni originali generate per questo progetto. Logo fornito dall’utente. Musica originale ed effetti sintetizzati nel browser, attivi dal primo tocco. Il pulsante ♪ controlla tutto l’audio. Il combattimento è un’interpretazione videoludica; nessuna affiliazione con Street Fighter o MUGEN.</p></dialog>
 <script src="scripts/core-assets.js?v=20261025-15"></script>
-<script src="scripts/roster.js?v=20261025-11"></script>
+<script src="scripts/roster.js?v=20261025-18"></script>
 <script src="scripts/game.js?v=20261025-12"></script>
 <script src="scripts/strike-point.js?v=20261025-10"></script>
 <script src="scripts/fighter-geometry.js?v=20261025-11"></script>
@@ -1476,8 +1477,8 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 
 </script>
 <script src="scripts/portrait-framing.js?v=20261025-11"></script>
-<script src="scripts/karateka-atlas.js?v=20261025-5"></script>
-<script src="scripts/karateka-art.js?v=20261025-15"></script>
+<script src="scripts/karateka-atlas.js?v=20261025-18"></script>
+<script src="scripts/karateka-art.js?v=20261025-18"></script>
 <script>
 /* audio.js */
 /* Original synthesized score and sound design for Kyokushin Spirit. */
@@ -2042,12 +2043,12 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 </script>
 <script src="scripts/mobile-controls.js?v=20261025-2"></script>
 <script src="scripts/orientation.js?v=20261025-2"></script>
-<script src="scripts/display-controller.js?v=20261025-15"></script>
+<script src="scripts/display-controller.js?v=20261025-18"></script>
 <script src="scripts/arcade.js?v=20261025-2"></script>
 <script src="scripts/leaderboard-config.js?v=20261025-2"></script>
 <script src="scripts/leaderboard.js?v=20261025-4"></script>
 <script src="scripts/arcade-atlas.js?v=20261025-11"></script>
-<script src="scripts/arcade-art.js?v=20261025-15"></script>
+<script src="scripts/arcade-art.js?v=20261025-18"></script>
 <script src="scripts/name-keyboard.js?v=20261025-12"></script>
 <script src="scripts/arcade-ui.js?v=20261025-17"></script>
 <script src="scripts/online-config.js?v=20261025-12"></script>
@@ -2057,6 +2058,6 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <script src="scripts/online-ui.js?v=20261025-17"></script>
 <script src="scripts/online-session.js?v=20261025-17"></script>
 <script src="scripts/game-interaction.js?v=20261025-13"></script>
-<script src="scripts/main.js?v=20261025-17"></script>
+<script src="scripts/main.js?v=20261025-18"></script>
 </body>
 </html>

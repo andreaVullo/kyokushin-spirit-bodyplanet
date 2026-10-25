@@ -11,7 +11,9 @@
   // Measured hairline-to-chin geometry in each intact idle cutout. Full atlas
   // rectangles include a wide stance, which must not shrink faces in cards.
   const portraitHeads = {
-    '01-marco-tabacco-collage': [145, 2, 68, 68],
+    "10-emanuele-micalizzi": [183, 2, 75, 78],
+    "11-francesco-privitera-1": [185, 2, 75, 84],
+    '01-marco-tabacco-collage': [145, 2, 75, 80],
     '02-gabriele-carbonaro': [153, 2, 66, 70],
     '03-leonardo-cappellani': [150, 2, 68, 76],
     '04-gabriele-randazzo': [153, 2, 68, 68],
@@ -132,7 +134,7 @@
         };
         image.src = source;
       };
-      script.src = new URL(key + '.js', root).href;
+      script.src = new URL(key + '.js?v=20261025-18', root).href;
       document.head.append(script);
     }).finally(() => pending.delete(key));
     pending.set(key, promise);

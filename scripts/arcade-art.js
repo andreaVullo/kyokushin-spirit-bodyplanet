@@ -170,13 +170,36 @@
     const base = rgb(rank.color), accent = rgb(rank.dan ? '#e5b74a' : (rank.stripe || rank.color));
     const length = bottom - top + 1, start = top + length * .42, end = bottom - Math.max(1, length * .04);
     const count = rank.dan || (rank.stripe ? 1 : 0);
+    // Select one connected patch on one tail, rather than painting a horizontal
+    // stripe across both dangling ends. Work in pose pixels before mirroring.
+    const stripePixels = new Set();
+    if (rank.stripe && !rank.dan) {
+      const candidates = new Set(mask.filter(i => {
+        const y = Math.floor(i / 4 / width), position = (y - start) / Math.max(1, end - start);
+        return position > .72 && position < .9;
+      }).map(i => i / 4));
+      let largest = [];
+      while (candidates.size) {
+        const seed = candidates.values().next().value, component = [seed]; candidates.delete(seed);
+        for (let n = 0; n < component.length; n++) {
+          const at = component[n], x = at % width, y = Math.floor(at / width);
+          for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+            if (x + dx < 0 || x + dx >= width || y + dy < 0 || y + dy >= height) continue;
+            const next = at + dy * width + dx;
+            if (candidates.delete(next)) component.push(next);
+          }
+        }
+        if (component.length > largest.length) largest = component;
+      }
+      largest.forEach(at => stripePixels.add(at * 4));
+    }
     for (const i of mask) {
       const y = Math.floor(i / 4 / width), brightness = clamp((pixels[i + 1] + pixels[i + 2]) / 360, .30, 1.23);
       if (y < top || y > bottom) continue;
       let color = base;
       if (count && y >= start && y <= end) {
         const position = (y - start) / Math.max(1, end - start);
-        if (count === 1 ? position > .72 && position < .9 : (position * count) % 1 < .43) color = accent;
+        if (rank.stripe && !rank.dan ? stripePixels.has(i) : count === 1 ? position > .72 && position < .9 : (position * count) % 1 < .43) color = accent;
       }
       for (let c = 0; c < 3; c++) pixels[i + c] = clamp(Math.round(color[c] * brightness), 0, 255);
     }

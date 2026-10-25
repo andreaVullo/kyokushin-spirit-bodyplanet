@@ -99,6 +99,7 @@ async function checkFight(frame,stage,label,c){
  expect(win.dojo.screen==='game','Combattimento non avviato');
  expect(d.querySelector('#game').dataset.stageId===stage.id,'Sfondo del combattimento non aggiornato');
  expect(d.querySelector('#stage-name').textContent===stage.name.toLocaleUpperCase('it'),'Didascalia arena errata');
+ const heading=d.querySelector('#arena-title-text');expect(heading.textContent===stage.name.toLocaleUpperCase('it'),'Titolo in alto diverso dall’arena');expect(heading.getBoundingClientRect().width>0&&win.getComputedStyle(heading.parentElement).display!=='none','Nome arena in alto nascosto');
  const canvas=d.querySelector('#game'),viewport=d.querySelector('#viewport'),canvasBox=canvas.getBoundingClientRect(),canvasStyle=win.getComputedStyle(canvas);
  expect(!d.body.classList.contains('orientation-blocked'),'Avviso ruota il telefono sopra il combattimento');
  expect(canvasBox.width>0&&canvasBox.height>0&&canvasStyle.display!=='none'&&canvasStyle.visibility!=='hidden','Campo di combattimento non visibile');

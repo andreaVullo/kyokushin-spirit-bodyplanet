@@ -1,9 +1,9 @@
 {
-  "01-marco-tabacco-collage/base": "85298c518d6d7b93c00865adb62d5d15fa604c13aa6b3542db5fcc08a7cc8a63",
-  "01-marco-tabacco-collage/pugni": "01089f9fa3c1a2e6b6ee81dcd8b2029e463bdf6e14f8e9d5bf01fe66a870454e",
-  "01-marco-tabacco-collage/calci": "f4d7f7466315f2e21281539d79fcb84821f862dfe4732cc44cdaec534fc04896",
-  "01-marco-tabacco-collage/movimento": "cd3b612c66bde3ae3d57228c594341315cc78e42db59fb7d41be01cca9313055",
-  "01-marco-tabacco-collage/difesa": "7192b2d9e22f777e360b115412914a1e25d4f1bc74e9c135c4f43fd45fed6161",
+  "01-marco-tabacco-collage/base": "36051ae07ac3cd8c91bb430b036ed70b71171829490523e9cb1eb20c4f096ad1",
+  "01-marco-tabacco-collage/pugni": "040fe6ce651a11f8ad1240f2829f0f0b1ca9d025594b394b208a9e65e5f43e89",
+  "01-marco-tabacco-collage/calci": "a991f3f0430bc514c7c836c5dfa69f998e2010f118b28de21ede0ee5952d403e",
+  "01-marco-tabacco-collage/movimento": "4e43690844b90a63b4b8b2c919dba3a9ae474cc120bdd6ec3abf681bd327e1ad",
+  "01-marco-tabacco-collage/difesa": "b9b396d201175a50c7ceaf37ebf89df44cf18f669deda6d02abfada534688193",
   "02-gabriele-carbonaro/base": "52e148ed6f46df5f227e84aa364a2c7d5e1bf755037decd0eb8d20d9f504888f",
   "02-gabriele-carbonaro/pugni": "d92c31f2ea09b0097be42ca4a64de916dcc808d4fc7954d1ff894543069d3fcd",
   "02-gabriele-carbonaro/calci": "1817a7a83a42ff22eb327a9ba6a514de00dbffad17b75df26adbf623bbd5efb5",
@@ -43,5 +43,15 @@
   "09-andrea-barbagallo/pugni": "3333236a34b2faef55688646ccf5045cc32ea717a41fe0ac21ccdd7aca24f22c",
   "09-andrea-barbagallo/calci": "cd91889b26e9da93060843208d067b30c8b42215d9004d536f6cfc809c62d2a4",
   "09-andrea-barbagallo/movimento": "6f35d9dd38eecb48a18fb1bd86fb40ac1b3a46973d34e3b2188db6542b13e509",
-  "09-andrea-barbagallo/difesa": "932e0fce03bd2de3a9bbd4cfa8a4e4770f1065fe88424297fae3ec9841028902"
+  "09-andrea-barbagallo/difesa": "932e0fce03bd2de3a9bbd4cfa8a4e4770f1065fe88424297fae3ec9841028902",
+  "10-emanuele-micalizzi/base": "9323dc712a5176a77d22f8077ce36151cd16e5ccb78ebc540f74ba7337bd5e05",
+  "10-emanuele-micalizzi/pugni": "6d06502f26dd9ed88b2a2fc1b26f487993058eec28b97c9e99fa665e0c2fa3af",
+  "10-emanuele-micalizzi/calci": "03ee6e749aa08ce4ea14a24b30df1dcb83519410c5cdc1f6484eff1b9176ceeb",
+  "10-emanuele-micalizzi/movimento": "ce1eba4d8955db42e1398b3a265b3024aa1ec1df132da23639a518b9999b32be",
+  "10-emanuele-micalizzi/difesa": "a22c5106182157a00fd20c8109422e98872dc8d62ed1ce50959f19e4d4dd1bfe",
+  "11-francesco-privitera-1/base": "d58f6b4a232eeaf4a6b5b1dcc0b364b6412ba6327a2c8ec06268e8120e08b4f9",
+  "11-francesco-privitera-1/pugni": "ab5706ca58bbe958ec332ce64b33b3cd029be1037a22819a78d2d7a21cf6755f",
+  "11-francesco-privitera-1/calci": "1f7c532e8cf82c930468c3575f5664e4bb19d098dea0d92dba5a012d0678c2c3",
+  "11-francesco-privitera-1/movimento": "d32d1a642de5c96231f2cac89378558ad9536108e677c121fa82df3e04e136e5",
+  "11-francesco-privitera-1/difesa": "48a1e6ee79b2908c76fc08d96c980b20632e6848b1105938e1c9c107fdf1323c"
 }

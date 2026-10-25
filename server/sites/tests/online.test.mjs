@@ -162,3 +162,12 @@ test('relay configuration is optional and validates only TURN URLs; errors do no
   assert.equal(failed.status, 503); assert.deepEqual(failed.data, { error: 'Connessione al servizio online non riuscita.', code: 'storage' });
   assert.equal((await call({}, '/online/rooms')).status, 503);
 });
+
+test('new white-belt karateka can create and join an online room', async () => {
+  const env = { DB: database() };
+  const host = await call(env, '/online/rooms', { body: player({ fighter: 'emanuele-micalizzi' }) });
+  assert.equal(host.status, 201);
+  const guest = await call(env, `/online/rooms/${host.data.code}/join`, { body: player({ fighter: 'francesco-privitera-1' }) });
+  assert.equal(guest.status, 200);
+  assert.deepEqual(guest.data.room.players.map(p => p.fighter), ['emanuele-micalizzi', 'francesco-privitera-1']);
+});

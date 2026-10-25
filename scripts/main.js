@@ -140,7 +140,7 @@
     const viewport=window.visualViewport;
     const layout=window.DojoOrientation.resolve({
       touchEnabled:touchPreference??touchDetected,
-      landscapeRequested:display.requested,hostManaged:display.hostManaged||display.hostPending,
+      landscapeRequested:display.requested,hostManaged:!display.nativeOwned&&(display.hostManaged||display.hostPending),
       width:window.innerWidth,height:window.innerHeight,
       visualWidth:viewport?.width,visualHeight:viewport?.height,
       offsetLeft:viewport?.offsetLeft,offsetTop:viewport?.offsetTop
@@ -152,7 +152,7 @@
     }))root.style.setProperty('--'+name,value+'px');
     document.body.classList.toggle('landscape-requested',display.requested);
     document.body.classList.toggle('virtual-landscape',layout.virtual);
-    document.body.classList.toggle('host-display-managed',display.hostManaged);
+    document.body.classList.toggle('host-display-managed',display.hostManaged&&!display.nativeOwned);
     $('arcade').classList.toggle('expanded',display.requested);
     const geometry=[layout.logicalWidth,layout.logicalHeight,layout.virtual].join(':');
     if(lastLayoutGeometry!==null&&geometry!==lastLayoutGeometry)clearCombatInput();
@@ -242,6 +242,7 @@
     currentStage=arena.stage;bg=arena.image;
     canvas.dataset.stageId=currentStage.id;
     if($('stage-name'))$('stage-name').textContent=currentStage.name.toLocaleUpperCase('it');
+    if($('arena-title-text')) { $('arena-title-text').textContent=currentStage.name.toLocaleUpperCase('it'); $('arena-title-text').title=currentStage.name; }
     if($('stage-number'))$('stage-number').textContent='STAGE '+String(currentStage.number).padStart(2,'0');
     if($('versus-stage'))$('versus-stage').textContent=currentStage.name+' · '+currentStage.location;
     if($('stage-load-note')){

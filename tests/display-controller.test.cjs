@@ -273,7 +273,7 @@ test('an unresponsive older host falls back locally after exactly 500 ms', () =>
   const h = harness({ embedded: true });
   h.display.open();
   assert.equal(h.display.hostPending, true);
-  assert.equal(h.requests.length, 0, 'the host receives the display request');
+  assert.equal(h.requests.length, 1, 'native fullscreen must be requested during the original gesture, even inside a host');
   assert.equal(h.layout().virtual, false);
   h.advance(499);
   assert.equal(h.display.hostPending, true);
@@ -359,19 +359,19 @@ test('a late managed acknowledgment transfers layout ownership without a second 
   assert.equal(hosted.logicalHeight, 390);
   h.advance(5000);
   assert.equal(h.display.requested, true);
-  assert.equal(h.requests.length, 0);
+  assert.equal(h.requests.length, 1);
 });
 
-test('host takeover exits any owned native surface without cancelling the host request', () => {
+test('host acknowledgment preserves native fullscreen granted inside the game', () => {
   const h = harness({ embedded: true });
   h.display.open(); h.advance(500);
   h.doc.fullscreenElement = h.element;
   h.doc.dispatch('fullscreenchange');
   assert.equal(h.display.nativeOwned, true);
   h.ack(true);
-  assert.equal(h.doc.fullscreenElement, null);
-  assert.equal(h.exits, 1);
-  assert.equal(h.display.nativeOwned, false);
+  assert.equal(h.doc.fullscreenElement, h.element);
+  assert.equal(h.exits, 0);
+  assert.equal(h.display.nativeOwned, true);
   assert.equal(h.display.hostManaged, true);
   assert.equal(h.display.requested, true);
   assert.equal(h.messages.filter(message => message.data.action === 'exit').length, 0);
@@ -409,3 +409,16 @@ test('destroy clears timers and unregisters listeners', () => {
   assert.equal(h.win.listeners.get('message').size, 0);
   assert.equal(h.doc.listeners.get('fullscreenchange').size, 0);
 });
+
+ test('prefixed Safari fullscreen enters and exits through the same gesture', () => {
+ const h = harness({ native: 'unavailable' }); let requests = 0, exits = 0;
+ h.element.webkitRequestFullscreen = () => { requests++; h.doc.webkitFullscreenElement = h.element; h.doc.dispatch('webkitfullscreenchange'); };
+ h.doc.exitFullscreen = undefined;
+ h.doc.webkitExitFullscreen = () => { exits++; h.doc.webkitFullscreenElement = null; h.doc.dispatch('webkitfullscreenchange'); };
+ h.display.open(); assert.equal(requests, 1); assert.equal(h.display.nativeOwned, true);
+ h.display.close(); assert.equal(exits, 1); assert.equal(h.display.requested, false);
+ });
+ test('host auto-fit does not consume the first explicit fullscreen tap', () => {
+ const h = harness({ embedded: true }); h.ack(true); assert.equal(h.display.layoutOnly, true);
+ h.display.toggle(); assert.equal(h.requests.length, 1); assert.equal(h.display.requested, true);
+ });

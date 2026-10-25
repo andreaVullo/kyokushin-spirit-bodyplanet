@@ -157,7 +157,7 @@
     function send(message) { if (frame && frame.contentWindow) frame.contentWindow.postMessage(message, origin); }
     function report(requestId) {
       if (!opened || !state) return;
-      var message = { type: 'kyokushin:display-state', managed: true, landscapeRequested: requested,
+      var message = { type: 'kyokushin:display-state', managed: !childFullscreen(), landscapeRequested: requested,
         rotated: state.rotated, viewport: { width: state.width, height: state.height },
         // Insets are already consumed outside the iframe, so the child must not
         // apply them a second time, including when this iframe is rotated.
@@ -171,6 +171,7 @@
       return { top: parseFloat(computed.paddingTop) || 0, right: parseFloat(computed.paddingRight) || 0,
         bottom: parseFloat(computed.paddingBottom) || 0, left: parseFloat(computed.paddingLeft) || 0 };
     }
+    function childFullscreen() { return frame && (doc.fullscreenElement || doc.webkitFullscreenElement) === frame; }
     function layout(requestId) {
       if (!opened) return;
       enforcePage();
@@ -178,7 +179,7 @@
       setStyles(dialog, { left: viewport.left + 'px', top: viewport.top + 'px', width: viewport.width + 'px', height: viewport.height + 'px' });
       setStyles(toolbar, { left: state.toolbarLeft + 'px', top: state.toolbarTop + 'px', width: state.toolbarWidth + 'px' });
       setStyles(stage, { left: state.left + 'px', top: state.top + 'px', width: state.stageWidth + 'px', height: state.stageHeight + 'px' });
-      if (frame) setStyles(frame, { width: state.width + 'px', height: state.height + 'px', transform: state.transform });
+      if (frame) setStyles(frame, childFullscreen() ? { width: viewport.width + 'px', height: viewport.height + 'px', transform: 'none' } : { width: state.width + 'px', height: state.height + 'px', transform: state.transform });
       dialog.dataset.rotated = String(state.rotated); dialog.dataset.landscape = String(requested);
       label.textContent = requested ? 'Vista automatica' : 'Gioca in orizzontale';
       label.setAttribute('aria-pressed', String(requested)); report(requestId);
@@ -317,7 +318,7 @@
       });
       listen(win, 'message', message); listen(win, 'resize', resized); listen(win, 'orientationchange', resized);
       listen(win.visualViewport, 'resize', resized); listen(win.visualViewport, 'scroll', schedule);
-      listen(doc, 'fullscreenchange', fullscreenChanged); listen(win.screen && win.screen.orientation, 'change', resized);
+      listen(doc, 'fullscreenchange', fullscreenChanged); listen(doc, 'webkitfullscreenchange', fullscreenChanged); listen(win.screen && win.screen.orientation, 'change', resized);
       listen(win, 'pagehide', close);
       if (win.MutationObserver) {
         observer = new win.MutationObserver(function () {

@@ -389,3 +389,11 @@ test('failed external bootstrap can retry and never installs a controller in the
   install(component.win, { gameUrl: '../Gioca.html' });
   assert.equal(host.doc.querySelectorAll('script').length, 1);
 });
+
+test('native fullscreen on the game iframe removes host rotation until it exits', () => {
+ const {launcher,doc,win}=environment();launcher.open();const frame=launcher.getState().frame;
+ const sync=()=>win.dispatch('message',{data:{type:'kyokushin:display',action:'sync'},source:frame.contentWindow,origin:'http://127.0.0.1:8765'});
+ doc.fullscreenElement=frame;sync();assert.equal(frame.style.getPropertyValue('transform'),'none');
+ assert.equal(frame.style.getPropertyValue('width'),'390px');
+ doc.fullscreenElement=null;sync();assert.notEqual(frame.style.getPropertyValue('transform'),'none');launcher.close();
+});

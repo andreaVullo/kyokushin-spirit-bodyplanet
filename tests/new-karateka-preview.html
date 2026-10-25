@@ -1,0 +1,17 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nuovi karateka · Kyokushin Spirit</title>
+<style>*{box-sizing:border-box}body{margin:0;padding:28px;background:#101923;color:#f6ebd5;font:14px system-ui}main{max-width:1200px;margin:auto}h1{font-size:34px;margin:0 0 6px}p{color:#c2cbd0}#portraits{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}article{min-width:0;border:1px solid #c9a96b;background:linear-gradient(140deg,#263c4e,#111e2b)}canvas{display:block;width:100%;height:auto}h2{font-size:18px;margin:0 14px 7px}article p{margin:0 14px 16px;color:#e9c583}.poses{margin-top:30px}.poses canvas{background:#1a2835}#status{color:#e9c583}a{color:#e9c583}@media(max-width:700px){#portraits{grid-template-columns:1fr}}</style>
+<main><h1>Il dojo si allarga.</h1><p>Stessa scala, stesso tatami. Nuovi karateka e gradi aggiornati.</p><p id="status">Caricamento…</p><div id="portraits"></div><div id="poses"></div><p><a href="../Gioca.html">Entra nel gioco →</a></p></main>
+<script src="load-real-art.js"></script><script>
+(async()=>{
+ await loadRealFighterArt();await window.__kyokushinAssetsReady;await FighterArt.load();
+ const ids=['emanuele-micalizzi','francesco-privitera-1','marco-tabacco-collage'];let total=0;
+ for(const id of ids){const c=KyokushinRoster[id],card=document.createElement('article'),art=document.createElement('canvas'),name=document.createElement('h2'),rank=document.createElement('p');art.width=600;art.height=580;name.textContent=c.name;rank.textContent=c.rank.replace('KARATEKA · ','')+' · '+c.belt;card.append(art,name,rank);document.getElementById('portraits').append(card);FighterArt.drawSelectionPortrait(art.getContext('2d'),id,0,0,600,580);}
+ for(const id of ids){
+  await FighterArt.loadFighters([id]);const game=new KyokushinGame();game.start({player:id,opponent:'angelo',mode:'training'});const source=game.getState().fighters[0];
+  const section=document.createElement('section');section.className='poses';const title=document.createElement('h2');title.textContent=KyokushinRoster[id].name+' · mosse e reazioni';const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=1200;section.append(title,canvas);document.getElementById('poses').append(section);const ctx=canvas.getContext('2d');
+  const entries=[{state:'idle'},...Object.keys(KyokushinMoves).map(move=>({state:'attack',move,moveProgress:(KyokushinMoves[move].start+KyokushinMoves[move].end)/2/KyokushinMoves[move].duration})),{state:'block'},{state:'legBlock'},{state:'hit',stun:.15},{state:'ko',hp:0},{state:'victory'}];
+  for(const [i,entry]of entries.entries()){const x=(i%4)*300,y=Math.floor(i/4)*300,f={...source,...entry,x:x+150,y:y+258,facing:1,scale:.9};ctx.strokeStyle='#b2a079';ctx.beginPath();ctx.moveTo(x+10,y+260);ctx.lineTo(x+290,y+260);ctx.stroke();FighterArt.draw(ctx,f,.2);ctx.fillStyle='#eee';ctx.fillText(entry.move||entry.state,x+12,y+286);total++;}
+ }
+ const status=document.getElementById('status');status.dataset.result='PASS';status.textContent='3 karateka pronti · '+total+' pose controllate · selezione e combattimento alla stessa scala';
+})().catch(error=>{const el=document.getElementById('status');el.dataset.result='FAIL';el.textContent=error.stack;});
+</script></html>

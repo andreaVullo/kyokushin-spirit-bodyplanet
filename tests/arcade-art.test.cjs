@@ -89,3 +89,20 @@ test('appearance sanitization preserves separate characters and supports hairsty
   assert.equal(h.ArcadeArt.getCharacter('second').rank.dan,10);
   assert.equal(h.ArcadeArt.isCustom('first'),true); assert.equal(h.ArcadeArt.isCustom('angelo'),false);
 });
+
+test('colored kyu stripes stay on a single belt end, including slanted tails', () => {
+  const source = fs.readFileSync(path.join(root, 'scripts/arcade-art.js'), 'utf8');
+  const fragment = source.slice(source.indexOf('  function rgb('), source.indexOf('  function restoreCollar('));
+  const context = vm.createContext({ clamp: (v,a,b) => Math.max(a,Math.min(b,v)) });
+  vm.runInContext(fragment, context);
+  for (const shift of [0, 1, -1]) {
+    const width=100,height=100,data=new Uint8ClampedArray(width*height*4);
+    function paint(x,y) {data.set([0,180,180,255],(y*width+x)*4);}
+    for(let y=10;y<20;y++)for(let x=10;x<80;x++)paint(x,y);
+    for(let y=20;y<80;y++)for(let dx=0;dx<9;dx++)for(const left of [25,58])paint(left+dx+Math.round((y-20)*shift*.12),y);
+    context.recolorBelt({getImageData:()=>({data}),putImageData(){}},width,height,{color:'#ee792b',stripe:'#2964c1',dan:0});
+    const sides=new Set();let accent=0;
+    for(let y=20;y<80;y++)for(let x=0;x<width;x++){const i=(y*width+x)*4;if(data[i+3]&&data[i+2]>data[i+1]&&data[i+1]>data[i]){accent++;sides.add(x<48?'left':'right');}}
+    assert.ok(accent>20, 'stripe remains visible');assert.equal(sides.size,1,'only one tail receives a stripe');
+  }
+});

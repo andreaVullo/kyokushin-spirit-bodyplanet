@@ -4,7 +4,7 @@ const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const ROOM_TTL = 30 * 60_000;
 const STALE_AFTER = 60_000;
 const MAX_BODY = 16_384;
-const ROSTER = new Set(['angelo', 'samuel', 'marco-tabacco-collage', 'gabriele-carbonaro', 'leonardo-cappellani', 'gabriele-randazzo', 'matteo-spata', 'oscar-gueli', 'andrea-barbagallo', 'andrea-vullo']);
+const ROSTER = new Set(['angelo', 'samuel', 'marco-tabacco-collage', 'gabriele-carbonaro', 'leonardo-cappellani', 'gabriele-randazzo', 'matteo-spata', 'oscar-gueli', 'andrea-barbagallo', 'andrea-vullo', 'emanuele-micalizzi', 'francesco-privitera-1']);
 const errors = {
   origin: 'Sito non autorizzato.', method: 'Operazione non disponibile.', 'not-configured': 'Servizio online non disponibile.',
   'content-type': 'Formato della richiesta non valido.', 'too-large': 'Richiesta troppo grande.', invalid: 'Dati della stanza non validi.',

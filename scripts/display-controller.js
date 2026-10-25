@@ -12,8 +12,10 @@
       this.fullscreen = () => this.fullscreenChanged();
       win.addEventListener('message', this.message);
       doc.addEventListener('fullscreenchange', this.fullscreen);
+      doc.addEventListener('webkitfullscreenchange', this.fullscreen);
       this.send('sync');
     }
+    nativeElement() { return this.doc.fullscreenElement || this.doc.webkitFullscreenElement; }
     send(action) {
       if (!this.hostOrigin || this.win.parent === this.win) return false;
       this.win.parent.postMessage({ type: 'kyokushin:display', action, requestId: this.serial }, this.hostOrigin);
@@ -33,32 +35,31 @@
           if (serial !== this.serial || !this.requested) return;
           this.hostPending = false; this.changed();
         }, 500);
-        this.changed();
-        return;
       }
       this.changed();
       if (!native) return;
       // The layout fallback is already active. Fullscreen only hides browser UI;
       // it never decides whether portrait is playable and never locks the device.
-      if (!this.element.requestFullscreen || this.doc.fullscreenElement) return;
+      const request = this.element.requestFullscreen || this.element.webkitRequestFullscreen;
+      if (!request || this.nativeElement()) return;
       this.nativePending = true;
       let result;
-      try { result = this.element.requestFullscreen(); }
+      try { result = request.call(this.element, { navigationUI: 'hide' }); }
       catch (_) { this.nativePending = false; this.changed(); return; }
       this.nativeTimer = this.win.setTimeout(() => {
         if (serial === this.serial) { this.nativePending = false; this.changed(); }
       }, 1500);
       Promise.resolve(result).catch(() => {}).then(() => {
         if (serial !== this.serial) {
-          if (!this.requested && this.doc.fullscreenElement === this.element) this.exitNative();
+          if (!this.requested && this.nativeElement() === this.element) this.exitNative();
           return;
         }
         this.win.clearTimeout(this.nativeTimer); this.nativePending = false; this.changed();
       });
     }
     exitNative() {
-      if (this.doc.fullscreenElement !== this.element) return;
-      try { Promise.resolve(this.doc.exitFullscreen?.()).catch(() => {}); } catch (_) {}
+      if (this.nativeElement() !== this.element) return;
+      try { Promise.resolve((this.doc.exitFullscreen || this.doc.webkitExitFullscreen)?.call(this.doc)).catch(() => {}); } catch (_) {}
     }
     close(notifyHost = true) {
       this.serial++; this.clearTimers();
@@ -71,10 +72,10 @@
     toggle() {
       // Automatic fitting must not turn the first fullscreen tap into an exit.
       if (this.layoutOnly) this.open();
-      else this.requested || this.doc.fullscreenElement === this.element ? this.close() : this.open();
+      else this.requested || this.nativeElement() === this.element ? this.close() : this.open();
     }
     fullscreenChanged() {
-      if (this.doc.fullscreenElement === this.element) {
+      if (this.nativeElement() === this.element) {
         this.nativeOwned = true; this.nativePending = false;
         if (!this.requested) { this.exitNative(); return; }
       } else if (this.nativeOwned) {
@@ -90,19 +91,20 @@
       if (!this.hostOrigin || event.origin !== this.hostOrigin || event.source !== this.win.parent ||
         event.data?.type !== 'kyokushin:display-state' || typeof event.data.landscapeRequested !== 'boolean') return;
       if (Number.isFinite(event.data.requestId) && event.data.requestId !== this.serial) return;
-      this.clearTimers(); this.hostPending = false; this.nativePending = false;
+      this.win.clearTimeout(this.hostTimer); this.hostPending = false;
       this.hostManaged = event.data.managed === true;
+      if (!this.requested && event.data.landscapeRequested) this.layoutOnly = true;
       this.requested = event.data.landscapeRequested;
-      if (this.hostManaged) {
-        // A late host acknowledgment transfers ownership without resetting play.
-        this.nativeOwned = false; this.exitNative();
-      }
+      if (!this.requested) this.exitNative();
+      // A host layout acknowledgment must not dismiss fullscreen granted from
+      // the original touch gesture inside the game. Native owns rotation then.
       this.changed();
     }
     destroy() {
       this.close();
       this.win.removeEventListener('message', this.message);
       this.doc.removeEventListener('fullscreenchange', this.fullscreen);
+      this.doc.removeEventListener('webkitfullscreenchange', this.fullscreen);
     }
   }
   global.DojoDisplay = DojoDisplay;

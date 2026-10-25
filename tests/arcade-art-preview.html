@@ -12,7 +12,7 @@
  await Promise.all([ArcadeArt.load(),ArcadeVFX.load()]);
  const poseSelect=document.getElementById('inspect-pose');for(let i=0;i<36;i++){const option=document.createElement('option');option.value=i;option.textContent=i;poseSelect.append(option);}poseSelect.value='23';
  const inspect=async()=>{const gender=document.getElementById('inspect-gender').value,pose=Number(poseSelect.value),m=ArcadeSpriteAtlas[gender][pose],image=new Image();await new Promise(resolve=>{image.onload=resolve;image.src='../assets/arcade/'+m.sheet+'.png'});const ctx=document.getElementById('inspect').getContext('2d');ctx.clearRect(0,0,1280,500);const [sx,sy,sw,sh]=m.region,scale=Math.min(580/sw,460/sh);ctx.drawImage(image,sx,sy,sw,sh,320-sw*scale/2,500-sh*scale,sw*scale,sh*scale);ArcadeArt.drawPreview(ctx,{gender,hair:3,rank:{color:'#17191f',dan:10}},640,0,640,500,{pose});};document.getElementById('inspect-gender').onchange=poseSelect.onchange=inspect;await inspect();
- const rank={color:'#17191f',dan:10};
+ const rank=new URLSearchParams(location.search).has('kyu')?{color:'#ee792b',stripe:'#2964c1',dan:0}:{color:'#17191f',dan:10};
  for(const gender of ['male','female']){
   const ctx=document.getElementById(gender+'-heads').getContext('2d');
   for(let hair=0;hair<5;hair++){ArcadeArt.drawPreview(ctx,{gender,hair,rank},hair*256,0,256,285);ctx.fillStyle='#fff';ctx.fillText(['Corti','Ciuffo','Ricci','Coda','Rasati'][hair],hair*256+105,302);}
