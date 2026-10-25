@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-25T08:47:47.044Z",
+  "updatedAt": "2026-10-25T18:47:25.250Z",
   "records": [
+    {
+      "version": 1,
+      "id": "029e07b5-4b55-40c6-ada1-e6e5bd906f9c",
+      "name": "SANTO BOSCO",
+      "gender": "male",
+      "hairstyle": 4,
+      "score": 42608,
+      "wins": 14,
+      "rankIndex": 14,
+      "rankId": "4-dan",
+      "rankLabel": "4 DAN",
+      "completed": false,
+      "reason": "defeat",
+      "matches": 15,
+      "elapsedSeconds": 284.936,
+      "createdAt": "2026-10-25T18:47:22.794Z"
+    },
     {
       "version": 1,
       "id": "193549c3-df23-4884-b855-c3bccfa296f7",
