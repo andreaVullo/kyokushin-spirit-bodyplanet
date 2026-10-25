@@ -2,6 +2,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const vm = require('node:vm');
+const fs = require('node:fs');
+const path = require('node:path');
 const { createLauncher, computeFrameLayout, measureViewport, trusted, install } = require('../scripts/flazio-launcher.js');
 
 class Events {
@@ -59,6 +61,15 @@ function environment(width = 390, height = 844) {
   return { win, doc, meta, pending, launcher: createLauncher(win, { gameUrl: '../Gioca.html' }),
     resize(w, h) { win.innerWidth = doc.documentElement.clientWidth = win.visualViewport.width = w; win.innerHeight = doc.documentElement.clientHeight = win.visualViewport.height = h; } };
 }
+
+test('both pasteable Flazio fragments contain the exact current launcher', () => {
+  const read = name => fs.readFileSync(path.join(__dirname, '..', name), 'utf8');
+  const launcher = read('scripts/flazio-launcher.js').trim();
+  const script = read('iframe-flazio.html');
+  assert.equal(script.slice(script.indexOf('\n') + 1).trim(), launcher);
+  const html = read('iframe-flazio-html.html');
+  assert.equal(html.slice(html.indexOf('<script>\n') + '<script>\n'.length, html.lastIndexOf('</script>')).trim(), launcher);
+});
 
 test('all phone shapes fit landscape in portrait even with hardware rotation locked', () => {
   for (const [width, height] of [[320,568],[360,640],[375,667],[390,844],[412,915],[430,932],[768,1024],[820,1180]]) {
@@ -135,6 +146,41 @@ test('closing exactly restores adaptive styles, viewport metadata, scroll and li
   assert.equal(doc.body.style.getPropertyPriority('transform'), 'important'); assert.equal(meta.getAttribute('content'), 'width=1200');
   assert.equal(win.scrollY, 420); assert.equal(win.scrollX, 31); assert.equal(count(), 0); assert.equal(pending.size, 0);
   assert.equal(frame.isConnected, false); assert.equal(win.observer.disconnected, true);
+});
+test('only the open modal suppresses text selection, image dragging and long-press menus', () => {
+  const { launcher, doc } = environment(); launcher.open();
+  const dialog = launcher.getState().frame.parentNode.parentNode;
+  const style = doc.head.querySelector('style').textContent;
+  assert.match(style, /#kyokushin-host-v6\[open\],#kyokushin-host-v6\[open\] \*\{[^}]*user-select:none!important/);
+  assert.match(style, /-webkit-touch-callout:none!important/);
+  assert.match(style, /-webkit-user-drag:none!important/);
+  for (const type of ['selectstart', 'dragstart', 'contextmenu']) {
+    let prevented = 0;
+    const event = { cancelable: true, preventDefault() { prevented++; } };
+    doc.dispatch(type, event);
+    assert.equal(prevented, 0, type + ' remains available elsewhere on the site');
+    dialog.dispatch(type, event);
+    assert.equal(prevented, 1, type + ' is suppressed inside the active modal');
+    dialog.dispatch(type, { ...event, cancelable: false });
+    assert.equal(prevented, 1, 'non-cancelable events are left alone');
+  }
+  let preventedPresses = 0;
+  for (const type of ['pointerdown', 'touchstart', 'mousedown', 'click']) {
+    dialog.dispatch(type, { cancelable: true, preventDefault() { preventedPresses++; } });
+  }
+  assert.equal(preventedPresses, 0, 'presses and clicks are not canceled');
+  const viewButton = doc.documentElement.querySelectorAll('button').find(button => button.textContent === 'Vista automatica');
+  viewButton.dispatch('click');
+  assert.equal(launcher.getState().landscapeRequested, false, 'toolbar activation still works');
+  launcher.close();
+  for (const type of ['selectstart', 'dragstart', 'contextmenu']) {
+    assert.equal(dialog.listeners.get(type).size, 0, 'closed modal removes ' + type + ' listener');
+  }
+  launcher.open();
+  for (const type of ['selectstart', 'dragstart', 'contextmenu']) {
+    assert.equal(dialog.listeners.get(type).size, 1, 'reopening installs one ' + type + ' listener');
+  }
+  launcher.close();
 });
 test('late native fullscreen cannot reopen an exited or closed session', async () => {
   const { launcher, win, doc } = environment(); let resolve;

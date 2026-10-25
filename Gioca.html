@@ -209,6 +209,9 @@ body:is(.front-title,.front-select,.front-versus,.front-create,.front-online) .a
 @media(max-width:650px){.motion-guide canvas{height:145px}.motion-guide .motion-caption{font-size:5px;letter-spacing:.7px}.title-instruction{letter-spacing:.8px}}
 
 /* Touch console: the arena owns its controls, including in fullscreen/iframe. */
+#game-shell,#game-shell *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#game-shell :is(input,textarea):not([readonly]):not([disabled]),#game-shell [contenteditable="true"],#game-shell [contenteditable="true"] *{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+#game-shell :is(img,svg,canvas){-webkit-user-drag:none}
 #game{touch-action:none}
 .selection-panel{touch-action:pan-y}
 .front-screen button{touch-action:manipulation}
@@ -2056,6 +2059,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <script src="scripts/online-game.js?v=20261025-12"></script>
 <script src="scripts/online-ui.js?v=20261025-12"></script>
 <script src="scripts/online-session.js?v=20261025-12"></script>
+<script src="scripts/game-interaction.js?v=20261025-13"></script>
 <script src="scripts/main.js?v=20261025-12"></script>
 </body>
 </html>
