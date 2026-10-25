@@ -1,5 +1,23 @@
 {
   "version": 1,
-  "updatedAt": null,
-  "records": []
+  "updatedAt": "2026-10-25T07:11:31.290Z",
+  "records": [
+    {
+      "version": 1,
+      "id": "193549c3-df23-4884-b855-c3bccfa296f7",
+      "name": "Martina",
+      "gender": "female",
+      "hairstyle": 3,
+      "score": 2453,
+      "wins": 1,
+      "rankIndex": 1,
+      "rankId": "10-kyu",
+      "rankLabel": "10 KYU",
+      "completed": false,
+      "reason": "defeat",
+      "matches": 2,
+      "elapsedSeconds": 32.128,
+      "createdAt": "2026-10-25T07:11:20.938Z"
+    }
+  ]
 }
