@@ -46,6 +46,8 @@ node --test tests/*.test.cjs
 
 La pagina `tests/render-preview.html`, con server locale, carica tutti i 45 fogli e mostra 162 pose nelle due direzioni per il controllo visivo. `assets/karateka/checksums.json` documenta l’impronta SHA-256 dei PNG sorgenti. Per misurare nuovamente i PNG, usa `python3 tools/measure-karateka.py CARTELLA_SPRITE coordinate.json` (richiede Pillow e NumPy); poi `python3 tools/import-karateka.py CARTELLA_SPRITE coordinate.json` rigenera gli involucri senza alterare le immagini. Per aggiungere soltanto un personaggio senza riscrivere gli altri, usa `--merge`.
 
+La pagina `tests/name-entry-layout.html` verifica tastiera e creatore con le regole touch reali in sette iframe, da 568×240 a 390×844 con rotazione virtuale: righe visibili, assenza di sovrapposizioni, pulsanti raggiungibili e conferma del nome.
+
 ## Comandi
 
 ### Telefono e tablet
@@ -116,7 +118,7 @@ Nelle sfide vince chi conquista **due round**. Ogni round dura **60 secondi real
 
 Il creatore permette di scegliere **uomo o donna**, **cinque capigliature per ciascuno** e un nome da 2 a 24 caratteri. Sono ammessi lettere, numeri, spazi, punti, apostrofi e trattini. La scelta estetica non cambia danni o regole del combattimento. L’anteprima parte dalla cintura bianca; la cintura del personaggio cambia con le promozioni.
 
-Su telefono il nome si inserisce con la **tastiera grafica del gioco**, senza aprire la tastiera del sistema: lettere accentate, numeri, spazio, maiuscole/minuscole, cursore e cancellazione. **Conferma nome** riporta al creatore ed evidenzia **Entra nel tatami**; **Annulla** conserva il nome precedente. Il pannello resta verticale e leggibile anche quando il gioco ruota con il blocco rotazione attivo. Sul computer si può continuare a usare la tastiera fisica o aprire quella grafica.
+Su telefono il nome si inserisce con la **tastiera grafica del gioco**, senza aprire la tastiera del sistema: lettere, spazio, maiuscole/minuscole, cursore e cancellazione; **123 / ÀÈ** apre numeri e accenti e **ABC** torna alle lettere. La conferma occupa una riga separata e non copre mai i tasti. Negli iframe bassi il nome compare accanto al titolo. Le opzioni del creatore scorrono in una propria area, con **Entra nel tatami** sempre disponibile in basso. **Conferma nome** riporta al creatore ed evidenzia **Entra nel tatami**; **Annulla** conserva il nome precedente. Il pannello resta verticale e leggibile anche quando il gioco ruota con il blocco rotazione attivo. Sul computer si può continuare a usare la tastiera fisica o aprire quella grafica.
 
 La partenza è **bianca, senza grado (mukyu)**, prima del 10 Kyu. Questo ordine segue le indicazioni introduttive del [Kyokushinkaikan Honbu Daikanyama Dojo](https://branch.kyokushinkaikan.org/daikanyamadojo/english-information).
 

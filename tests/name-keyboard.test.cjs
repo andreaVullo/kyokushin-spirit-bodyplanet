@@ -55,3 +55,10 @@ test('on-screen case, accents, spaces, cursor and deletion compose a valid real 
   ui.press('X'); ui.press('backspace'); ui.press('confirm');
   assert.deepEqual(writes, ['Andrea Barbagallo']);
 });
+test('switching to numbers and accents preserves the name, cursor and case', () => {
+  const { ui } = fixture('SARO'); ui.press('left'); ui.press('shift');
+  ui.press('page'); assert.equal(ui.symbols, true);
+  assert.equal(ui.draft.value, 'SARO'); assert.equal(ui.draft.caret, 3); assert.equal(ui.upper, false);
+  ui.press('È'); assert.equal(ui.draft.value, 'SARèO');
+  ui.press('page'); assert.equal(ui.symbols, false); assert.equal(ui.draft.caret, 4);
+});

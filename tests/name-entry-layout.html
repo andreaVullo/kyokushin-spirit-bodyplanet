@@ -1,0 +1,53 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><title>Verifica tastiera e creatore mobile</title>
+<style>body{font:15px system-ui;background:#eee9dd;color:#162435;margin:20px}iframe{border:1px solid #888;margin:10px;display:block}pre{white-space:pre-wrap}</style>
+<h1>Tastiera e creatore negli iframe mobile</h1><pre id="status">Verifica…</pre><div id="fixtures"></div>
+<script>
+(async()=>{
+ const html=await fetch('../Gioca.html').then(r=>r.text()), parsed=new DOMParser().parseFromString(html,'text/html');
+ const styles=[...parsed.querySelectorAll('style,link[rel=stylesheet]')].map(e=>e.outerHTML).join('');
+ const cases=[{w:710,h:266},{w:568,h:240},{w:568,h:320},{w:844,h:280},{w:320,h:568},{w:390,h:844,virtual:true},{w:280,h:653,virtual:true}];
+ const reports=[];
+ for(const c of cases){
+  const frame=document.createElement('iframe');frame.width=c.w;frame.height=c.h;frame.title=`${c.w}×${c.h}${c.virtual?' · rotazione bloccata':''}`;document.querySelector('#fixtures').append(frame);
+  const lw=c.virtual?c.h:c.w,lh=c.virtual?c.w:c.h,land=lw>lh;
+  const classes=['front-create','embedded','touch-active','force-touch',land?'landscape-layout':'',lh<=330?'landscape-tiny':'',lh<=380&&land?'landscape-short':'',c.virtual?'virtual-landscape landscape-requested':''].join(' ');
+  const variables=`--view-width:${c.w}px;--view-height:${c.h}px;--layout-width:${lw}px;--layout-height:${lh}px;--view-left:0px;--view-top:0px;`;
+  const load=new Promise(resolve=>frame.addEventListener('load',resolve,{once:true}));
+  frame.srcdoc=`<!doctype html><html style="${variables}"><head><base href="${new URL('../',location.href)}"><meta name="viewport" content="width=device-width,initial-scale=1">${styles}</head><body class="${classes}"><main id="game-shell"><section id="arcade" class="arcade expanded"><header class="arena-topline">BODYPLANET</header><div id="viewport" class="viewport"><div id="versus-screen" hidden></div></div></section><div hidden><button id="title-start-button"></button><p id="result-text"></p><button id="result-menu-button"></button><button id="rematch-button"></button></div></main><script src="scripts/arcade.js"><\/script><script src="scripts/name-keyboard.js?v=20261025-7"><\/script><script src="scripts/arcade-ui.js?v=20261025-7"><\/script><script>window.fixtureUI=new ArcadeUI({onCreate(){},onBack(){},onLeaderboard(){}});const creator=document.querySelector('#arcade-create');creator.hidden=false;creator.inert=false;creator.classList.remove('hidden');fixtureUI.setLoading('ready');fixtureUI.nameKeyboard.setTouch(true);<\/script></body></html>`;
+  await load;await new Promise(r=>frame.contentWindow.requestAnimationFrame(()=>frame.contentWindow.requestAnimationFrame(r)));
+  const d=frame.contentDocument,ui=frame.contentWindow.fixtureUI,errors=[],expect=(ok,msg)=>{if(!ok)errors.push(msg)};
+  const creator=d.querySelector('#arcade-create'),heading=d.querySelector('.creator-heading'),form=d.querySelector('.creator-form');
+  if(land)expect(form.offsetTop>=heading.offsetTop+heading.offsetHeight-1,'titolo sovrapposto al modulo');
+  expect(form.scrollHeight>=form.clientHeight,'area modulo non valida');
+  ui.nameKeyboard.open();ui.nameKeyboard.write('SARO');
+  await new Promise(r=>frame.contentWindow.requestAnimationFrame(r));
+  const rect=e=>e.getBoundingClientRect(),dialog=d.querySelector('#name-keyboard');
+  function checkKeys(label){
+   const footer=rect(dialog.querySelector('footer')),editing=rect(dialog.querySelector('.name-editing')),keys=rect(dialog.querySelector('.name-keys')),box=rect(dialog);
+   expect(footer.top>=editing.bottom-1,label+': conferma sopra i comandi');
+   expect(editing.top>=keys.bottom-1,label+': comandi sopra le lettere');
+   expect(footer.bottom<=box.bottom-1&&box.bottom<=c.h+1,label+': conferma fuori schermo');
+   expect(keys.height>=28,label+': area lettere troppo bassa');
+   if(c.w>=480&&c.h>=240)expect(dialog.querySelector('.name-keys').scrollHeight<=dialog.querySelector('.name-keys').clientHeight+2,label+': righe nascoste nello schermo orizzontale');
+   const area=dialog.querySelector('.name-keys');area.scrollTop=area.scrollHeight;
+   const last=rect(dialog.querySelector(`[data-page="${ui.nameKeyboard.symbols?'symbols':'letters'}"] .name-key-row:last-child`));
+   expect(last.bottom<=keys.bottom+1,label+': ultima riga non raggiungibile');
+   area.scrollTop=0;
+  }
+  checkKeys('lettere');ui.nameKeyboard.press('page');checkKeys('numeri e accenti');ui.nameKeyboard.press('page');
+  ui.nameKeyboard.press('confirm');await new Promise(r=>setTimeout(r,30));
+  expect(d.querySelector('#arcade-name').value==='SARO','nome non confermato');
+  const submit=d.querySelector('#arcade-create-submit'),options=d.querySelector('.creator-options');
+  expect(submit.offsetTop>=options.offsetTop+options.clientHeight-1,'pulsante sopra le opzioni');
+  options.scrollTop=options.scrollHeight;
+  const hair=options.querySelector('.creator-rules');
+  expect(hair.offsetTop+hair.offsetHeight<=options.offsetTop+options.scrollTop+options.clientHeight+2,'ultime opzioni non raggiungibili');
+  expect(submit.offsetTop+submit.offsetHeight<=form.offsetTop+form.scrollTop+form.clientHeight+2||!land,'conferma non rende raggiungibile Entra nel tatami');
+  expect(d.querySelector('#arcade-name').readOnly&&d.querySelector('#arcade-name').inputMode==='none','tastiera OS non esclusa');
+  ui.nameKeyboard.open();
+  reports.push({case:frame.title,pass:!errors.length,errors});
+  document.querySelector('#status').textContent=JSON.stringify(reports,null,2);
+ }
+ document.querySelector('#status').dataset.result=reports.every(r=>r.pass)?'PASS':'FAIL';
+})().catch(e=>{document.querySelector('#status').textContent=e.stack;document.querySelector('#status').dataset.result='ERROR';});
+</script></html>

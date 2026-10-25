@@ -37,19 +37,23 @@
       host.append(dialog);
       const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM', 'ÀÈÉÌÒÙ'];
       const keys = dialog.querySelector('.name-keys');
+      const alphabet = document.createElement('div'), symbols = document.createElement('div');
+      alphabet.className = symbols.className = 'name-key-page';
+      alphabet.dataset.page = 'letters'; symbols.dataset.page = 'symbols';
+      keys.append(alphabet, symbols);
       for (const row of rows) {
         const line = document.createElement('div'); line.className = 'name-key-row';
         for (const char of row) line.append(this.button(char, char, true));
         if (row === 'ZXCVBNM') line.prepend(this.button('shift', '⇧', false, 'Maiuscole o minuscole'));
         if (row === 'ÀÈÉÌÒÙ') for (const char of ["'", '-', '.']) line.append(this.button(char, char));
-        keys.append(line);
+        (row === 'ÀÈÉÌÒÙ' ? symbols : alphabet).append(line);
       }
       const numbers = document.createElement('div'); numbers.className = 'name-key-row name-numbers';
       for (const char of '1234567890') numbers.append(this.button(char, char));
-      keys.append(numbers);
+      symbols.prepend(numbers);
       const editing = document.createElement('div'); editing.className = 'name-key-row name-editing';
-      for (const [key, label, accessible] of [['left', '←', 'Sposta cursore a sinistra'], ['space', 'SPAZIO', 'Spazio'], ['right', '→', 'Sposta cursore a destra'], ['backspace', '⌫', 'Cancella lettera']]) editing.append(this.button(key, label, false, accessible));
-      keys.append(editing);
+      for (const [key, label, accessible] of [['page', '123 / ÀÈ', 'Numeri e accenti'], ['left', '←', 'Sposta cursore a sinistra'], ['space', 'SPAZIO', 'Spazio'], ['right', '→', 'Sposta cursore a destra'], ['backspace', '⌫', 'Cancella lettera']]) editing.append(this.button(key, label, false, accessible));
+      keys.after(editing);
       dialog.addEventListener('click', event => {
         const button = event.target.closest('button');
         if (button?.dataset.key) this.press(button.dataset.key);
@@ -66,7 +70,7 @@
       });
       dialog.addEventListener('close', () => {
         const target = this.confirmed ? next : trigger;
-        if (target && !target.disabled && !target.closest('[hidden],[inert]')) target.focus({ preventScroll: true });
+        if (target && !target.disabled && !target.closest('[hidden],[inert]')) target.focus({ preventScroll: !this.confirmed });
       });
     }
     setTouch(touch) {
@@ -81,7 +85,7 @@
     }
     open() {
       if (this.input.disabled || this.dialog.open) return;
-      this.input.blur(); this.draft = new NameDraft(this.input.value); this.upper = true; this.confirmed = false;
+      this.input.blur(); this.draft = new NameDraft(this.input.value); this.upper = true; this.symbols = false; this.confirmed = false;
       this.dialog.querySelector('.name-error').textContent = '';
       this.render(); this.dialog.showModal(); this.dialog.querySelector('[data-key="Q"]').focus({ preventScroll: true });
     }
@@ -100,6 +104,7 @@
       }
       this.dialog.querySelector('.name-error').textContent = '';
       if (key === 'shift') this.upper = !this.upper;
+      else if (key === 'page') this.symbols = !this.symbols;
       else if (key === 'left' || key === 'right') this.draft.move(key === 'left' ? -1 : 1);
       else if (key === 'home') this.draft.caret = 0;
       else if (key === 'end') this.draft.caret = this.draft.chars.length;
@@ -114,6 +119,11 @@
       this.dialog.querySelector('.name-count').textContent = this.draft.chars.length + ' / 24';
       this.dialog.querySelectorAll('[data-letter]').forEach(button => { button.textContent = this.upper ? button.dataset.letter : button.dataset.letter.toLocaleLowerCase('it'); });
       this.dialog.querySelector('[data-key="shift"]').setAttribute('aria-pressed', String(this.upper));
+      this.dialog.querySelector('[data-page="letters"]').hidden = !!this.symbols;
+      this.dialog.querySelector('[data-page="symbols"]').hidden = !this.symbols;
+      const page = this.dialog.querySelector('[data-key="page"]');
+      page.textContent = this.symbols ? 'ABC' : '123 / ÀÈ';
+      page.setAttribute('aria-label', this.symbols ? 'Torna alle lettere' : 'Numeri e accenti');
     }
   }
   global.DojoNameKeyboard = NameKeyboard;

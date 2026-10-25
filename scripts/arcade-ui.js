@@ -20,12 +20,15 @@
         <header class="creator-heading"><button id="arcade-back" type="button" class="arcade-back" aria-label="Torna al titolo">← <span>TITOLO</span></button><div><small>ARCADE / UNA SOLA SCALATA</small><h2>IL TUO SPIRITO. IL TUO NOME.</h2></div><b aria-hidden="true">極真</b></header>
         <div class="creator-poster"><canvas id="arcade-preview" width="480" height="480" aria-label="Anteprima del karateka"></canvas><div class="creator-identity"><span>CINTURA BIANCA</span><strong id="arcade-preview-name">IL TUO KARATEKA</strong><small>IL PRIMO PASSO VERSO IL 10º DAN</small></div><p id="arcade-art-status" role="status">Preparo il tuo karateka…</p></div>
         <form id="arcade-form" class="creator-form" novalidate>
+          <div class="creator-options" tabindex="0" aria-label="Opzioni del karateka: scorri per vedere tutte le scelte">
           <label class="creator-field">01 / IL TUO NOME<input id="arcade-name" name="name" autocomplete="off" spellcheck="false" maxlength="48" placeholder="Come ti chiami?" aria-describedby="arcade-name-help arcade-create-error"><small id="arcade-name-help">Da 2 a 24 caratteri. Il nome accompagnerà il risultato in classifica.</small></label>
           <fieldset><legend>02 / IL TUO KARATEKA</legend><div class="creator-genders"><button type="button" data-arcade-gender="male" aria-pressed="true">UOMO</button><button type="button" data-arcade-gender="female" aria-pressed="false">DONNA</button></div></fieldset>
           <fieldset><legend>03 / CAPIGLIATURA</legend><div id="arcade-hair-options" class="creator-hair"></div></fieldset>
           <div class="creator-journey"><span>BIANCA</span><div id="arcade-rank-trail" aria-label="Progressione delle cinture"></div><strong>10º DAN</strong></div>
           <p class="creator-rules">20 sfide. Una promozione per vittoria. Una sconfitta termina la scalata. <strong>Nome e risultato finale vengono salvati automaticamente nella classifica pubblica.</strong> Nessun account richiesto. La partita non può essere ripresa.</p>
           <p id="arcade-create-error" class="arcade-message" role="alert"></p>
+          </div>
+          <small class="creator-scroll-hint">Scorri le opzioni per scegliere il karateka e i capelli ↕</small>
           <button id="arcade-create-submit" type="submit" class="start-button" disabled>PREPARO IL KARATEKA…</button>
         </form>`;
       $('versus-screen').before(creator);
