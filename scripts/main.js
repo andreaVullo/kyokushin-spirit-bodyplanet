@@ -150,6 +150,10 @@
     lastLayoutGeometry=geometry;
     document.body.classList.toggle('landscape-layout',layout.logicalWidth>layout.logicalHeight&&(layout.logicalHeight<=650||(touchPreference??touchDetected)||display.requested));
     document.body.classList.toggle('landscape-tiny',layout.logicalHeight<=330);
+    document.body.classList.toggle('landscape-narrow',layout.logicalWidth<=480);
+    document.body.classList.toggle('landscape-flat',layout.logicalHeight<=260);
+    document.body.classList.toggle('keyboard-compact',layout.width>=480&&layout.height<=500);
+    document.body.classList.toggle('keyboard-flat',layout.width>=480&&layout.height<=320);
     document.body.classList.toggle('landscape-short',layout.logicalWidth>layout.logicalHeight&&layout.logicalHeight<=380);
     document.body.dataset.orientationMode=layout.blocked?'portrait':layout.virtual?'virtual':display.hostManaged?'host':'native';
     return layout;

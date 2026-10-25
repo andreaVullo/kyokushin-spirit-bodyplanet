@@ -2,22 +2,27 @@
 <style>body{margin:16px;font:14px system-ui;background:#e9edf0;color:#182a38}h1{font-size:24px}iframe{display:block;border:1px solid #6e7c84;margin:10px 0 22px;max-width:none}#fixtures{display:flex;flex-wrap:wrap;align-items:flex-start;gap:24px}h2{font-size:14px}#report{white-space:pre-wrap}button{padding:10px 16px}</style>
 <h1>Inviti · browser delle app e ridimensionamenti</h1><button id="run">VERIFICA INVITI</button><p id="summary" role="status">Pronto.</p><details><summary>Risultati</summary><pre id="report"></pre></details><div id="fixtures"></div>
 <script>
-const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms)),cases=[{w:390,h:500},{w:320,h:420},{w:568,h:240}],reports=[];
+const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms)),cases=[{w:390,h:500},{w:320,h:420},{w:568,h:240},{w:390,h:700,visible:{w:390,h:420}},{w:700,h:390,visible:{w:700,h:240}}],reports=[];
 const root=document.querySelector('#fixtures'),report=document.querySelector('#report'),summary=document.querySelector('#summary');
 const tick=win=>new Promise(resolve=>win.requestAnimationFrame(()=>win.requestAnimationFrame(resolve)));
 const rect=element=>element.getBoundingClientRect();
 const contained=(inner,outer)=>inner.left>=outer.left-2&&inner.right<=outer.right+2&&inner.top>=outer.top-2&&inner.bottom<=outer.bottom+2;
 function publish(name,errors,metrics){reports.push({case:name,pass:!errors.length,errors,...(errors.length?{metrics}:{})});report.textContent=JSON.stringify(reports,null,2);summary.textContent=reports.filter(item=>item.pass).length+'/'+reports.length+' verifiche superate';}
 async function inspect(frame,c,label){
- const win=frame.contentWindow,d=frame.contentDocument,errors=[],expect=(condition,message)=>{if(!condition)errors.push(message);};
+ const win=frame.contentWindow,d=frame.contentDocument,visible=c.visible||c,errors=[],expect=(condition,message)=>{if(!condition)errors.push(message);};
  await tick(win);const panel=d.querySelector('#online-lobby'),viewport=d.querySelector('#viewport'),area=d.querySelector('.online-scroll'),footer=d.querySelector('.online-footer'),cabinet=d.querySelector('#arcade');
  expect(win.dojo?.ready,'gioco non pronto');expect(d.body.dataset.screen==='online'&&!panel.hidden&&!panel.inert,'invito non apre automaticamente Online');
  expect(d.querySelector('#online-code').value==='ABC234','codice stanza perso');
  expect(!d.body.classList.contains('orientation-blocked'),'orientamento bloccato sopra la lobby');
- expect(d.body.classList.contains('virtual-landscape')===(c.h>c.w),'rotazione virtuale non coerente con lo spazio disponibile');
- const bounds={left:0,top:0,right:c.w,bottom:c.h},cabinetBox=rect(cabinet);
+ expect(d.body.classList.contains('virtual-landscape')===(visible.h>visible.w),'rotazione virtuale non coerente con lo spazio disponibile');
+ const bounds={left:0,top:0,right:visible.w,bottom:visible.h},cabinetBox=rect(cabinet);
  expect(contained(cabinetBox,bounds),'il gioco esce dalla finestra dell’app');
- expect(Math.abs(cabinetBox.width-c.w)<=2&&Math.abs(cabinetBox.height-c.h)<=2,'il gioco non riempie lo spazio dell’app');
+ expect(Math.abs(cabinetBox.width-visible.w)<=2&&Math.abs(cabinetBox.height-visible.h)<=2,'il gioco non riempie lo spazio visibile dell’app');
+ if(c.visible){
+  expect(d.body.classList.contains('landscape-narrow')===(Math.max(visible.w,visible.h)<=480),'colonne non adattate allo spazio realmente visibile');
+  expect(d.body.classList.contains('landscape-flat')===(Math.min(visible.w,visible.h)<=260),'altezza ritratto non adattata allo spazio realmente visibile');
+  if(Math.max(visible.w,visible.h)<=480)expect(win.getComputedStyle(area).gridTemplateColumns.trim().split(/\s+/).length===1,'le barre della chat lasciano due colonne troppo strette');
+ }
  expect(panel.offsetWidth<=viewport.clientWidth+1&&panel.offsetHeight<=viewport.clientHeight+1,'lobby fuori dal viewport');
  expect(area.scrollWidth<=area.clientWidth+1,'opzioni tagliate orizzontalmente: '+area.scrollWidth+'>'+area.clientWidth);
  expect(d.documentElement.scrollWidth<=c.w+1,'pagina con scorrimento orizzontale');
@@ -44,11 +49,20 @@ document.querySelector('#run').onclick=async()=>{
  document.querySelector('#run').disabled=true;reports.length=0;root.replaceChildren();summary.textContent='Verifica in corso…';
  try{
   for(const c of cases){
-   const section=document.createElement('section'),heading=document.createElement('h2'),frame=document.createElement('iframe');heading.textContent='App '+c.w+'×'+c.h;frame.width=c.w;frame.height=c.h;frame.title=heading.textContent;section.append(heading,frame);root.append(section);
+   const section=document.createElement('section'),heading=document.createElement('h2'),frame=document.createElement('iframe');heading.textContent='App '+c.w+'×'+c.h+(c.visible?' · visibile '+c.visible.w+'×'+c.visible.h:'');frame.width=c.w;frame.height=c.h;frame.title=heading.textContent;section.append(heading,frame);root.append(section);
    const loaded=new Promise(resolve=>frame.addEventListener('load',resolve,{once:true}));frame.src='../Gioca.html?online=1&fromInvite=1&room=ABC234&standalone=1&touch=1';await Promise.race([loaded,delay(1000)]);
    const deadline=Date.now()+30000;while(!frame.contentWindow.dojo?.ready&&Date.now()<deadline)await delay(80);
+   if(c.visible){
+    // Simulate chat controls reducing only the visual viewport after the page
+    // has opened; keep the same real controller, document and invitation URL.
+    const win=frame.contentWindow,identity=win.dojo,viewport=new win.EventTarget();
+    Object.assign(viewport,{width:c.visible.w,height:c.visible.h,offsetLeft:0,offsetTop:0,pageLeft:0,pageTop:0,scale:1});
+    Object.defineProperty(win,'visualViewport',{configurable:true,value:viewport});
+    win.dispatchEvent(new win.Event('resize'));viewport.dispatchEvent(new win.Event('resize'));await delay(250);
+    if(win.dojo!==identity)throw new Error('La riduzione della finestra visibile ha ricaricato il gioco');
+   }
    await delay(200);await inspect(frame,c,heading.textContent);
-   if(c.w===390){
+   if(c.w===390&&!c.visible){
     const identity=frame.contentWindow.dojo;
     for(const size of [{w:390,h:700},{w:700,h:300},{w:320,h:420}]){
      frame.width=size.w;frame.height=size.h;await delay(250);await inspect(frame,size,'Stesso invito → '+size.w+'×'+size.h);

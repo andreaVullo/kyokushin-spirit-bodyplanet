@@ -41,6 +41,12 @@ body.virtual-landscape #touch-controls {
   padding-left:max(12px,var(--safe-left));padding-right:max(12px,var(--safe-right));padding-bottom:max(9px,var(--safe-bottom));
 }
 /* Native modal dialogs remain upright and readable above a rotated cabinet. */
+#game-shell>dialog {
+  left:var(--view-left,0px);top:var(--view-top,0px);
+  right:calc(100vw - var(--view-left,0px) - var(--view-width,100vw));
+  bottom:calc(100dvh - var(--view-top,0px) - var(--view-height,100dvh));
+  max-width:calc(var(--view-width,100vw) - 24px);max-height:calc(var(--view-height,100dvh) - 24px);
+}
 body.virtual-landscape #game-shell>dialog {transform:none;width:calc(var(--view-width) - 24px);max-height:calc(var(--view-height) - 24px)}
 body.landscape-tiny.landscape-layout #selection-panel.expanded-roster {
   grid-template-columns:minmax(0,1fr);grid-template-rows:26px auto auto;gap:5px;padding:5px 12px;

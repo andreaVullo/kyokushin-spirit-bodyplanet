@@ -30,12 +30,9 @@ body.landscape-short .online-heading h2{font-size:18px}body.landscape-short .onl
 @media(prefers-reduced-motion:reduce){.online-lobby *{scroll-behavior:auto}}
 /* A messaging app can leave a logical landscape width below 480px, including
    a portrait window rotated by the game. Keep controls readable in one column. */
-@media(max-width:480px) and (orientation:landscape),(max-height:480px) and (orientation:portrait){
- body.landscape-layout .online-scroll{grid-template-columns:minmax(0,1fr);gap:12px}
- body.landscape-layout .online-fighters{grid-template-columns:repeat(5,minmax(0,1fr))}
- body.landscape-layout .online-room-heading{align-items:flex-start}
- body.landscape-layout .online-room-heading>div:last-child{flex-direction:column;gap:5px}
-}
-@media(max-height:260px) and (orientation:landscape),(max-width:260px) and (orientation:portrait){
- body.landscape-layout .online-preview{height:80px}
-}
+/* Match visualViewport, which may be shorter than CSS media-query dimensions. */
+body.landscape-layout.landscape-narrow .online-scroll{grid-template-columns:minmax(0,1fr);gap:12px}
+body.landscape-layout.landscape-narrow .online-fighters{grid-template-columns:repeat(5,minmax(0,1fr))}
+body.landscape-layout.landscape-narrow .online-room-heading{align-items:flex-start}
+body.landscape-layout.landscape-narrow .online-room-heading>div:last-child{flex-direction:column;gap:5px}
+body.landscape-layout.landscape-flat .online-preview{height:80px}
