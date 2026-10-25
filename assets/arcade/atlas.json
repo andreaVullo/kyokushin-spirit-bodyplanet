@@ -1,0 +1,2361 @@
+{
+  "male": [
+    {
+      "sheet": "male-body",
+      "bounds": [
+        24,
+        16,
+        187,
+        222
+      ],
+      "component": 2,
+      "region": [
+        22,
+        14,
+        191,
+        226
+      ],
+      "anchor": [
+        134.4,
+        237
+      ],
+      "head": [
+        122,
+        65,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        227,
+        16,
+        175,
+        223
+      ],
+      "component": 3,
+      "region": [
+        225,
+        14,
+        179,
+        227
+      ],
+      "anchor": [
+        342.5,
+        238
+      ],
+      "head": [
+        330,
+        66,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        457,
+        16,
+        166,
+        222
+      ],
+      "component": 4,
+      "region": [
+        455,
+        14,
+        170,
+        226
+      ],
+      "anchor": [
+        547.5,
+        237
+      ],
+      "head": [
+        544,
+        65,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        640,
+        44,
+        210,
+        195
+      ],
+      "component": 6,
+      "region": [
+        638,
+        42,
+        214,
+        199
+      ],
+      "anchor": [
+        657.3,
+        238
+      ],
+      "head": [
+        805,
+        94,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        887,
+        4,
+        153,
+        182
+      ],
+      "component": 1,
+      "region": [
+        885,
+        2,
+        157,
+        186
+      ],
+      "anchor": [
+        963.5,
+        185
+      ],
+      "head": [
+        985,
+        53,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        1077,
+        32,
+        169,
+        184
+      ],
+      "component": 5,
+      "region": [
+        1075,
+        30,
+        173,
+        188
+      ],
+      "anchor": [
+        1161.5,
+        215
+      ],
+      "head": [
+        1171,
+        80,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        7,
+        250,
+        186,
+        217
+      ],
+      "component": 8,
+      "region": [
+        5,
+        248,
+        190,
+        221
+      ],
+      "anchor": [
+        109.9,
+        466
+      ],
+      "head": [
+        110,
+        300,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        213,
+        254,
+        236,
+        215
+      ],
+      "component": 10,
+      "region": [
+        211,
+        252,
+        240,
+        219
+      ],
+      "anchor": [
+        344.8,
+        468
+      ],
+      "head": [
+        330,
+        303,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        434,
+        253,
+        188,
+        216
+      ],
+      "component": 9,
+      "region": [
+        432,
+        251,
+        192,
+        220
+      ],
+      "anchor": [
+        499,
+        468
+      ],
+      "head": [
+        572,
+        304,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        629,
+        248,
+        247,
+        221
+      ],
+      "component": 7,
+      "region": [
+        627,
+        246,
+        251,
+        225
+      ],
+      "anchor": [
+        747.6,
+        468
+      ],
+      "head": [
+        755,
+        300,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        882,
+        295,
+        173,
+        168
+      ],
+      "component": 12,
+      "region": [
+        880,
+        293,
+        177,
+        172
+      ],
+      "anchor": [
+        930.9,
+        462
+      ],
+      "head": [
+        997,
+        347,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        1063,
+        256,
+        182,
+        211
+      ],
+      "component": 11,
+      "region": [
+        1061,
+        254,
+        186,
+        215
+      ],
+      "anchor": [
+        1078.8,
+        466
+      ],
+      "head": [
+        1152,
+        305,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        24,
+        477,
+        166,
+        236
+      ],
+      "component": 15,
+      "region": [
+        22,
+        475,
+        170,
+        240
+      ],
+      "anchor": [
+        88.1,
+        712
+      ],
+      "head": [
+        88,
+        529,
+        50
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        213,
+        482,
+        207,
+        220
+      ],
+      "component": 16,
+      "region": [
+        211,
+        480,
+        211,
+        224
+      ],
+      "anchor": [
+        312.9,
+        701
+      ],
+      "head": [
+        308,
+        532,
+        50
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        443,
+        475,
+        152,
+        225
+      ],
+      "component": 13,
+      "region": [
+        441,
+        473,
+        156,
+        229
+      ],
+      "anchor": [
+        507.5,
+        699
+      ],
+      "head": [
+        490,
+        525,
+        50
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        622,
+        487,
+        234,
+        220
+      ],
+      "component": 17,
+      "region": [
+        620,
+        485,
+        238,
+        224
+      ],
+      "anchor": [
+        691.4,
+        706
+      ],
+      "head": [
+        676,
+        541,
+        50
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        866,
+        475,
+        126,
+        231
+      ],
+      "component": 14,
+      "region": [
+        864,
+        473,
+        130,
+        235
+      ],
+      "anchor": [
+        931.6,
+        705
+      ],
+      "head": [
+        908,
+        527,
+        50
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        1032,
+        489,
+        214,
+        214
+      ],
+      "component": 18,
+      "region": [
+        1030,
+        487,
+        218,
+        218
+      ],
+      "anchor": [
+        1114.8,
+        702
+      ],
+      "head": [
+        1081,
+        540,
+        50
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        43,
+        714,
+        129,
+        207
+      ],
+      "component": 20,
+      "region": [
+        41,
+        712,
+        133,
+        211
+      ],
+      "anchor": [
+        92.8,
+        920
+      ],
+      "head": [
+        101,
+        793,
+        50
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        217,
+        709,
+        211,
+        213
+      ],
+      "component": 19,
+      "region": [
+        215,
+        707,
+        215,
+        217
+      ],
+      "anchor": [
+        287.5,
+        921
+      ],
+      "head": [
+        254,
+        783,
+        50
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        444,
+        716,
+        155,
+        206
+      ],
+      "component": 21,
+      "region": [
+        442,
+        714,
+        159,
+        210
+      ],
+      "anchor": [
+        511.9,
+        921
+      ],
+      "head": [
+        499,
+        765,
+        49,
+        0,
+        1
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        616,
+        728,
+        235,
+        195
+      ],
+      "component": 23,
+      "region": [
+        614,
+        726,
+        239,
+        199
+      ],
+      "anchor": [
+        695.4,
+        922
+      ],
+      "head": [
+        672,
+        780,
+        49,
+        0,
+        1
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        856,
+        778,
+        191,
+        136
+      ],
+      "component": 24,
+      "region": [
+        854,
+        776,
+        195,
+        140
+      ],
+      "anchor": [
+        895.9,
+        913
+      ],
+      "head": [
+        962,
+        829,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        1057,
+        716,
+        191,
+        148
+      ],
+      "component": 22,
+      "region": [
+        1055,
+        714,
+        195,
+        152
+      ],
+      "anchor": [
+        1152.5,
+        863
+      ],
+      "head": [
+        1119,
+        766,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "supplement",
+      "bounds": [
+        24,
+        62,
+        283,
+        365
+      ],
+      "component": 1,
+      "region": [
+        22,
+        60,
+        287,
+        369
+      ],
+      "anchor": [
+        174.1,
+        426
+      ],
+      "head": [
+        175,
+        149,
+        76
+      ],
+      "nominal": 354
+    },
+    {
+      "sheet": "supplement",
+      "bounds": [
+        345,
+        73,
+        292,
+        354
+      ],
+      "component": 3,
+      "region": [
+        343,
+        71,
+        296,
+        358
+      ],
+      "anchor": [
+        507.5,
+        426
+      ],
+      "head": [
+        487,
+        150,
+        76
+      ],
+      "nominal": 354
+    },
+    {
+      "sheet": "supplement",
+      "bounds": [
+        702,
+        67,
+        199,
+        359
+      ],
+      "component": 2,
+      "region": [
+        700,
+        65,
+        203,
+        363
+      ],
+      "anchor": [
+        775.2,
+        425
+      ],
+      "head": [
+        798,
+        144,
+        76
+      ],
+      "nominal": 354
+    },
+    {
+      "sheet": "supplement",
+      "bounds": [
+        997,
+        114,
+        201,
+        311
+      ],
+      "component": 4,
+      "region": [
+        995,
+        112,
+        205,
+        315
+      ],
+      "anchor": [
+        1020.7,
+        424
+      ],
+      "head": [
+        1108,
+        189,
+        76
+      ],
+      "nominal": 354
+    },
+    {
+      "sheet": "male-reactions",
+      "bounds": [
+        159,
+        48,
+        465,
+        555
+      ],
+      "component": 1,
+      "region": [
+        157,
+        46,
+        469,
+        559
+      ],
+      "anchor": [
+        318.3,
+        602
+      ],
+      "head": [
+        307,
+        153,
+        110
+      ],
+      "nominal": 555
+    },
+    {
+      "sheet": "male-reactions",
+      "bounds": [
+        731,
+        66,
+        420,
+        537
+      ],
+      "component": 2,
+      "region": [
+        729,
+        64,
+        424,
+        541
+      ],
+      "anchor": [
+        879.4,
+        602
+      ],
+      "head": [
+        853,
+        160,
+        115,
+        -55
+      ],
+      "nominal": 555,
+      "eraseHead": [
+        818,
+        112,
+        57,
+        48,
+        0
+      ]
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        14,
+        1093,
+        241,
+        152
+      ],
+      "component": 33,
+      "region": [
+        12,
+        1091,
+        245,
+        156
+      ],
+      "anchor": [
+        134.5,
+        1244
+      ],
+      "head": [
+        60,
+        1176,
+        49,
+        -70
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        272,
+        1174,
+        298,
+        66
+      ],
+      "component": 36,
+      "region": [
+        270,
+        1172,
+        302,
+        70
+      ],
+      "anchor": [
+        421,
+        1239
+      ],
+      "head": [
+        298,
+        1204,
+        49,
+        -90
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        584,
+        1116,
+        134,
+        128
+      ],
+      "component": 34,
+      "region": [
+        582,
+        1114,
+        138,
+        132
+      ],
+      "anchor": [
+        652.2,
+        1243
+      ],
+      "head": [
+        675,
+        1167,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        733,
+        1037,
+        181,
+        214
+      ],
+      "component": 31,
+      "region": [
+        731,
+        1035,
+        185,
+        218
+      ],
+      "anchor": [
+        817.5,
+        1250
+      ],
+      "head": [
+        813,
+        1115,
+        49
+      ],
+      "nominal": 222
+    },
+    {
+      "sheet": "male-reactions",
+      "bounds": [
+        899,
+        641,
+        262,
+        556
+      ],
+      "component": 3,
+      "region": [
+        897,
+        639,
+        266,
+        560
+      ],
+      "anchor": [
+        1030.7,
+        1196
+      ],
+      "head": [
+        1032,
+        756,
+        120,
+        0,
+        1
+      ],
+      "nominal": 555
+    },
+    {
+      "sheet": "male-body",
+      "bounds": [
+        1059,
+        1121,
+        183,
+        128
+      ],
+      "component": 35,
+      "region": [
+        1057,
+        1119,
+        187,
+        132
+      ],
+      "anchor": [
+        1130.8,
+        1248
+      ],
+      "head": [
+        1184,
+        1172,
+        49
+      ],
+      "nominal": 222
+    }
+  ],
+  "female": [
+    {
+      "sheet": "female-body",
+      "bounds": [
+        23,
+        24,
+        170,
+        209
+      ],
+      "component": 2,
+      "region": [
+        21,
+        22,
+        174,
+        213
+      ],
+      "anchor": [
+        114.9,
+        232
+      ],
+      "head": [
+        108,
+        69,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        240,
+        24,
+        164,
+        211
+      ],
+      "component": 3,
+      "region": [
+        238,
+        22,
+        168,
+        215
+      ],
+      "anchor": [
+        356.2,
+        234
+      ],
+      "head": [
+        327,
+        69,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        466,
+        24,
+        171,
+        211
+      ],
+      "component": 4,
+      "region": [
+        464,
+        22,
+        175,
+        215
+      ],
+      "anchor": [
+        569.4,
+        234
+      ],
+      "head": [
+        548,
+        68,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        674,
+        65,
+        191,
+        172
+      ],
+      "component": 6,
+      "region": [
+        672,
+        63,
+        195,
+        176
+      ],
+      "anchor": [
+        684.4,
+        236
+      ],
+      "head": [
+        836,
+        110,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        905,
+        10,
+        132,
+        172
+      ],
+      "component": 1,
+      "region": [
+        903,
+        8,
+        136,
+        176
+      ],
+      "anchor": [
+        971,
+        181
+      ],
+      "head": [
+        989,
+        55,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        1086,
+        25,
+        150,
+        167
+      ],
+      "component": 5,
+      "region": [
+        1084,
+        23,
+        154,
+        171
+      ],
+      "anchor": [
+        1161,
+        191
+      ],
+      "head": [
+        1190,
+        68,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        11,
+        256,
+        184,
+        201
+      ],
+      "component": 9,
+      "region": [
+        9,
+        254,
+        188,
+        205
+      ],
+      "anchor": [
+        109.2,
+        456
+      ],
+      "head": [
+        87,
+        301,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        220,
+        253,
+        216,
+        203
+      ],
+      "component": 7,
+      "region": [
+        218,
+        251,
+        220,
+        207
+      ],
+      "anchor": [
+        300,
+        455
+      ],
+      "head": [
+        329,
+        298,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        472,
+        258,
+        175,
+        199
+      ],
+      "component": 10,
+      "region": [
+        470,
+        256,
+        179,
+        203
+      ],
+      "anchor": [
+        591.1,
+        456
+      ],
+      "head": [
+        557,
+        304,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        662,
+        253,
+        218,
+        201
+      ],
+      "component": 8,
+      "region": [
+        660,
+        251,
+        222,
+        205
+      ],
+      "anchor": [
+        741.5,
+        453
+      ],
+      "head": [
+        765,
+        298,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        895,
+        289,
+        149,
+        163
+      ],
+      "component": 12,
+      "region": [
+        893,
+        287,
+        153,
+        167
+      ],
+      "anchor": [
+        943.6,
+        451
+      ],
+      "head": [
+        995,
+        335,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        1069,
+        261,
+        173,
+        194
+      ],
+      "component": 11,
+      "region": [
+        1067,
+        259,
+        177,
+        198
+      ],
+      "anchor": [
+        1120.3,
+        454
+      ],
+      "head": [
+        1158,
+        307,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        29,
+        481,
+        131,
+        215
+      ],
+      "component": 15,
+      "region": [
+        27,
+        479,
+        135,
+        219
+      ],
+      "anchor": [
+        90.3,
+        695
+      ],
+      "head": [
+        113,
+        528,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        228,
+        490,
+        176,
+        205
+      ],
+      "component": 17,
+      "region": [
+        226,
+        488,
+        180,
+        209
+      ],
+      "anchor": [
+        295.7,
+        694
+      ],
+      "head": [
+        289,
+        534,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "supplement",
+      "bounds": [
+        51,
+        497,
+        208,
+        369
+      ],
+      "component": 5,
+      "region": [
+        49,
+        495,
+        212,
+        373
+      ],
+      "anchor": [
+        160.1,
+        865
+      ],
+      "head": [
+        142,
+        563,
+        70
+      ],
+      "nominal": 354
+    },
+    {
+      "sheet": "supplement",
+      "bounds": [
+        337,
+        534,
+        329,
+        329
+      ],
+      "component": 7,
+      "region": [
+        335,
+        532,
+        333,
+        333
+      ],
+      "anchor": [
+        433.4,
+        862
+      ],
+      "head": [
+        431,
+        598,
+        70
+      ],
+      "nominal": 354
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        871,
+        465,
+        126,
+        223
+      ],
+      "component": 13,
+      "region": [
+        869,
+        463,
+        130,
+        227
+      ],
+      "anchor": [
+        926,
+        687
+      ],
+      "head": [
+        919,
+        510,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        1029,
+        482,
+        214,
+        209
+      ],
+      "component": 16,
+      "region": [
+        1027,
+        480,
+        218,
+        213
+      ],
+      "anchor": [
+        1112.9,
+        690
+      ],
+      "head": [
+        1064,
+        526,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        45,
+        705,
+        118,
+        198
+      ],
+      "component": 21,
+      "region": [
+        43,
+        703,
+        122,
+        202
+      ],
+      "anchor": [
+        109.9,
+        902
+      ],
+      "head": [
+        108,
+        752,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        214,
+        701,
+        222,
+        201
+      ],
+      "component": 19,
+      "region": [
+        212,
+        699,
+        226,
+        205
+      ],
+      "anchor": [
+        266.8,
+        901
+      ],
+      "head": [
+        246,
+        756,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        456,
+        710,
+        134,
+        193
+      ],
+      "component": 22,
+      "region": [
+        454,
+        708,
+        138,
+        197
+      ],
+      "anchor": [
+        506.3,
+        902
+      ],
+      "head": [
+        514,
+        758,
+        45,
+        0,
+        1
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        622,
+        716,
+        249,
+        185
+      ],
+      "component": 23,
+      "region": [
+        620,
+        714,
+        253,
+        189
+      ],
+      "anchor": [
+        726.4,
+        900
+      ],
+      "head": [
+        660,
+        758,
+        45,
+        0,
+        1
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "supplement",
+      "bounds": [
+        667,
+        544,
+        241,
+        289
+      ],
+      "component": 8,
+      "region": [
+        665,
+        542,
+        245,
+        293
+      ],
+      "anchor": [
+        716.2,
+        832
+      ],
+      "head": [
+        835,
+        609,
+        70
+      ],
+      "nominal": 354
+    },
+    {
+      "sheet": "supplement",
+      "bounds": [
+        947,
+        523,
+        281,
+        306
+      ],
+      "component": 6,
+      "region": [
+        945,
+        521,
+        285,
+        310
+      ],
+      "anchor": [
+        1087.5,
+        828
+      ],
+      "head": [
+        1024,
+        740,
+        65,
+        -35
+      ],
+      "nominal": 354
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        62,
+        908,
+        143,
+        201
+      ],
+      "component": 26,
+      "region": [
+        60,
+        906,
+        147,
+        205
+      ],
+      "anchor": [
+        158.2,
+        1108
+      ],
+      "head": [
+        106,
+        967,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        247,
+        911,
+        153,
+        198
+      ],
+      "component": 27,
+      "region": [
+        245,
+        909,
+        157,
+        202
+      ],
+      "anchor": [
+        259.1,
+        1108
+      ],
+      "head": [
+        304,
+        963,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        462,
+        929,
+        94,
+        180
+      ],
+      "component": 30,
+      "region": [
+        460,
+        927,
+        98,
+        184
+      ],
+      "anchor": [
+        537.1,
+        1108
+      ],
+      "head": [
+        510,
+        978,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        677,
+        920,
+        94,
+        189
+      ],
+      "component": 29,
+      "region": [
+        675,
+        918,
+        98,
+        193
+      ],
+      "anchor": [
+        729.5,
+        1108
+      ],
+      "head": [
+        715,
+        969,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        868,
+        914,
+        161,
+        188
+      ],
+      "component": 28,
+      "region": [
+        866,
+        912,
+        165,
+        192
+      ],
+      "anchor": [
+        936.1,
+        1101
+      ],
+      "head": [
+        894,
+        959,
+        45,
+        -22
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        1059,
+        899,
+        182,
+        195
+      ],
+      "component": 25,
+      "region": [
+        1057,
+        897,
+        186,
+        199
+      ],
+      "anchor": [
+        1152.3,
+        1093
+      ],
+      "head": [
+        1094,
+        941,
+        50,
+        -40
+      ],
+      "nominal": 211,
+      "eraseHead": [
+        1083,
+        921,
+        26,
+        26,
+        -40
+      ]
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        19,
+        1102,
+        209,
+        136
+      ],
+      "component": 33,
+      "region": [
+        17,
+        1100,
+        213,
+        140
+      ],
+      "anchor": [
+        123.5,
+        1237
+      ],
+      "head": [
+        78,
+        1187,
+        45,
+        -65
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        239,
+        1173,
+        263,
+        66
+      ],
+      "component": 36,
+      "region": [
+        237,
+        1171,
+        267,
+        70
+      ],
+      "anchor": [
+        370.5,
+        1238
+      ],
+      "head": [
+        260,
+        1209,
+        45,
+        -90
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        518,
+        1115,
+        141,
+        124
+      ],
+      "component": 35,
+      "region": [
+        516,
+        1113,
+        145,
+        128
+      ],
+      "anchor": [
+        578.3,
+        1238
+      ],
+      "head": [
+        614,
+        1163,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        692,
+        1049,
+        144,
+        195
+      ],
+      "component": 31,
+      "region": [
+        690,
+        1047,
+        148,
+        199
+      ],
+      "anchor": [
+        750.8,
+        1243
+      ],
+      "head": [
+        771,
+        1111,
+        45
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        916,
+        1087,
+        77,
+        157
+      ],
+      "component": 32,
+      "region": [
+        914,
+        1085,
+        81,
+        161
+      ],
+      "anchor": [
+        956.4,
+        1243
+      ],
+      "head": [
+        956,
+        1135,
+        50,
+        0,
+        1
+      ],
+      "nominal": 211
+    },
+    {
+      "sheet": "female-body",
+      "bounds": [
+        1087,
+        1113,
+        139,
+        128
+      ],
+      "component": 34,
+      "region": [
+        1085,
+        1111,
+        143,
+        132
+      ],
+      "anchor": [
+        1135.5,
+        1240
+      ],
+      "head": [
+        1173,
+        1160,
+        45
+      ],
+      "nominal": 211
+    }
+  ],
+  "heads": [
+    {
+      "sheet": "heads",
+      "bounds": [
+        57,
+        21,
+        216,
+        254
+      ],
+      "component": 2,
+      "region": [
+        55,
+        19,
+        220,
+        258
+      ],
+      "anchor": [
+        159,
+        272
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        341,
+        17,
+        229,
+        255
+      ],
+      "component": 1,
+      "region": [
+        339,
+        15,
+        233,
+        259
+      ],
+      "anchor": [
+        445,
+        270
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        619,
+        24,
+        211,
+        249
+      ],
+      "component": 4,
+      "region": [
+        617,
+        22,
+        215,
+        253
+      ],
+      "anchor": [
+        717,
+        271
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        854,
+        23,
+        262,
+        244
+      ],
+      "component": 3,
+      "region": [
+        852,
+        21,
+        266,
+        248
+      ],
+      "anchor": [
+        1008,
+        265
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        1167,
+        34,
+        206,
+        236
+      ],
+      "component": 5,
+      "region": [
+        1165,
+        32,
+        210,
+        240
+      ],
+      "anchor": [
+        1264,
+        268
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        63,
+        301,
+        198,
+        248
+      ],
+      "component": 9,
+      "region": [
+        61,
+        299,
+        202,
+        252
+      ],
+      "anchor": [
+        155,
+        545
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        332,
+        293,
+        237,
+        255
+      ],
+      "component": 7,
+      "region": [
+        330,
+        291,
+        241,
+        259
+      ],
+      "anchor": [
+        441,
+        545
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        611,
+        299,
+        212,
+        249
+      ],
+      "component": 8,
+      "region": [
+        609,
+        297,
+        216,
+        253
+      ],
+      "anchor": [
+        719,
+        545
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        865,
+        301,
+        259,
+        248
+      ],
+      "component": 10,
+      "region": [
+        863,
+        299,
+        263,
+        252
+      ],
+      "anchor": [
+        1006,
+        545
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        1192,
+        305,
+        187,
+        240
+      ],
+      "component": 11,
+      "region": [
+        1190,
+        303,
+        191,
+        244
+      ],
+      "anchor": [
+        1280,
+        542
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        59,
+        573,
+        204,
+        251
+      ],
+      "component": 12,
+      "region": [
+        57,
+        571,
+        208,
+        255
+      ],
+      "anchor": [
+        136,
+        820
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        324,
+        574,
+        245,
+        250
+      ],
+      "component": 13,
+      "region": [
+        322,
+        572,
+        249,
+        254
+      ],
+      "anchor": [
+        431,
+        821
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        597,
+        574,
+        241,
+        250
+      ],
+      "component": 14,
+      "region": [
+        595,
+        572,
+        245,
+        254
+      ],
+      "anchor": [
+        714,
+        821
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        839,
+        577,
+        274,
+        247
+      ],
+      "component": 15,
+      "region": [
+        837,
+        575,
+        278,
+        251
+      ],
+      "anchor": [
+        1005,
+        822
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        1182,
+        590,
+        179,
+        234
+      ],
+      "component": 16,
+      "region": [
+        1180,
+        588,
+        183,
+        238
+      ],
+      "anchor": [
+        1260,
+        821
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        59,
+        837,
+        205,
+        250
+      ],
+      "component": 25,
+      "region": [
+        57,
+        835,
+        209,
+        254
+      ],
+      "anchor": [
+        144,
+        1083
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        334,
+        842,
+        230,
+        243
+      ],
+      "component": 26,
+      "region": [
+        332,
+        840,
+        234,
+        247
+      ],
+      "anchor": [
+        438,
+        1083
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        603,
+        843,
+        230,
+        244
+      ],
+      "component": 28,
+      "region": [
+        601,
+        841,
+        234,
+        248
+      ],
+      "anchor": [
+        715,
+        1083
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        860,
+        842,
+        264,
+        245
+      ],
+      "component": 27,
+      "region": [
+        858,
+        840,
+        268,
+        249
+      ],
+      "anchor": [
+        1003,
+        1083
+      ],
+      "head": [],
+      "nominal": 240
+    },
+    {
+      "sheet": "heads",
+      "bounds": [
+        1192,
+        846,
+        180,
+        238
+      ],
+      "component": 29,
+      "region": [
+        1190,
+        844,
+        184,
+        242
+      ],
+      "anchor": [
+        1279,
+        1080
+      ],
+      "head": [],
+      "nominal": 240
+    }
+  ],
+  "vfx": {
+    "columns": 6,
+    "rows": 6,
+    "width": 1254,
+    "height": 1254
+  },
+  "source": "AI generated original PNGs; only runtime composition/palette mapping"
+}

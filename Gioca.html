@@ -18,11 +18,11 @@
 @media(max-width:650px){.combo-readout{top:38%;max-width:43%}.combo-readout b{font-size:30px}.combo-readout>div{gap:5px}.combo-readout>div>span{font-size:11px}.combo-readout>strong{font-size:5px;letter-spacing:.4px}.combo-readout>small{font-size:5px;margin-top:2px}.defense-guide{gap:8px}.defense-guide article{padding:10px}.defense-guide canvas{height:120px}.defense-guide h3{font-size:18px}.defense-guide p{font-size:10px}.defense-guide .field-label{font-size:6px;letter-spacing:.8px}.combo-routes>div{display:block}.combo-routes span{display:block;margin-top:4px;font-size:10px}.playing .announcer small{font-size:7px;letter-spacing:2px}}
 
 /* Arcade front end: title, fighter selection and match introduction. */
-body:is(.front-title,.front-select,.front-versus) .title-row{display:none}
-body:is(.front-title,.front-select,.front-versus) .arcade{margin-top:28px}
-body:is(.front-title,.front-select,.front-versus) .viewport{aspect-ratio:16/9;min-height:630px;background:#101722}
-body:is(.front-title,.front-select,.front-versus) :is(.hud,.arena-shade,.stage-caption,.touch-controls){display:none}
-body:is(.front-title,.front-select,.front-versus) #game{visibility:hidden}
+body:is(.front-title,.front-select,.front-versus,.front-create) .title-row{display:none}
+body:is(.front-title,.front-select,.front-versus,.front-create) .arcade{margin-top:28px}
+body:is(.front-title,.front-select,.front-versus,.front-create) .viewport{aspect-ratio:16/9;min-height:630px;background:#101722}
+body:is(.front-title,.front-select,.front-versus,.front-create) :is(.hud,.arena-shade,.stage-caption,.touch-controls){display:none}
+body:is(.front-title,.front-select,.front-versus,.front-create) #game{visibility:hidden}
 .front-screen{position:absolute;inset:0;isolation:isolate;color:#fff2d7;overflow:hidden}
 .front-screen canvas{position:static;display:block;aspect-ratio:auto}
 .title-screen{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 38%,#4d272b 0,#1d202b 44%,#0b1420 83%)}
@@ -126,9 +126,9 @@ body:is(.front-title,.front-select,.front-versus) #game{visibility:hidden}
   .fighter-bio h3{max-width:190px}
 }
 @media(max-width:650px){
-  body:is(.front-title,.front-select,.front-versus) .arcade{margin-top:17px}
+  body:is(.front-title,.front-select,.front-versus,.front-create) .arcade{margin-top:17px}
   body.front-title .viewport{aspect-ratio:auto;height:566px;min-height:0}
-  body.front-select .viewport{aspect-ratio:auto;height:650px;min-height:0}
+  body:is(.front-select,.front-create) .viewport{aspect-ratio:auto;height:650px;min-height:0}
   body.front-versus .viewport{aspect-ratio:auto;height:520px;min-height:0}
   .title-content{width:100%;padding:12px 12px 40px}
   .title-dojo{font-size:9px;letter-spacing:3.7px}
@@ -196,9 +196,9 @@ body:is(.front-title,.front-select,.front-versus) #game{visibility:hidden}
   .versus-loading{left:15%;right:15%;bottom:36px;font-size:6px;letter-spacing:2px}
 }
 @media(prefers-reduced-motion:reduce){.front-screen *,.front-screen *:before,.front-screen *:after{animation:none!important}}
-body:is(.front-title,.front-select,.front-versus) .arcade:fullscreen{justify-content:flex-start;overflow-y:auto}
-body:is(.front-title,.front-select,.front-versus) .arcade:fullscreen .viewport{flex-shrink:0}
-body:is(.front-title,.front-select,.front-versus) .arcade.expanded .viewport{max-height:none}
+body:is(.front-title,.front-select,.front-versus,.front-create) .arcade:fullscreen{justify-content:flex-start;overflow-y:auto}
+body:is(.front-title,.front-select,.front-versus,.front-create) .arcade:fullscreen .viewport{flex-shrink:0}
+body:is(.front-title,.front-select,.front-versus,.front-create) .arcade.expanded .viewport{max-height:none}
 /* Decorative art must not create a scrollable viewport when focus changes. */
 .front-screen{overflow:clip}
 .versus-screen:focus{outline:none}
@@ -270,18 +270,18 @@ body.embedded{background:#101820;overflow:hidden;overscroll-behavior:none}
 body.standalone-game .standalone-return{display:inline-flex}
 body.standalone-game .arena-title{display:none}
 .arena-site-return{flex-shrink:0;margin-left:-8px}
-.screen-site-return{position:absolute;z-index:1;top:max(8px,env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left))}
+.screen-site-return{position:absolute;z-index:1;top:max(8px,var(--safe-top,env(safe-area-inset-top)));left:max(14px,var(--safe-left,env(safe-area-inset-left)))}
 .standalone-return:hover{color:#fff3d6;background:#ffe5a60a}
 body.embedded>.masthead,body.embedded .title-row,body.embedded .play-guide,body.embedded main>footer{display:none!important}
 body.embedded main{width:100%;max-width:none;height:100dvh;margin:0;padding:0}
 body.embedded #arcade,#arcade:fullscreen,#arcade.expanded{position:relative;display:flex;flex-direction:column;justify-content:center;width:100%;height:100dvh;max-height:none;margin:0!important;padding:0;overflow:hidden;background:#101820;box-shadow:none}
 #arcade.expanded{position:fixed;inset:0;z-index:50}
-:is(body.embedded #arcade,#arcade:fullscreen,#arcade.expanded)>.arena-topline{width:100%;max-width:none;min-height:44px;height:44px;margin:0;padding:0 max(12px,env(safe-area-inset-left));flex-shrink:0}
+:is(body.embedded #arcade,#arcade:fullscreen,#arcade.expanded)>.arena-topline{width:100%;max-width:none;min-height:44px;height:44px;margin:0;padding:0 max(12px,var(--safe-left,env(safe-area-inset-left)));flex-shrink:0}
 :is(body.embedded #arcade,#arcade:fullscreen,#arcade.expanded)>.arena-bottomline{width:100%;max-width:none;min-height:28px;height:28px;margin:0;flex-shrink:0}
 :is(body.embedded #arcade,#arcade:fullscreen,#arcade.expanded)>.viewport{flex:0 1 auto;width:min(100%,calc((100dvh - 72px)*16/9));aspect-ratio:16/9;height:auto;min-height:0;max-height:none;margin:auto}
 :is(body.embedded #arcade,#arcade:fullscreen,#arcade.expanded)>.viewport>#game{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:16/9}
-body:is(.front-title,.front-select,.front-versus) :is(#arcade:fullscreen,#arcade.expanded)>.viewport,body.embedded:is(.front-title,.front-select,.front-versus) #arcade>.viewport{flex:1 1 0;aspect-ratio:auto;width:100%;height:auto;min-height:0;max-height:none;margin:0}
-body:is(.front-title,.front-select,.front-versus) :is(#arcade:fullscreen,#arcade.expanded){overflow:hidden;justify-content:flex-start}
+body:is(.front-title,.front-select,.front-versus,.front-create) :is(#arcade:fullscreen,#arcade.expanded)>.viewport,body.embedded:is(.front-title,.front-select,.front-versus,.front-create) #arcade>.viewport{flex:1 1 0;aspect-ratio:auto;width:100%;height:auto;min-height:0;max-height:none;margin:0}
+body:is(.front-title,.front-select,.front-versus,.front-create) :is(#arcade:fullscreen,#arcade.expanded){overflow:hidden;justify-content:flex-start}
 body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
 .arcade>dialog{position:fixed;max-height:calc(100dvh - 24px);overflow:auto}
 
@@ -291,7 +291,7 @@ body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
   body:is(.touch-active,.force-touch){background:#131c25;overscroll-behavior-y:none}
   body:is(.touch-active,.force-touch) main{width:100%;max-width:none;padding:0;margin:0}
   body:is(.touch-active,.force-touch) #arcade{padding:0;margin:0!important;width:100%;min-height:100dvh;display:flex;flex-direction:column;box-shadow:none;background:#131c25;overflow:hidden}
-  body:is(.touch-active,.force-touch) .arena-topline{height:44px;min-height:44px;flex:0 0 44px;padding:0 max(8px,env(safe-area-inset-left));font-size:7px;letter-spacing:.55px}
+  body:is(.touch-active,.force-touch) .arena-topline{height:44px;min-height:44px;flex:0 0 44px;padding:0 max(8px,var(--safe-left,env(safe-area-inset-left)));font-size:7px;letter-spacing:.55px}
   body:is(.touch-active,.force-touch) .arena-topline #mode-label{display:none}
   body:is(.touch-active,.force-touch) .arena-topline .arena-utilities{gap:0}
   body:is(.touch-active,.force-touch) .arena-topline button{width:44px;height:44px;min-width:44px;min-height:44px;font-size:20px;border-radius:0;border:0;flex-shrink:0}
@@ -300,7 +300,7 @@ body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
   body:is(.touch-active,.force-touch).playing #arcade>.viewport>#game{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:16/9}
   body:is(.touch-active,.force-touch) .arena-bottomline{height:30px;min-height:30px;flex:0 0 30px;padding:0 12px;font-size:6px;letter-spacing:.7px;border-top:1px solid #7886942b;background:#18222c}
   body:is(.touch-active,.force-touch) #bottom-hint{display:none}
-  body:is(.touch-active,.force-touch) .touch-controls{--pad-key:clamp(44px,12vw,56px);grid-template-columns:auto minmax(0,1fr);grid-template-rows:28px minmax(194px,1fr) 30px;max-width:760px;flex:1;min-height:278px;padding:14px max(12px,env(safe-area-inset-left)) max(20px,env(safe-area-inset-bottom));column-gap:14px;row-gap:8px;align-content:center;border-top:1px solid #8599a533}
+  body:is(.touch-active,.force-touch) .touch-controls{--pad-key:clamp(44px,12vw,56px);grid-template-columns:auto minmax(0,1fr);grid-template-rows:28px minmax(194px,1fr) 30px;max-width:760px;flex:1;min-height:278px;padding:14px max(12px,var(--safe-left,env(safe-area-inset-left))) max(20px,var(--safe-bottom,env(safe-area-inset-bottom)));column-gap:14px;row-gap:8px;align-content:center;border-top:1px solid #8599a533}
   body:is(.touch-active,.force-touch) .touch-console-meta{font-size:6px;letter-spacing:.7px;align-self:start}
   body:is(.touch-active,.force-touch) .touch-console-meta b{font-size:5px;letter-spacing:.55px;display:none}
   body:is(.touch-active,.force-touch) .touch-rotate-hint{display:flex;font-size:6px}
@@ -310,10 +310,10 @@ body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
   body:is(.touch-active,.force-touch) .touch-defenses button{font-size:7px;letter-spacing:.25px;gap:4px}
   body:is(.touch-active,.force-touch) .touch-console-note{font-size:6px;letter-spacing:.45px;padding-top:9px;line-height:1.5}
   body:is(.touch-active,.force-touch) .touch-button-icon{font-size:15px}
-  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus) #arcade{height:100dvh;min-height:0}
-  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus) #arcade>.viewport{flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto;margin:0}
-  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus) .arena-bottomline{display:none}
-  body:is(.touch-active,.force-touch) .selection-panel{overflow-y:auto;overscroll-behavior:contain;grid-template-rows:44px minmax(180px,1fr) 125px auto;gap:12px;padding:13px 14px max(18px,env(safe-area-inset-bottom))}
+  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus,.front-create) #arcade{height:100dvh;min-height:0}
+  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus,.front-create) #arcade>.viewport{flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto;margin:0}
+  body:is(.touch-active,.force-touch):is(.front-title,.front-select,.front-versus,.front-create) .arena-bottomline{display:none}
+  body:is(.touch-active,.force-touch) .selection-panel{overflow-y:auto;overscroll-behavior:contain;grid-template-rows:44px minmax(180px,1fr) 125px auto;gap:12px;padding:13px 14px max(18px,var(--safe-bottom,env(safe-area-inset-bottom)))}
   body:is(.touch-active,.force-touch) .arcade-back{min-width:44px;width:44px;min-height:44px;height:44px}
   body:is(.touch-active,.force-touch) .select-footer .mode-select button{min-height:44px}
   body:is(.touch-active,.force-touch) .select-footer .difficulty-label select{min-height:44px}
@@ -332,14 +332,14 @@ body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested)>.masthead,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .title-row,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .play-guide,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) main>footer{display:none!important}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) main{width:100%;max-width:none;height:var(--layout-height,100dvh);margin:0;padding:0}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #arcade{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:flex-start;width:100%;height:var(--layout-height,100dvh);min-height:0;padding:0;margin:0!important;overflow:hidden;background:#101820;box-shadow:none}
-  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-topline{flex:0 0 44px;height:44px;min-height:44px;width:100%;max-width:none;margin:0;padding:0 max(10px,env(safe-area-inset-left));font-size:7px;letter-spacing:.6px;z-index:12;background:#101923}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-topline{flex:0 0 44px;height:44px;min-height:44px;width:100%;max-width:none;margin:0;padding:0 max(10px,var(--safe-left,env(safe-area-inset-left)));font-size:7px;letter-spacing:.6px;z-index:12;background:#101923}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-topline #mode-label{display:none}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-topline .arena-utilities{gap:2px}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-topline button{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;width:44px;height:44px;border:0;border-radius:0}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .arena-bottomline{display:none}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested).playing #arcade>.viewport{position:absolute;top:44px;bottom:auto;left:0;right:0;flex:none;width:min(100%,calc((var(--layout-height,100dvh) - 44px)*16/9));height:min(calc(var(--layout-height,100dvh) - 44px),calc(var(--layout-width,100vw)*9/16));min-height:0;max-height:none;margin:0 auto;aspect-ratio:16/9;overflow:hidden}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested).playing #arcade>.viewport>#game{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:16/9}
-  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-controls{--pad-key:46px;position:absolute;inset:auto 0 0;z-index:11;flex:none;width:100%;max-width:none;min-height:0;height:auto;grid-template-columns:auto 176px;grid-template-rows:auto;justify-content:space-between;align-items:end;column-gap:0;row-gap:0;margin:0;padding:0 max(12px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));border:0;background:none;pointer-events:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-controls{--pad-key:46px;position:absolute;inset:auto 0 0;z-index:11;flex:none;width:100%;max-width:none;min-height:0;height:auto;grid-template-columns:auto 176px;grid-template-rows:auto;justify-content:space-between;align-items:end;column-gap:0;row-gap:0;margin:0;padding:0 max(12px,var(--safe-right,env(safe-area-inset-right))) max(9px,var(--safe-bottom,env(safe-area-inset-bottom))) max(12px,var(--safe-left,env(safe-area-inset-left)));border:0;background:none;pointer-events:none}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-console-meta,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-console-note{display:none}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-directions,body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-deck{pointer-events:auto;align-self:end;filter:drop-shadow(0 2px 6px #06101dbb)}
   body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) .touch-directions{gap:4px;grid-template-rows:var(--pad-key) var(--pad-key) 16px}
@@ -363,8 +363,8 @@ body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
 
 /* Short cabinets: title fits; only the selection panel may scroll. */
 /* Shared by native and virtual landscape; dimensions come from the visible viewport. */
-  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus) #arcade>.viewport{position:relative;inset:auto;flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto;margin:0}
-  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus) .arena-bottomline{display:none}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus,.front-create) #arcade>.viewport{position:relative;inset:auto;flex:1 1 0;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto;margin:0}
+  body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus,.front-create) .arena-bottomline{display:none}
   body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-content{width:62%;height:100%;justify-content:center;padding:6px 10px 18px}
   body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-dojo{font-size:7px;letter-spacing:2.6px}
   body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-dojo span{font-size:5px;letter-spacing:1.8px;margin-top:4px}
@@ -424,7 +424,7 @@ body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
   body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-loading{bottom:10px;font-size:5px;letter-spacing:1.5px}
   body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested) .versus-loading i{margin-top:6px;height:2px}
 /* Shared by native and virtual landscape; dimensions come from the visible viewport. */
-  body.landscape-short:is(.touch-active,.force-touch,.landscape-requested) .touch-controls{--pad-key:44px;grid-template-columns:auto 164px;padding-bottom:max(6px,env(safe-area-inset-bottom))}
+  body.landscape-short:is(.touch-active,.force-touch,.landscape-requested) .touch-controls{--pad-key:44px;grid-template-columns:auto 164px;padding-bottom:max(6px,var(--safe-bottom,env(safe-area-inset-bottom)))}
   body.landscape-short:is(.touch-active,.force-touch,.landscape-requested) .touch-attacks{grid-template-rows:44px 44px;gap:5px}
   body.landscape-short:is(.touch-active,.force-touch,.embedded,.landscape-requested) .title-emblem{width:44px;height:44px;margin:5px 0 7px}
   body.landscape-short:is(.touch-active,.force-touch,.embedded,.landscape-requested) .game-wordmark>span{font-size:34px}
@@ -443,7 +443,7 @@ body.embedded .selection-panel{overflow-y:auto;overscroll-behavior:contain}
 }
 
 /* Mobile combat is landscape-only; keep this inside the fullscreen cabinet. */
-.rotate-screen{display:none;position:fixed;inset:0;z-index:80;align-items:center;justify-content:center;isolation:isolate;background:radial-gradient(ellipse at 50% 35%,#263b49,#111c29 62%,#0c1520);color:#f3e7cf;padding:max(30px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) max(30px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left));overflow:hidden;touch-action:manipulation;text-align:center}
+.rotate-screen{display:none;position:fixed;inset:0;z-index:80;align-items:center;justify-content:center;isolation:isolate;background:radial-gradient(ellipse at 50% 35%,#263b49,#111c29 62%,#0c1520);color:#f3e7cf;padding:max(30px,var(--safe-top,env(safe-area-inset-top))) max(24px,var(--safe-right,env(safe-area-inset-right))) max(30px,var(--safe-bottom,env(safe-area-inset-bottom))) max(24px,var(--safe-left,env(safe-area-inset-left)));overflow:hidden;touch-action:manipulation;text-align:center}
 .rotate-screen:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.32;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,#0003 4px),linear-gradient(125deg,transparent 30%,#c7744720 50%,transparent 70%)}
 .rotate-screen:after{content:"極真";position:absolute;left:50%;top:49%;z-index:-1;transform:translate(-50%,-50%) rotate(-12deg);font:250px/1 serif;color:#e9984e05;letter-spacing:-.15em;pointer-events:none}
 body.orientation-blocked{overflow:hidden!important;overscroll-behavior:none}
@@ -530,7 +530,7 @@ body.landscape-short .title-motto{margin:8px 0!important}
 #touch-controls[data-active-bank="special"] .action-primary{background:radial-gradient(circle at 35% 20%,#f5945acd,#ae472ede 65%,#762b23f0);border-color:#ffc792}
 #touch-controls .action-orbit button[data-action="block"],#touch-controls .action-orbit button[data-action="legBlock"]{border-color:#b9e8e9b3;color:#d2f3f3;background:radial-gradient(circle at 35% 20%,#547b83b3,#284650de 65%,#17313aef)}
 #touch-controls .action-orbit button:is(:active,.pressed){opacity:1;background:#edc887;color:#223347;border-color:#ffedc5;box-shadow:inset 0 2px 7px #5e4a364d,0 1px #142431,0 0 22px #ffe4a347;transform:none}
-body.landscape-layout #touch-controls{position:absolute;inset:auto 0 0;z-index:11;grid-template-columns:var(--stick-size) var(--orbit-width);grid-template-rows:auto;column-gap:0;row-gap:0;width:100%;max-width:none;height:auto;min-height:0;flex:none;align-items:end;justify-content:space-between;margin:0;padding:0 max(15px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));border:0;background:transparent;pointer-events:none}
+body.landscape-layout #touch-controls{position:absolute;inset:auto 0 0;z-index:11;grid-template-columns:var(--stick-size) var(--orbit-width);grid-template-rows:auto;column-gap:0;row-gap:0;width:100%;max-width:none;height:auto;min-height:0;flex:none;align-items:end;justify-content:space-between;margin:0;padding:0 max(15px,var(--safe-right,env(safe-area-inset-right))) max(12px,var(--safe-bottom,env(safe-area-inset-bottom))) max(20px,var(--safe-left,env(safe-area-inset-left)));border:0;background:transparent;pointer-events:none}
 body.landscape-layout #touch-controls .touch-console-meta,body.landscape-layout #touch-controls .touch-console-note{display:none}
 body.landscape-layout #touch-controls .joystick-area{padding-bottom:4px}
 body.landscape-short #touch-controls{--stick-size:126px;--orbit-width:184px;--orbit-height:132px;--primary-size:76px;--satellite-size:48px}
@@ -557,7 +557,7 @@ body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #hud .
 /* Visible before the portable image bundle has even finished downloading. */
 body.boot-loading{overflow:hidden;background:#080e16}
 body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
-.boot-screen{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;min-height:100%;padding:22px max(22px,env(safe-area-inset-right)) 22px max(22px,env(safe-area-inset-left));color:#f5e4b9;background:radial-gradient(ellipse at 50% 35%,#4c3a2050,transparent 60%),#080e16;text-align:center;overflow:auto}
+.boot-screen{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;min-height:100%;padding:22px max(22px,var(--safe-right,env(safe-area-inset-right))) 22px max(22px,var(--safe-left,env(safe-area-inset-left)));color:#f5e4b9;background:radial-gradient(ellipse at 50% 35%,#4c3a2050,transparent 60%),#080e16;text-align:center;overflow:auto}
 .boot-screen[hidden]{display:none}
 .boot-content{width:min(440px,100%);margin:auto}
 .boot-brand{font-size:9px;letter-spacing:3px;font-weight:800;color:#b8a887}
@@ -583,6 +583,9 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   
   
   
+<link rel="stylesheet" href="scripts/roster-ui.css">
+<link rel="stylesheet" href="scripts/orientation.css">
+<link rel="stylesheet" href="scripts/arcade-ui.css">
 </head>
 <body class="front-title boot-loading" data-screen="title" data-boot-state="loading">
   <section id="boot-screen" class="boot-screen" aria-label="Caricamento del gioco" aria-busy="true">
@@ -658,7 +661,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   <main>
     <section class="title-row" aria-label="Kyokushin Spirit">
       <div><div class="eyebrow"><span class="red-line"></span> THE BODYPLANET FIGHTING GAME</div><h1>KYOKUSHIN <em>SPIRIT</em><span class="title-stamp">極真</span></h1></div>
-      <div class="title-note"><span class="live-dot"></span> 2 FIGHTERS. ONE DOJO.<p>Il rispetto prima di tutto.<br>Il combattimento subito dopo.</p></div>
+      <div class="title-note"><span class="live-dot"></span> 10 SCELTE. UN SOLO DOJO.<p>Il rispetto prima di tutto.<br>Il combattimento subito dopo.</p></div>
     </section>
 
     <div id="game-shell">
@@ -750,7 +753,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
           <span class="rotate-eyebrow">BODYPLANET DOJO <i>·</i> MOBILE ARCADE</span>
           <div class="rotate-illustration" aria-hidden="true"><span class="rotate-orbit">↻</span><div class="rotate-device"><span class="rotate-device-arena"></span><span class="rotate-device-controls"></span></div><span class="rotate-landscape-line"></span></div>
           <h2 id="rotate-title">RUOTA IL<br><em>TELEFONO.</em></h2>
-          <p id="rotate-description">Gira il telefono in orizzontale. Se lo schermo resta verticale, disattiva il blocco rotazione del telefono.</p>
+          <p id="rotate-description">Ruota il telefono oppure premi Gioca in orizzontale: funziona anche con la rotazione bloccata.</p>
           <button id="rotate-fullscreen-button" type="button"><span aria-hidden="true">⛶</span> <span id="rotate-action-label">SCHERMO INTERO</span></button>
           <small>La partita resta aperta. Tocca ♪ per attivare musica ed effetti.</small>
           <span class="rotate-signature">FULL CONTACT. FULL SPIRIT.</span>
@@ -788,629 +791,8 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   }
 })();
 </script>
-<script>
-/* game.js */
-/* Bodyplanet — Kyokushin Spirit. A small, dependency-free fighting engine. */
-(function (global) {
-  'use strict';
-
-  const FLOOR = 625;
-  const LEFT = 90;
-  const RIGHT = 1190;
-  const MAX_HP = 1000;
-  const PACE = 1.3;
-  const QUEUE_WINDOW = .68;
-  const MAX_COMBO = 6;
-  const DASH_TAP_WINDOW = .25;
-  const ACTIONS = ['left', 'right', 'jump', 'block', 'legBlock', 'tsuki', 'shita', 'kagi', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten'];
-  const ATTACKS = ['tsuki', 'gyaku', 'shita', 'kagi', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten'];
-  const KICKS = new Set(['mae', 'mawashi', 'ushiro', 'gedan', 'kaiten']);
-  const BASE_MOVES = {
-    tsuki:  { name: 'Chūdan tsuki', shortName: 'TSUKI', duration: .34, start: .095, end: .17, damage: 65, reach: 142, height: 149, radius: 37, level: 'body', stun: .25, push: 140, lunge: 52, ki: 7 },
-    gyaku:  { name: 'Gyaku tsuki', shortName: 'GYAKU TSUKI', duration: .43, start: .13, end: .22, damage: 95, reach: 161, height: 143, radius: 36, level: 'body', stun: .29, push: 185, lunge: 105, ki: 9 },
-    shita:  { name: 'Shita tsuki', shortName: 'SHITA TSUKI', duration: .46, start: .135, end: .235, damage: 90, reach: 149, height: 155, radius: 31, level: 'body', stun: .30, push: 145, lunge: 95, ki: 9 },
-    kagi:   { name: 'Kagi tsuki', shortName: 'KAGI TSUKI', duration: .54, start: .19, end: .29, damage: 110, reach: 174, height: 145, radius: 34, level: 'body', stun: .36, push: 205, lunge: 105, ki: 10 },
-    gedan:  { name: 'Gedan mawashi geri', shortName: 'GEDAN', duration: .57, start: .20, end: .31, damage: 90, reach: 199, height: 57, radius: 33, level: 'low', stun: .32, push: 165, lunge: 50, ki: 10 },
-    mae:    { name: 'Mae geri', shortName: 'MAE GERI', duration: .62, start: .20, end: .32, damage: 120, reach: 218, height: 145, radius: 38, level: 'body', stun: .36, push: 235, lunge: 90, ki: 11 },
-    mawashi:{ name: 'Jōdan mawashi geri', shortName: 'MAWASHI GERI', duration: .75, start: .265, end: .385, damage: 145, reach: 235, height: 215, radius: 28, level: 'high', stun: .39, push: 280, lunge: 75, ki: 13 },
-    ushiro: { name: 'Ushiro geri', shortName: 'USHIRO GERI', duration: .88, start: .36, end: .49, damage: 185, reach: 248, height: 153, radius: 39, level: 'body', stun: .46, push: 420, lunge: 118, ki: 16 },
-    kaiten: { name: 'Kaiten dō mawashi geri', shortName: 'KAITEN GERI', duration: 1.13, start: .36, end: .61, damage: 235, reach: 248, height: 178, radius: 65, level: 'high', stun: .57, push: 405, lunge: 225, ki: 0, cost: 45, knockdown: true },
-  };
-  const MOVES = Object.freeze(Object.fromEntries(Object.entries(BASE_MOVES).map(([id, def]) => [id, Object.freeze({
-    ...def, duration: def.duration / PACE, start: def.start / PACE, end: def.end / PACE,
-    stun: def.stun / PACE, lunge: def.lunge * PACE, push: def.push * PACE,
-  })])));
-  const CHAINS = {
-    tsuki: ['gyaku', 'shita', 'mae', 'gedan'], gyaku: ['shita', 'kagi', 'mae', 'gedan'],
-    shita: ['kagi', 'mae'], kagi: ['mae', 'mawashi', 'ushiro'],
-    mae: ['mawashi', 'ushiro'], gedan: ['mae'], mawashi: ['kaiten'],
-  };
-  const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
-  const mix = (a, b, t) => a + (b - a) * t;
-
-  class KyokushinGame {
-    constructor(options = {}) {
-      this.onEvent = typeof options.onEvent === 'function' ? options.onEvent : () => {};
-      this.random = options.random || Math.random;
-      this.options = { player: 'angelo', mode: 'cpu', difficulty: 'normal' };
-      this.inputs = [this.newInput(), this.newInput()];
-      this.paused = false;
-      this.state = null;
-      this.start(this.options);
-    }
-
-    newInput() { return { held: Object.fromEntries(ACTIONS.map(a => [a, false])), pressed: [], directionTap: null }; }
-
-    makeFighter(id, player, x) {
-      return {
-        id, player, x, y: FLOOR, vx: 0, vy: 0, facing: player === 0 ? 1 : -1,
-        state: 'idle', move: null, previousMove: null, moveProgress: 0, moveTime: 0,
-        hp: MAX_HP, maxHp: MAX_HP, ki: 45, maxKi: 100, combo: 0, wins: 0,
-        stun: 0, invulnerable: 0, hitFlash: 0, guardFlash: 0, walkCycle: 0,
-        lastDamage: 0, comboDamage: 0, comboTimer: 0, comboMoves: [], comboActive: false, comboTarget: null, lastHitBy: null, attackSerial: 0,
-        attack: null, buffer: null, inputQueue: [], crouching: false, blocking: false,
-        guardType: null, legBlocking: false, stunType: null, movement: 0, retreating: false,
-        dashProgress: 0, dashDirection: 0, dashBack: false, dashRemaining: 0, dashDuration: 0, dashDistance: 0, dashCooldown: 0, dashSettling: false,
-        airborne: false, knockdown: false, recovery: 0,
-      };
-    }
-
-    start(options = {}) {
-      this.options = { ...this.options, ...options };
-      if (!['angelo', 'samuel'].includes(this.options.player)) this.options.player = 'angelo';
-      if (!['cpu', 'versus', 'training'].includes(this.options.mode)) this.options.mode = 'cpu';
-      if (!['easy', 'normal', 'hard'].includes(this.options.difficulty)) this.options.difficulty = 'normal';
-      this.inputs = [this.newInput(), this.newInput()];
-      const id = this.options.player;
-      this.state = {
-        fighters: [this.makeFighter(id, 0, 380), this.makeFighter(id === 'angelo' ? 'samuel' : 'angelo', 1, 900)],
-        phase: 'intro', round: 1, timer: this.options.mode === 'training' ? Infinity : 60,
-        winner: null, roundWinner: null, announcement: 'ROUND 1', announcementSub: 'SPIRITO • TECNICA • RISPETTO',
-        phaseTime: 0, elapsed: 0, hitstop: 0, paused: false,
-        mode: this.options.mode, difficulty: this.options.difficulty, pace: PACE,
-      };
-      this.paused = false;
-      this.ai = { decision: .25, guard: 0, retreat: 0, attackCooldown: .55, reaction: 0 };
-      this.emit('round', { round: 1, announcement: 'ROUND 1' });
-      return this.state;
-    }
-
-    reset() { return this.start(this.options); }
-    getState() { return this.state; }
-    pause(value = !this.paused) {
-      this.paused = !!value;
-      this.state.paused = this.paused;
-      if (this.paused) this.clearInput();
-      return this.paused;
-    }
-    clearInput() { this.inputs = [this.newInput(), this.newInput()]; }
-
-    setInput(playerIndex, action, pressed, options = {}) {
-      const input = this.inputs[playerIndex];
-      if (!input || !ACTIONS.includes(action)) return;
-      if (this.paused && pressed) return;
-      const edge = pressed && !input.held[action];
-      input.held[action] = !!pressed;
-      const direction = action === 'left' || action === 'right';
-      const allowDash = options?.allowDash !== false;
-      // Sliding a held thumb between buttons is movement, not a second tap.
-      if (direction && !allowDash) input.directionTap = null;
-      if (edge) {
-        input.pressed.push(action);
-        if (direction && allowDash) {
-          const fighter = this.state.fighters[playerIndex];
-          const opposite = action === 'left' ? 'right' : 'left';
-          if (!this.canDash(fighter, input) || input.held[opposite]) { input.directionTap = null; return; }
-          const previous = input.directionTap;
-          input.directionTap = { action, time: this.state.elapsed };
-          if (previous?.action === action && this.state.elapsed - previous.time <= DASH_TAP_WINDOW) {
-            this.beginDash(fighter, action === 'right' ? 1 : -1);
-            input.directionTap = null;
-          }
-        }
-      }
-    }
-
-    emit(type, details = {}) { this.onEvent({ type, ...details }); }
-
-    update(dt) {
-      if (this.paused || !this.state || !Number.isFinite(dt) || dt <= 0) return this.state;
-      // Catch-up stays bounded after a hidden tab; normal frames retain their full time.
-      let remaining = Math.min(dt, .1);
-      while (remaining > .000001) {
-        const step = Math.min(remaining, 1 / 120);
-        this.step(step);
-        remaining -= step;
-      }
-      return this.state;
-    }
-
-    step(dt) {
-      const s = this.state;
-      s.elapsed += dt;
-      for (const fighter of s.fighters) {
-        fighter.hitFlash = Math.max(0, fighter.hitFlash - dt);
-        fighter.guardFlash = Math.max(0, fighter.guardFlash - dt);
-      }
-      // The round clock uses real play time, including short impact freezes.
-      if (s.phase === 'fight' && s.mode !== 'training') s.timer = Math.max(0, s.timer - dt);
-      if (s.hitstop > 0) {
-        s.hitstop = Math.max(0, s.hitstop - dt);
-        if (s.phase === 'fight' && s.timer <= 0) this.finishRound('time');
-        return;
-      }
-      s.phaseTime += dt;
-
-      if (s.phase === 'intro') {
-        this.discardPressed();
-        if (s.phaseTime > .85 && s.announcement !== 'HAJIME!') {
-          s.announcement = 'HAJIME!'; s.announcementSub = 'COMBATTI CON SPIRITO';
-          this.emit('announcement', { text: 'HAJIME!' });
-        }
-        if (s.phaseTime >= 1.55) {
-          s.phase = 'fight'; s.phaseTime = 0; s.announcement = ''; s.announcementSub = '';
-          this.emit('fight', { round: s.round });
-        }
-        return;
-      }
-
-      if (s.phase === 'roundOver' || s.phase === 'matchOver') {
-        this.discardPressed();
-        for (const fighter of s.fighters) this.updatePhysics(fighter, dt);
-        if (s.phase === 'roundOver' && s.phaseTime >= 2.35) this.nextRound();
-        return;
-      }
-
-      if (s.mode !== 'versus') this.updateAI(dt);
-      for (let i = 0; i < 2; i++) this.updateFighter(s.fighters[i], s.fighters[1 - i], this.inputs[i], dt);
-      this.separateFighters();
-      this.finishDashes();
-
-      // Determine both contacts before applying either, allowing honest trades.
-      const contacts = [];
-      for (let i = 0; i < 2; i++) {
-        const a = s.fighters[i], target = s.fighters[1 - i];
-        if (!a.attack || a.attack.hitApplied || a.moveTime < a.attack.def.start || a.moveTime > a.attack.def.end) continue;
-        if (this.intersects(a, target)) contacts.push([a, target, a.attack]);
-      }
-      for (const [a, target, attack] of contacts) this.applyHit(a, target, attack);
-      // A hit can stop a dash while the fighters overlap. Resolve that contact
-      // immediately, before hitstop freezes the interrupted pose.
-      if (s.fighters.some(f => f.dashSettling && f.dashRemaining <= 0)) {
-        this.separateFighters();
-        this.finishDashes();
-      }
-
-      if (s.mode === 'training') {
-        for (const fighter of s.fighters) {
-          if (fighter.hp < MAX_HP && fighter.stun <= 0 && !fighter.knockdown && fighter.comboTimer <= 0) fighter.hp = Math.min(MAX_HP, fighter.hp + 180 * dt);
-          if (fighter.hp <= 0) { fighter.hp = MAX_HP; fighter.stun = 0; fighter.knockdown = false; fighter.invulnerable = .65; }
-        }
-      } else {
-        if (s.fighters.some(f => f.hp <= 0)) this.finishRound('ko');
-        else if (s.timer <= 0) this.finishRound('time');
-      }
-    }
-
-    discardPressed() { for (const input of this.inputs) input.pressed.length = 0; }
-
-    updateFighter(f, opponent, input, dt) {
-      f.invulnerable = Math.max(0, f.invulnerable - dt);
-      f.stun = Math.max(0, f.stun - dt);
-      if (f.stun === 0) f.stunType = null;
-      f.recovery = Math.max(0, f.recovery - dt);
-      f.dashCooldown = Math.max(0, f.dashCooldown - dt);
-      f.comboTimer = Math.max(0, f.comboTimer - dt);
-      if (opponent.stun <= 0 || opponent.stunType !== 'hit' || opponent.lastHitBy !== f.player || opponent.knockdown) f.comboActive = false;
-      if (f.comboTimer === 0) { f.combo = 0; f.comboDamage = 0; f.comboMoves = []; f.comboActive = false; }
-      // Queue entries age only at the front; a fast input sequence keeps its order.
-      if (f.inputQueue.length) {
-        f.inputQueue[0].ttl -= dt;
-        if (f.inputQueue[0].ttl <= 0) f.inputQueue.shift();
-      }
-      this.syncBuffer(f);
-      // A little ki regeneration guarantees that the signature technique returns.
-      f.ki = Math.min(f.maxKi, f.ki + (this.state.mode === 'training' ? 7 : 2.1) * dt);
-
-      this.updatePhysics(f, dt);
-      const dashedThisStep = this.updateDash(f, opponent, dt);
-      // Facing must be updated before interpreting the relative back direction.
-      if (!f.attack && !dashedThisStep && f.stun <= 0 && !f.knockdown) f.facing = opponent.x >= f.x ? 1 : -1;
-      const away = f.facing === 1 ? input.held.left : input.held.right;
-      const toward = f.facing === 1 ? input.held.right : input.held.left;
-      const retreat = away && !toward;
-      const ownsBlockstun = f.stun > 0 && f.stunType === 'block';
-      const mayGuard = !dashedThisStep && !f.airborne && !f.attack && !f.knockdown && (f.stun <= 0 || ownsBlockstun);
-      if (!mayGuard) f.guardType = null;
-      else if (!ownsBlockstun) {
-        const check = input.held.legBlock;
-        f.guardType = check ? 'leg' : input.held.block || retreat ? 'arms' : null;
-      }
-      f.legBlocking = f.guardType === 'leg';
-      f.blocking = f.guardType !== null;
-      f.crouching = false; // Compatibility field: ducking is no longer an action.
-      f.movement = 0; f.retreating = false;
-
-      for (const action of input.pressed) {
-        if (ATTACKS.includes(action)) this.requestAttack(f, action);
-        else if (action === 'jump' && !dashedThisStep && !f.attack && f.stun <= 0 && !f.airborne && !f.knockdown) {
-          f.vy = -690 * PACE; f.airborne = true; f.blocking = false; f.legBlocking = false; f.guardType = null; f.crouching = false;
-          this.emit('jump', { player: f.player, x: f.x, y: f.y });
-        }
-      }
-      input.pressed.length = 0;
-
-      if (f.attack) {
-        const previousProgress = f.moveProgress;
-        f.moveTime += dt;
-        f.moveProgress = clamp(f.moveTime / f.attack.def.duration, 0, 1);
-        f.state = 'attack';
-        if (f.move === 'kaiten' && !f.attack.landingEmitted && previousProgress < .82 && f.moveProgress >= .82) {
-          f.attack.landingEmitted = true;
-          this.emit('land', { player: f.player, x: f.x, y: FLOOR, heavy: true, move: 'kaiten' });
-        }
-        const def = f.attack.def;
-        if (f.moveTime < def.end) {
-          const lungeFactor = f.moveTime < def.start ? .65 : 1;
-          f.x = clamp(f.x + f.facing * def.lunge * lungeFactor * dt, LEFT, RIGHT);
-        }
-        if (f.moveTime > def.end && !f.attack.hitApplied && !f.attack.whiffEmitted) {
-          f.attack.whiffEmitted = true;
-          this.emit('whiff', { player: f.player, move: f.move, x: f.x + f.facing * def.reach, y: f.y - def.height });
-        }
-        const canCancel = f.attack.hitConfirmed && f.combo < MAX_COMBO && f.moveTime >= f.attack.hitTime + .016 && f.buffer && (CHAINS[f.move] || []).includes(f.buffer.move);
-        if (canCancel) {
-          const nextMove = this.takeQueuedMove(f);
-          f.attack = null;
-          this.beginAttack(f, nextMove, true);
-        } else if (f.moveTime >= def.duration) {
-          f.previousMove = f.move;
-          f.move = null; f.attack = null; f.moveProgress = 0; f.moveTime = 0;
-          if (f.buffer && f.stun <= 0) {
-            const nextMove = this.takeQueuedMove(f);
-            this.beginAttack(f, nextMove);
-          }
-        }
-        return;
-      }
-
-      if (f.stun > 0 || f.knockdown) {
-        f.state = ownsBlockstun ? f.legBlocking ? 'legBlock' : 'block' : 'hit';
-        return;
-      }
-      if (dashedThisStep) {
-        f.state = 'dash'; f.movement = f.dashDirection; f.retreating = f.dashBack;
-        return;
-      }
-      if (f.buffer) { const move = this.takeQueuedMove(f); this.beginAttack(f, move); return; }
-
-      let movement = 0;
-      if (!f.legBlocking && (!input.held.block || retreat)) movement = Number(input.held.right) - Number(input.held.left);
-      if (movement) {
-        const backpedal = movement !== f.facing;
-        const beforeX = f.x;
-        f.x = clamp(f.x + movement * (backpedal ? 180 : 235) * PACE * (f.airborne ? .85 : 1) * dt, LEFT, RIGHT);
-        if (!f.airborne) {
-          const oldStep = Math.floor(f.walkCycle / Math.PI);
-          f.walkCycle += Math.abs(f.x - beforeX) * (backpedal ? 8 / 180 : 11 / 235);
-          if (Math.floor(f.walkCycle / Math.PI) > oldStep) this.emit('footstep', { player: f.player, x: f.x, y: f.y, back: backpedal });
-        }
-        f.movement = movement; f.retreating = backpedal;
-      }
-      f.state = f.airborne ? 'jump' : f.legBlocking ? 'legBlock' : f.blocking ? 'block' : movement ? 'walk' : 'idle';
-    }
-
-    syncBuffer(f) { f.buffer = f.inputQueue[0] || null; }
-    takeQueuedMove(f) { const next = f.inputQueue.shift(); this.syncBuffer(f); return next?.move; }
-    clearQueue(f) { f.inputQueue.length = 0; f.buffer = null; }
-
-    canDash(f, input = this.inputs[f?.player]) {
-      return !!f && !this.paused && this.state.phase === 'fight' && f.hp > 0 &&
-        !f.airborne && f.y >= FLOOR && !f.attack && f.stun <= 0 && !f.knockdown &&
-        !f.legBlocking && !input?.held.legBlock && !f.inputQueue.length &&
-        !input?.pressed.some(action => ATTACKS.includes(action) || action === 'jump') &&
-        f.dashRemaining <= 0 && f.dashCooldown <= 0;
-    }
-
-    beginDash(f, direction) {
-      if (!this.canDash(f)) return false;
-      const opponent = this.state.fighters[1 - f.player];
-      f.facing = opponent.x >= f.x ? 1 : -1;
-      f.dashDirection = direction > 0 ? 1 : -1;
-      f.dashBack = f.dashDirection !== f.facing;
-      f.dashDuration = f.dashBack ? .20 : .18;
-      f.dashDistance = f.dashBack ? 115 : 150;
-      f.dashRemaining = f.dashDuration; f.dashProgress = 0; f.dashSettling = true;
-      f.dashCooldown = f.dashDuration + .24;
-      f.state = 'dash'; f.guardType = null; f.blocking = false; f.legBlocking = false;
-      f.crouching = false; f.vx = 0;
-      this.emit('dash', { player: f.player, x: f.x, y: f.y, direction: f.dashDirection, back: f.dashBack });
-      return true;
-    }
-
-    stopDash(f) { f.dashRemaining = 0; }
-
-    updateDash(f, opponent, dt) {
-      if (f.dashRemaining <= 0) return false;
-      if (f.stun > 0 || f.knockdown || f.hp <= 0 || f.airborne) { this.stopDash(f); return false; }
-      const previous = f.dashProgress;
-      f.dashRemaining = Math.max(0, f.dashRemaining - dt);
-      if (f.dashRemaining < 1e-8) f.dashRemaining = 0;
-      f.dashProgress = clamp(1 - f.dashRemaining / f.dashDuration, 0, 1);
-      const ease = t => 1 - (1 - t) * (1 - t);
-      const distance = f.dashDistance * (ease(f.dashProgress) - ease(previous));
-      const desired = f.x + f.dashDirection * distance;
-      const next = clamp(desired, LEFT, RIGHT);
-      // Dashes may cross the opponent's body; their strike hurtboxes stay live.
-      f.x = next;
-      if (Math.abs(next - desired) > .01) {
-        this.stopDash(f); f.dashProgress = 1;
-        f.dashCooldown = Math.min(f.dashCooldown, .24);
-      }
-      return true;
-    }
-
-    updatePhysics(f, dt) {
-      if (f.airborne || f.y < FLOOR || f.vy < 0) {
-        f.vy += 1840 * PACE * PACE * dt;
-        f.y += f.vy * dt;
-        if (f.y >= FLOOR) {
-          f.y = FLOOR; f.vy = 0;
-          if (f.airborne) this.emit('land', { player: f.player, x: f.x, y: FLOOR, heavy: f.knockdown });
-          f.airborne = false;
-          if (f.knockdown) f.recovery = Math.max(f.recovery, .34 / PACE);
-        }
-      }
-      if (f.knockdown && !f.airborne && f.stun <= 0 && f.recovery <= 0 && f.hp > 0) {
-        f.knockdown = false; f.invulnerable = .25;
-      }
-      f.x = clamp(f.x + f.vx * dt, LEFT, RIGHT);
-      f.vx *= Math.exp(-8 * PACE * dt);
-      if (Math.abs(f.vx) < .5) f.vx = 0;
-    }
-
-    requestAttack(f, action) {
-      if (!ATTACKS.includes(action) || f.knockdown || f.hp <= 0) return;
-      let move = action;
-      // Resolve punches against the queued predecessor, not just the current pose.
-      const preceding = f.inputQueue.at(-1)?.move || f.move || (f.comboTimer > 0 ? f.previousMove : null);
-      if (action === 'tsuki' && preceding === 'tsuki') move = 'gyaku';
-      if (f.attack || f.dashRemaining > 0 || f.dashSettling || f.stun > 0 || f.inputQueue.length) {
-        if (f.inputQueue.length < 3) f.inputQueue.push({ move, ttl: QUEUE_WINDOW });
-        this.syncBuffer(f);
-        return;
-      }
-      if (MOVES[move].cost && f.ki < MOVES[move].cost) {
-        this.emit('noKi', { player: f.player, move, required: MOVES[move].cost });
-        return;
-      }
-      this.beginAttack(f, move);
-    }
-
-    beginAttack(f, move, linked = false) {
-      const def = MOVES[move];
-      if (!def || f.hp <= 0 || f.knockdown || f.stun > 0 || f.dashRemaining > 0 || f.dashSettling) return false;
-      if (def.cost && f.ki < def.cost) { this.emit('noKi', { player: f.player, move, required: def.cost }); return false; }
-      f.ki -= def.cost || 0;
-      f.attack = { def, linked, hitApplied: false, hitConfirmed: false, hitTime: Infinity, whiffEmitted: false, landingEmitted: false, serial: ++f.attackSerial, move };
-      // A confirmed link reuses the previous movement's momentum and skips a
-      // small amount of preparation, keeping even mae → ushiro continuous.
-      f.move = move; f.previousMove = move; f.moveTime = linked ? Math.min(.03, def.start * .22) : 0;
-      f.moveProgress = f.moveTime / def.duration;
-      f.state = 'attack'; f.blocking = false; f.legBlocking = false; f.guardType = null; f.crouching = false; f.movement = 0; f.retreating = false;
-      this.emit('attack', { player: f.player, move, x: f.x, y: f.y, facing: f.facing });
-      if (move === 'kaiten') {
-        this.emit('special', { player: f.player, move, x: f.x, y: f.y - 150, facing: f.facing });
-      }
-      return true;
-    }
-
-    intersects(attacker, target) {
-      if (target.hp <= 0 || target.invulnerable > 0 || target.knockdown) return false;
-      const def = attacker.attack.def;
-      const distance = (target.x - attacker.x) * attacker.facing;
-      if (distance < -20 || distance > def.reach + 27) return false;
-      // Jumps clear low kicks through real height geometry; standing height is fixed.
-      const hitY = attacker.y - def.height;
-      const top = target.y - 236;
-      const bottom = target.y - 15;
-      return hitY + def.radius >= top && hitY - def.radius <= bottom;
-    }
-
-    applyHit(attacker, target, attack) {
-      if (attack.hitApplied) return;
-      attack.hitApplied = true;
-      const def = attack.def;
-      const facingAttacker = (attacker.x - target.x) * target.facing >= -25;
-      const guardType = target.guardType;
-      const blocked = target.blocking && !target.airborne && target.dashRemaining <= 0 && target.state !== 'dash' && facingAttacker &&
-        (guardType === 'leg' ? KICKS.has(attack.move) : guardType === 'arms' && def.level !== 'low');
-      const x = mix(attacker.x, target.x, .77);
-      const y = clamp(attacker.y - def.height, target.y - 215, target.y - 30);
-      if (blocked) {
-        const chip = def.cost && guardType !== 'leg' ? 12 : 0;
-        target.hp = Math.max(1, target.hp - chip);
-        target.stun = Math.max(target.stun, def.stun * .48);
-        target.stunType = 'block'; target.guardFlash = .17;
-        target.state = guardType === 'leg' ? 'legBlock' : 'block';
-        target.vx = attacker.facing * def.push * .45;
-        target.ki = Math.min(target.maxKi, target.ki + 4);
-        attacker.ki = Math.min(attacker.maxKi, attacker.ki + 2);
-        this.state.hitstop = Math.max(this.state.hitstop, .026);
-        attacker.comboActive = false;
-        this.emit('block', { player: attacker.player, target: target.player, x, y, move: attack.move, damage: chip, facing: attacker.facing, guardType });
-        return;
-      }
-      attack.hitConfirmed = true;
-      attack.hitTime = attacker.moveTime;
-      const connected = attacker.comboActive && attacker.comboTarget === target.player && target.stun > 0 && target.stunType === 'hit' && target.lastHitBy === attacker.player;
-      if (!connected) { attacker.combo = 0; attacker.comboDamage = 0; attacker.comboMoves = []; }
-      const scaling = Math.max(.38, 1 - attacker.combo * .12);
-      const damage = Math.round(def.damage * scaling);
-      target.hp = Math.max(0, target.hp - damage);
-      this.stopDash(target);
-      this.inputs[target.player].directionTap = null;
-      target.lastDamage = damage;
-      target.hitFlash = .18;
-      target.stun = def.stun; target.stunType = 'hit'; target.lastHitBy = attacker.player;
-      target.vx = attacker.facing * def.push;
-      target.attack = null; target.move = null; target.moveProgress = 0; target.moveTime = 0;
-      this.clearQueue(target); target.blocking = false; target.legBlocking = false; target.guardType = null; target.crouching = false; target.state = 'hit'; target.comboActive = false;
-      attacker.combo += 1; attacker.comboDamage += damage; attacker.comboTimer = 1.15;
-      attacker.comboMoves.push(attack.move); attacker.comboActive = true; attacker.comboTarget = target.player;
-      attacker.ki = Math.min(attacker.maxKi, attacker.ki + def.ki);
-      target.ki = Math.min(target.maxKi, target.ki + def.ki * .6);
-      const comboLimit = attacker.combo >= MAX_COMBO;
-      if (def.knockdown || comboLimit || (attack.move === 'ushiro' && attacker.combo >= 3)) {
-        target.knockdown = true; target.airborne = true; target.vy = -265 * PACE;
-        target.stun = Math.max(target.stun, .62 / PACE);
-        attacker.comboActive = false;
-        this.clearQueue(attacker);
-      }
-      this.state.hitstop = Math.max(this.state.hitstop, def.cost ? .072 : damage > 130 ? .052 : .034);
-      const comboMoves = [...attacker.comboMoves];
-      this.emit('hit', { player: attacker.player, target: target.player, x, y, move: attack.move, damage, combo: attacker.combo, comboDamage: attacker.comboDamage, comboMoves, facing: attacker.facing, knockdown: target.knockdown, comboLimit });
-      if (attacker.combo > 1) this.emit('combo', { player: attacker.player, target: target.player, combo: attacker.combo, comboDamage: attacker.comboDamage, comboMoves, x, y, finished: target.knockdown });
-    }
-
-    separateFighters() {
-      const [a, b] = this.state.fighters;
-      if (a.dashRemaining > 0 || b.dashRemaining > 0) return;
-      const dashEnded = a.dashSettling || b.dashSettling;
-      if (Math.abs(a.y - b.y) > 145 || ((a.knockdown || b.knockdown) && !dashEnded)) return;
-      const distance = Math.abs(a.x - b.x);
-      if (distance >= 82) return;
-      // At an exact meeting point, the dash directions choose the crossed side
-      // deterministically, including simultaneous opposite dashes at a wall.
-      const crossingDirection = (a.dashSettling ? a.dashDirection : 0) - (b.dashSettling ? b.dashDirection : 0);
-      const direction = distance < 1e-6 && crossingDirection ? Math.sign(crossingDirection) : a.x <= b.x ? -1 : 1;
-      const middle = clamp((a.x + b.x) * .5, LEFT + 41, RIGHT - 41);
-      a.x = middle + direction * 41;
-      b.x = middle - direction * 41;
-    }
-
-    finishDashes() {
-      let ended = false;
-      for (const f of this.state.fighters) {
-        if (f.dashSettling && f.dashRemaining <= 0) { f.dashSettling = false; ended = true; }
-      }
-      if (!ended) return;
-      for (const f of this.state.fighters) {
-        const opponent = this.state.fighters[1 - f.player];
-        if (!f.attack && f.dashRemaining <= 0 && !f.knockdown) f.facing = opponent.x >= f.x ? 1 : -1;
-      }
-    }
-
-    updateAI(dt) {
-      const s = this.state, ai = this.ai;
-      const f = s.fighters[1], opponent = s.fighters[0];
-      const input = this.inputs[1];
-      ai.decision -= dt; ai.guard = Math.max(0, ai.guard - dt); ai.retreat = Math.max(0, ai.retreat - dt);
-      ai.attackCooldown = Math.max(0, ai.attackCooldown - dt);
-      input.held.left = input.held.right = input.held.block = input.held.legBlock = false;
-      if (!f.attack && f.stun <= 0 && !f.knockdown) f.facing = opponent.x >= f.x ? 1 : -1;
-      const toward = opponent.x > f.x ? 'right' : 'left';
-      const away = toward === 'right' ? 'left' : 'right';
-      const distance = Math.abs(opponent.x - f.x);
-      if (s.mode === 'training') {
-        // A stationary partner: occasional visible guards, no attacks or round timer.
-        if (ai.decision <= 0) { ai.decision = 1.25 + this.random(); ai.guard = this.random() < .2 ? .6 : 0; }
-        input.held.block = ai.guard > 0;
-        return;
-      }
-      const skill = s.difficulty === 'hard' ? 2 : s.difficulty === 'easy' ? 0 : 1;
-      const observedAttack = opponent.attack?.serial;
-      if (observedAttack !== ai.observedAttack) { ai.observedAttack = observedAttack; ai.reaction = 0; }
-      else if (opponent.attack) ai.reaction += dt;
-      else ai.reaction = 0;
-      if (ai.decision <= 0) {
-        ai.decision = [.23, .15, .105][skill] + this.random() * .07;
-        if (opponent.attack && ai.reaction > [.15, .105, .075][skill] && distance < 275 && this.random() < [.23, .48, .72][skill]) {
-          ai.guard = .18 + this.random() * .20;
-          ai.guardLow = KICKS.has(opponent.move) && this.random() < .8;
-        }
-        if (!f.attack && f.stun <= 0 && !f.knockdown && ai.attackCooldown <= 0 && ai.guard <= 0) {
-          if (distance < 252 && this.random() < [.50, .72, .86][skill]) {
-            let choices;
-            if (distance < 160) choices = ['tsuki', 'tsuki', 'shita', 'kagi', 'gyaku', 'gedan', 'mae'];
-            else if (distance < 195) choices = ['kagi', 'mae', 'gedan', 'mawashi', 'ushiro'];
-            else if (distance < 212) choices = ['mae', 'gedan', 'mawashi', 'mae', 'ushiro'];
-            else choices = ['mawashi', 'ushiro', 'mae'];
-            let move = choices[Math.floor(this.random() * choices.length)];
-            if (f.ki >= 45 && distance < 270 && this.random() < [.08, .15, .22][skill]) move = 'kaiten';
-            this.requestAttack(f, move);
-            ai.attackCooldown = [.48, .23, .10][skill] + this.random() * .23;
-            if (this.random() < .16) ai.retreat = .20;
-          } else if (distance > 290 && this.random() < .035 && !f.airborne) {
-            f.vy = -650 * PACE; f.airborne = true;
-          }
-        }
-        // Only confirmed attacks are chained; there is always recovery to punish.
-        if (f.attack && f.attack.hitConfirmed && f.comboActive && f.moveTime > f.attack.hitTime && !f.buffer && this.random() < [.18, .40, .68][skill]) {
-          const followups = CHAINS[f.move];
-          if (followups) this.requestAttack(f, followups[Math.floor(this.random() * followups.length)]);
-        }
-      }
-      if (ai.guard > 0) { input.held.legBlock = !!ai.guardLow; input.held.block = !ai.guardLow; }
-      else if (ai.retreat > 0 && distance < 245) input.held[away] = true;
-      else if (distance > (f.id === 'samuel' ? 178 : 154)) input.held[toward] = true;
-      else if (distance < 115 && !f.attack) input.held[away] = true;
-    }
-
-    finishRound(reason) {
-      const s = this.state;
-      if (s.phase !== 'fight') return;
-      this.clearInput();
-      const [a, b] = s.fighters;
-      const winner = a.hp === b.hp ? null : a.hp > b.hp ? 0 : 1;
-      s.roundWinner = winner;
-      s.phaseTime = 0;
-      s.announcement = reason === 'ko' ? 'K.O.' : 'TEMPO!';
-      if (winner === null) s.announcementSub = 'HIKIWAKE · PAREGGIO';
-      else {
-        const victor = s.fighters[winner];
-        victor.wins += 1;
-        s.announcementSub = `${victor.id === 'angelo' ? 'ANGELO' : 'SAMUEL'} VINCE IL ROUND`;
-      }
-      for (let i = 0; i < 2; i++) {
-        const f = s.fighters[i];
-        f.attack = null; this.clearQueue(f); this.stopDash(f); f.blocking = false; f.legBlocking = false; f.guardType = null; f.movement = 0; f.retreating = false;
-        f.move = null; f.moveProgress = 0;
-        f.state = winner === i ? 'victory' : f.hp <= 0 ? 'ko' : 'idle';
-        if (f.hp <= 0) { f.knockdown = true; f.vy = -170 * PACE; f.airborne = true; }
-      }
-      this.separateFighters();
-      this.finishDashes();
-      s.phase = 'roundOver';
-      this.emit(reason === 'ko' ? 'ko' : 'time', { winner, round: s.round, x: winner === null ? 640 : s.fighters[1 - winner].x, y: FLOOR - 130 });
-      if (winner !== null && s.fighters[winner].wins >= 2) {
-        s.phase = 'matchOver'; s.winner = winner;
-        this.emit('match', { winner, id: s.fighters[winner].id, round: s.round });
-      }
-    }
-
-    nextRound() {
-      const s = this.state;
-      s.fighters = s.fighters.map((old, i) => {
-        const fresh = this.makeFighter(old.id, i, i === 0 ? 380 : 900);
-        fresh.wins = old.wins;
-        fresh.ki = Math.max(30, old.ki * .75);
-        return fresh;
-      });
-      s.round += 1; s.timer = 60; s.phase = 'intro'; s.phaseTime = 0; s.roundWinner = null;
-      s.announcement = `ROUND ${s.round}`; s.announcementSub = 'OSU. NON ARRENDERTI.';
-      this.inputs = [this.newInput(), this.newInput()];
-      this.ai = { decision: .25, guard: 0, retreat: 0, attackCooldown: .6, reaction: 0 };
-      this.emit('round', { round: s.round, announcement: s.announcement });
-    }
-  }
-
-  global.KyokushinGame = KyokushinGame;
-  global.KyokushinMoves = MOVES;
-  if (typeof module !== 'undefined' && module.exports) module.exports = { KyokushinGame, KyokushinMoves: MOVES };
-})(typeof window !== 'undefined' ? window : globalThis);
-
-</script>
+<script src="scripts/roster.js"></script>
+<script src="scripts/game.js"></script>
 <script>
 /* renderer.js */
 /* Original arcade character artwork, generated from the supplied references.
@@ -2055,6 +1437,8 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 })();
 
 </script>
+<script src="scripts/karateka-atlas.js"></script>
+<script src="scripts/karateka-art.js"></script>
 <script>
 /* audio.js */
 /* Original synthesized score and sound design for Kyokushin Spirit. */
@@ -2617,1019 +2001,15 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
-<script>
-/* mobile-controls.js */
-/* Aggregated keyboard and multitouch input for the local arcade game. */
-(function (global) {
-  'use strict';
-  const ACTIONS = new Set(['left', 'right', 'jump', 'block', 'legBlock', 'tsuki', 'shita', 'kagi', 'mae', 'mawashi', 'ushiro', 'gedan', 'kaiten']);
-  const BANKS = {
-    punches: [
-      ['tsuki', 'Tsuki, pugno diretto al corpo'],
-      ['shita', 'Shita tsuki, montante al corpo'],
-      ['kagi', 'Kagi tsuki, gancio al corpo'],
-      ['mae', 'Mae geri, calcio frontale']
-    ],
-    kicks: [
-      ['mae', 'Mae geri, calcio frontale'],
-      ['mawashi', 'Mawashi geri, calcio circolare alto'],
-      ['gedan', 'Gedan, calcio basso'],
-      ['ushiro', 'Ushiro geri, calcio posteriore']
-    ],
-    special: [
-      ['kaiten', 'Kaiten geri, tecnica speciale da 45 Spirit'],
-      ['block', 'Tieni premuto per parare con le braccia'],
-      ['legBlock', 'Tieni premuto per parare i calci con il ginocchio'],
-      ['ushiro', 'Ushiro geri, calcio posteriore']
-    ]
-  };
-  const BANK_ORDER = ['punches', 'kicks', 'special'];
-  const BANK_LABELS = ['pugni', 'calci', 'speciali e parate'];
-  // Small, consistent karate silhouettes remain legible without names. Motion
-  // strokes distinguish the straight, rising and hooked punches at a glance.
-  const svg = content => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">${content}</svg>`;
-  const head = (x, y) => `<circle cx="${x}" cy="${y}" r="5" fill="currentColor" stroke="none"/>`;
-  const motion = path => `<path d="${path}" stroke-width="2.4" opacity=".65"/>`;
-  const punchBase = head(23, 17) + '<path d="M19 24 28 24 31 40 19 40Z" fill="currentColor" stroke="none"/><path d="M20 27 12 33 19 35M22 40 16 49 10 58M28 40 34 50 43 57"/>';
-  const ICONS = {
-    tsuki: svg(punchBase + '<path d="M27 27 39 27 53 27"/><path d="M52 25h5v5h-5Z" fill="currentColor" stroke="none"/>' + motion('M36 14H56m-5-4 5 4-5 4')),
-    shita: svg(punchBase + '<path d="M28 28 42 37 49 23"/><path d="m47 21 5 1-1 5-5-1Z" fill="currentColor" stroke="none"/>' + motion('M57 36V15m-4 5 4-5 4 5')),
-    kagi: svg(punchBase + '<path d="M28 27 48 30 48 19 39 19"/><path d="M36 16h5v6h-5Z" fill="currentColor" stroke="none"/>' + motion('M57 29Q62 7 39 8m4-4-5 4 5 4')),
-    mae: svg(head(21, 13) + '<path d="m18 21 10-1 3 18-12 1Z" fill="currentColor" stroke="none"/><path d="M20 23 12 31 20 34M27 23 34 26 38 20M24 39 18 49 15 59M28 39 39 31 54 32"/>' + motion('M40 42h18m-4-4 4 4-4 4')),
-    mawashi: svg(head(18, 18) + '<path d="m16 26 9-3 9 17-11 5Z" fill="currentColor" stroke="none"/><path d="M18 27 10 36 17 39M25 26 32 29 35 23M27 43 20 50 17 59M31 40 43 27 56 20"/>' + motion('M43 12Q59 9 60 28m-4-4 4 5 3-5')),
-    gedan: svg(head(22, 13) + '<path d="M18 21h10l3 19H18Z" fill="currentColor" stroke="none"/><path d="M19 24 12 32 20 34M27 24 34 29 38 22M22 40 16 51 14 59M29 40 41 48 55 52"/>' + motion('M39 58h20m-4-4 4 4-4 3')),
-    ushiro: svg(head(19, 24) + '<path d="m25 27 16 5-4 10-17-7Z" fill="currentColor" stroke="none"/><path d="M25 29 16 39 10 36M28 34 23 43 17 43M36 40 33 50 34 59M39 35 48 32 57 31"/>' + motion('M40 17h19m-5-4 5 4-5 4')),
-    kaiten: svg(head(23, 43) + '<path d="m25 35 10-11 8 8-12 11Z" fill="currentColor" stroke="none"/><path d="M27 37 15 33 12 26M32 38 41 45 46 39M36 27 29 17 20 20M40 28 48 17 52 8"/>' + motion('M11 17A23 23 0 1 0 55 40m-5 3 6-3 2 6')),
-    block: svg(head(32, 15) + '<path d="M26 24h12l3 17H24Z" fill="currentColor" stroke="none"/><path d="M26 26 18 30 21 16M38 26 46 30 43 16M28 41 22 50 18 59M36 41 42 50 46 59"/>' + motion('M15 9 9 23m40-14 6 14')),
-    legBlock: svg(head(27, 13) + '<path d="M22 22h11l2 19H22Z" fill="currentColor" stroke="none"/><path d="M23 25 16 31 19 19M32 25 39 29 42 19M25 41 23 51 25 59M32 40 44 32 47 48"/>' + motion('M53 28v22m-3-17 3-5 3 5'))
-  };
-  const BANK_ICONS = { punches: ICONS.tsuki, kicks: ICONS.mawashi, special: ICONS.kaiten };
-
-  class DojoControls {
-    constructor({ element, setInput, canPlay = () => true, onTouch = () => {} } = {}) {
-      if (!element?.addEventListener || typeof setInput !== 'function') throw new TypeError('DojoControls requires an element and setInput callback.');
-      this.element = element;
-      this.document = element.ownerDocument;
-      this.setInput = setInput;
-      this.canPlay = canPlay;
-      this.onTouch = onTouch;
-      this.sources = new Map();
-      this.actions = new Map();
-      this.pointers = new Map();
-      this.padKeys = new Map();
-      this.bank = 'punches';
-      this.destroyed = false;
-      this.listeners = [];
-      this.originalStyle = {};
-      for (const key of ['touchAction', 'userSelect', 'webkitUserSelect', 'webkitTouchCallout']) {
-        this.originalStyle[key] = element.style[key];
-        element.style[key] = 'none';
-      }
-      this._listen(element, 'pointerdown', event => this._down(event));
-      this._listen(element, 'pointermove', event => this._move(event));
-      this._listen(element, 'pointerup', event => this._end(event, 'up'));
-      this._listen(element, 'pointercancel', event => this._end(event, 'cancel'));
-      this._listen(element, 'lostpointercapture', event => this._end(event, 'lostcapture'));
-      this._listen(element, 'keydown', event => this._keyDown(event));
-      this._listen(element, 'keyup', event => this._keyUp(event));
-      this._listen(element, 'click', event => {
-        const cycle = this._within(event.target, '[data-bank-cycle]');
-        if (!cycle) return;
-        event.preventDefault();event.stopPropagation();
-        if (!this.canPlay() || cycle.disabled) return;
-        this.cycleBank();
-        this.onTouch(event);
-      });
-      this._listen(element, 'focusout', event => {
-        for (const [code, record] of [...this.padKeys]) {
-          if (record.button === this._button(event.target)) this._releasePadKey(code, 'blur');
-        }
-      });
-      // Capture is supported on target browsers; these also release pointers if
-      // capture is unavailable and the finger/mouse leaves the controls.
-      if (this.document?.addEventListener) {
-        this._listen(this.document, 'pointermove', event => { if (this.pointers.get(event.pointerId)?.captured === false) this._move(event); });
-        this._listen(this.document, 'pointerup', event => this._end(event, 'up'));
-        this._listen(this.document, 'pointercancel', event => this._end(event, 'cancel'));
-      }
-      for (const type of ['click', 'contextmenu', 'dragstart']) {
-        this._listen(element, type, event => {
-          if (!this._button(event.target) && !this._within(event.target, '[data-joystick]')) return;
-          event.preventDefault();
-          if (type === 'click') event.stopPropagation(); // No delayed synthetic attack/click.
-        });
-      }
-      this._syncButtons();
-      this.setBank(this.bank);
-    }
-
-    _listen(target, type, listener) {
-      target.addEventListener(type, listener, { passive: false });
-      this.listeners.push({ target, type, listener });
-    }
-
-    _key(player, action) { return `${player}:${action}`; }
-    _valid(player, action) { return (player === 0 || player === 1) && ACTIONS.has(action); }
-
-    _button(target) {
-      return this._within(target, '[data-action]');
-    }
-
-    _within(target, selector) {
-      const node = target?.closest?.(selector) || target?.parentElement?.closest?.(selector);
-      return node && this.element.contains(node) ? node : null;
-    }
-
-    /** Changing banks releases only touch actions, preserving a held joystick/key. */
-    setBank(bank) {
-      if (this.destroyed || !BANKS[bank]) return false;
-      const buttons = [...this.element.querySelectorAll('[data-action-slot]')];
-      if (bank !== this.bank) {
-        for (const record of [...this.pointers.values()]) if (record.kind !== 'joystick') this._finishPointer(record.pointerId, 'bank');
-        for (const [code, record] of [...this.padKeys]) if (buttons.includes(record.button)) this._releasePadKey(code, 'bank');
-      }
-      this.bank = bank;
-      this.element.dataset.activeBank = bank;
-      for (const button of buttons) {
-        const spec = BANKS[bank][Number(button.dataset.actionSlot)];
-        if (!spec) continue;
-        const [action, description] = spec;
-        button.dataset.action = action;
-        button.setAttribute('aria-label', description);
-        const icon = button.querySelector('[data-action-icon]');
-        if (icon) icon.innerHTML = ICONS[action];
-      }
-      const index = BANK_ORDER.indexOf(bank), next = (index + 1) % BANK_ORDER.length;
-      for (const cycle of this.element.querySelectorAll('[data-bank-cycle]')) {
-        cycle.dataset.bankIndex = String(index);
-        cycle.setAttribute('aria-label', `Cambia tecniche. Gruppo ${index + 1} di 3: ${BANK_LABELS[index]}. Prossimo gruppo: ${BANK_LABELS[next]}.`);
-        const icon = cycle.querySelector('[data-bank-icon]');
-        if (icon) icon.innerHTML = BANK_ICONS[bank];
-        const dots = cycle.querySelector('.bank-dots')?.children || [];
-        for (let i = 0; i < dots.length; i++) dots[i].classList.toggle('active', i === index);
-      }
-      this._syncButtons();
-      return true;
-    }
-
-    /** One native click/tap advances one group; pointer events never duplicate it. */
-    cycleBank() {
-      if (this.destroyed || !this.canPlay()) return false;
-      return this.setBank(BANK_ORDER[(BANK_ORDER.indexOf(this.bank) + 1) % BANK_ORDER.length]);
-    }
-
-    _binding(button) {
-      if (!button || button.disabled) return null;
-      const player = button.dataset.player === undefined ? 0 : Number(button.dataset.player);
-      const action = button.dataset.action;
-      return this._valid(player, action) ? { player, action } : null;
-    }
-
-    _buttons() {
-      const list = [...this.element.querySelectorAll('[data-action]')];
-      if (this.element.dataset?.action) list.unshift(this.element);
-      return list;
-    }
-
-    _syncButtons() {
-      for (const button of this._buttons()) {
-        const binding = this._binding(button);
-        const down = !!binding && !!this.actions.get(this._key(binding.player, binding.action))?.size;
-        button.classList.toggle('pressed', down);
-        button.setAttribute('aria-pressed', String(down));
-      }
-    }
-
-    /** Hold one action for an arbitrary stable source, e.g. "key:KeyA". */
-    press(source, player, action) {
-      return this._press(source, player, action, { origin: 'external', phase: 'press' });
-    }
-
-    _press(source, player, action, meta) {
-      if (this.destroyed || source === null || source === undefined || !this._valid(player, action)) return false;
-      if (!this.canPlay()) { this._release(source, meta); return false; }
-      const previous = this.sources.get(source);
-      if (previous?.player === player && previous.action === action) return true;
-      if (previous) this._release(source, meta);
-      const key = this._key(player, action);
-      let owners = this.actions.get(key);
-      if (!owners) { owners = new Set(); this.actions.set(key, owners); }
-      const wasHeld = owners.size > 0;
-      owners.add(source); this.sources.set(source, { player, action });
-      if (!wasHeld) this.setInput(player, action, true, meta);
-      this._syncButtons();
-      return true;
-    }
-
-    /** Releasing one source never releases another finger/key on the action. */
-    release(source) { return this._release(source, { origin: 'external', phase: 'release' }); }
-
-    _release(source, meta) {
-      const previous = this.sources.get(source);
-      if (!previous) return false;
-      this.sources.delete(source);
-      const key = this._key(previous.player, previous.action), owners = this.actions.get(key);
-      owners?.delete(source);
-      if (!owners?.size) {
-        this.actions.delete(key);
-        this.setInput(previous.player, previous.action, false, meta);
-      }
-      this._syncButtons();
-      return true;
-    }
-
-    _meta(record, phase) { return { origin: 'pointer', phase, pointerType: record.pointerType, pointerId: record.pointerId }; }
-
-    _activationKey(event) {
-      const code = event.code || (event.key === ' ' ? 'Space' : event.key);
-      return ['Enter', 'NumpadEnter', 'Space'].includes(code) ? code : null;
-    }
-
-    _keyDown(event) {
-      if (this._activationKey(event) && this._within(event.target, '[data-bank-cycle]')) {
-        // Keep the button's native Enter/Space click, but not game shortcuts or
-        // repeated Enter clicks while a keyboard button is held down.
-        event.stopPropagation();
-        if (event.repeat) event.preventDefault();
-        return;
-      }
-      const code = this._activationKey(event), button = this._button(event.target), binding = this._binding(button);
-      if (!code || !binding || this.destroyed) return;
-      // Preserve a held guard and suppress the browser's synthetic click as well
-      // as the game's global Enter/Space shortcuts on these focused buttons.
-      event.preventDefault();event.stopPropagation();
-      if (event.repeat || this.padKeys.has(code) || !this.canPlay()) return;
-      const source = Symbol(`pad-key:${code}`);
-      if (this._press(source, binding.player, binding.action, { origin: 'pad-keyboard', phase: 'down', key: code })) {
-        this.padKeys.set(code, { source, button });
-      }
-    }
-
-    _keyUp(event) {
-      if (this._activationKey(event) && this._within(event.target, '[data-bank-cycle]')) { event.stopPropagation();return; }
-      const code = this._activationKey(event);
-      if (!code || (!this.padKeys.has(code) && !this._button(event.target))) return;
-      event.preventDefault();event.stopPropagation();
-      this._releasePadKey(code, 'up');
-    }
-
-    _releasePadKey(code, phase) {
-      const record = this.padKeys.get(code);
-      if (!record) return;
-      this.padKeys.delete(code);
-      this._release(record.source, { origin: 'pad-keyboard', phase, key: code });
-    }
-
-    _down(event) {
-      if (this.destroyed || (event.pointerType === 'mouse' && event.button !== 0)) return;
-      const joystick = this._within(event.target, '[data-joystick]');
-      if (joystick) { this._joystickDown(event, joystick); return; }
-      const button = this._button(event.target), binding = this._binding(button);
-      if (!binding) return;
-      event.preventDefault();
-      if (!this.canPlay() || this.pointers.has(event.pointerId)) return;
-      const record = { source: Symbol(`pointer:${event.pointerId}`), pointerId: event.pointerId,
-        pointerType: event.pointerType || 'touch', button, captured: false };
-      this.pointers.set(event.pointerId, record);
-      if (!this._press(record.source, binding.player, binding.action, this._meta(record, 'down'))) {
-        this.pointers.delete(event.pointerId); return;
-      }
-      try {
-        if (this.element.setPointerCapture) { this.element.setPointerCapture(event.pointerId); record.captured = true; }
-      } catch (_) { record.captured = false; }
-      this.onTouch(event);
-    }
-
-    _joystickDown(event, joystick) {
-      event.preventDefault();
-      if (!this.canPlay() || this.pointers.has(event.pointerId) || [...this.pointers.values()].some(record => record.joystick === joystick)) return;
-      const record = { kind: 'joystick', joystick, source: Symbol(`stick:${event.pointerId}`),
-        jumpSource: Symbol(`stick-jump:${event.pointerId}`), horizontal: null, jumping: false,
-        pointerId: event.pointerId, pointerType: event.pointerType || 'touch', captured: false };
-      this.pointers.set(event.pointerId, record);
-      try {
-        if (this.element.setPointerCapture) { this.element.setPointerCapture(event.pointerId); record.captured = true; }
-      } catch (_) { record.captured = false; }
-      this._joystickMove(event, record);
-      this.onTouch(event);
-    }
-
-    _joystickMove(event, record) {
-      const rect = record.joystick.getBoundingClientRect();
-      const dx = event.clientX - rect.left - rect.width / 2, dy = event.clientY - rect.top - rect.height / 2;
-      const radius = Math.max(1, Math.min(rect.width, rect.height) / 2);
-      const x = dx / radius, y = dy / radius;
-      const old = record.horizontal;
-      const direction = x > (old === 'right' ? .16 : .27) ? 'right' : x < (old === 'left' ? -.16 : -.27) ? 'left' : null;
-      if (direction !== old) {
-        this._release(record.source, this._meta(record, direction ? 'move' : 'up'));
-        // A new flick from neutral is a deliberate tap. Crossing directly from
-        // left to right is movement and must not accidentally prime a dash.
-        if (direction) this._press(record.source, 0, direction, this._meta(record, old ? 'move' : 'down'));
-        record.horizontal = direction;
-      }
-      const jumping = y < (record.jumping ? -.28 : -.48);
-      if (jumping !== record.jumping) {
-        if (jumping) this._press(record.jumpSource, 0, 'jump', this._meta(record, 'down'));
-        else this._release(record.jumpSource, this._meta(record, 'move'));
-        record.jumping = jumping;
-      }
-      const length = Math.hypot(x, y), travel = radius * .55 / Math.max(1, length);
-      record.joystick.style.setProperty('--stick-x', `${x * travel}px`);
-      record.joystick.style.setProperty('--stick-y', `${y * travel}px`);
-      record.joystick.classList.toggle('engaged', true);
-      record.joystick.classList.toggle('jumping', jumping);
-      record.joystick.setAttribute('aria-label', `Joystick: ${direction === 'left' ? 'sinistra' : direction === 'right' ? 'destra' : 'neutro'}${jumping ? ', salto' : ''}. Trascina per muoverti, verso l’alto per saltare.`);
-    }
-
-    _resetJoystick(joystick) {
-      joystick.style.setProperty('--stick-x', '0px');joystick.style.setProperty('--stick-y', '0px');
-      joystick.classList.toggle('engaged', false);joystick.classList.toggle('jumping', false);
-      joystick.setAttribute('aria-label', 'Joystick: trascina a sinistra o destra per muoverti, in alto per saltare. Due flick nella stessa direzione per scattare.');
-    }
-
-    _move(event) {
-      const record = this.pointers.get(event.pointerId);
-      if (!record) return;
-      event.preventDefault();
-      if (!this.canPlay()) { this._finishPointer(event.pointerId, 'cancel'); return; }
-      if (record.kind === 'joystick') { this._joystickMove(event, record); return; }
-      // Pointer capture retargets events, so hit-test using the iframe's own
-      // document and viewport coordinates instead of event.target.
-      const hit = this.document?.elementFromPoint?.(event.clientX, event.clientY);
-      const button = this._button(hit), binding = this._binding(button);
-      const meta = this._meta(record, 'move');
-      if (binding) this._press(record.source, binding.player, binding.action, meta);
-      else this._release(record.source, meta);
-      record.button = button;
-    }
-
-    _end(event, phase) {
-      if (!this.pointers.has(event.pointerId)) return;
-      event.preventDefault();
-      this._finishPointer(event.pointerId, phase);
-    }
-
-    _finishPointer(pointerId, phase) {
-      const record = this.pointers.get(pointerId);
-      if (!record) return;
-      this.pointers.delete(pointerId);
-      this._release(record.source, this._meta(record, phase));
-      if (record.kind === 'joystick') {
-        this._release(record.jumpSource, this._meta(record, phase));
-        this._resetJoystick(record.joystick);
-      }
-      this._releaseCapture(record);
-    }
-
-    _releaseCapture(record) {
-      if (!record.captured) return;
-      try {
-        if (!this.element.hasPointerCapture || this.element.hasPointerCapture(record.pointerId)) this.element.releasePointerCapture?.(record.pointerId);
-      } catch (_) { /* The browser may already have released a cancelled pointer. */ }
-    }
-
-    /** Root calls this on pause, menus, blur, visibility/orientation changes. */
-    clear() {
-      const pointers = [...this.pointers.values()];
-      this.pointers.clear();
-      this.padKeys.clear();
-      for (const source of [...this.sources.keys()]) this._release(source, { origin: 'system', phase: 'clear' });
-      for (const record of pointers) {
-        if (record.kind === 'joystick') this._resetJoystick(record.joystick);
-        this._releaseCapture(record);
-      }
-      this._syncButtons();
-    }
-
-    destroy() {
-      if (this.destroyed) return;
-      this.clear();this.destroyed = true;
-      for (const { target, type, listener } of this.listeners) target.removeEventListener(type, listener);
-      this.listeners.length = 0;
-      for (const [key, value] of Object.entries(this.originalStyle)) this.element.style[key] = value;
-    }
-  }
-
-  global.DojoControls = DojoControls;
-  if (typeof module !== 'undefined' && module.exports) module.exports = { DojoControls };
-})(typeof window !== 'undefined' ? window : globalThis);
-
-</script>
-<script>
-/* orientation.js */
-/* Follow the browser viewport; the game never applies a second screen rotation. */
-(function (global) {
-  'use strict';
-
-  const ROUNDING_TOLERANCE = 2;
-  const positive = value => Number.isFinite(value) && value > 0;
-  const shape = (width, height) => Math.sign(width - height);
-  const clampOffset = (value, maximum) => Number.isFinite(value) ? Math.max(0, Math.min(maximum, value)) : 0;
-
-  function resolve(input = {}) {
-    input = input || {};
-    // These are the containing document's inner dimensions, never device pixels.
-    const layoutWidth = positive(input.width) ? input.width : 1;
-    const layoutHeight = positive(input.height) ? input.height : 1;
-    const portrait = layoutHeight > layoutWidth;
-    let width = layoutWidth, height = layoutHeight, left = 0, top = 0;
-
-    // A late visualViewport update must not invert a freshly resized layout.
-    // Smaller, consistently oriented dimensions still support pinch zoom/panning.
-    const visualFits = positive(input.visualWidth) && positive(input.visualHeight)
-      && shape(input.visualWidth, input.visualHeight) === shape(layoutWidth, layoutHeight)
-      && input.visualWidth <= layoutWidth + ROUNDING_TOLERANCE
-      && input.visualHeight <= layoutHeight + ROUNDING_TOLERANCE;
-    if (visualFits) {
-      width = Math.min(layoutWidth, input.visualWidth);
-      height = Math.min(layoutHeight, input.visualHeight);
-      left = clampOffset(input.offsetLeft, layoutWidth - width);
-      top = clampOffset(input.offsetTop, layoutHeight - height);
-    }
-
-    // Native orientation notifications and fullscreen promises may settle before
-    // the iframe is resized. Only the actual layout can make the arena playable.
-    // A denied or unsupported native request must not rotate it with CSS instead.
-    const blocked = !!input.touchEnabled && portrait;
-    return {
-      width, height, left, top, virtual: false,
-      logicalWidth: width,
-      logicalHeight: height,
-      blocked
-    };
-  }
-
-  const DojoOrientation = Object.freeze({ resolve });
-  global.DojoOrientation = DojoOrientation;
-  if (typeof module !== 'undefined' && module.exports) module.exports = { DojoOrientation };
-})(typeof window !== 'undefined' ? window : globalThis);
-
-</script>
-<script>
-/* main.js */
-(() => {
-  'use strict';
-  const $ = id => document.getElementById(id);
-  const pageOptions = new URLSearchParams(location.search);
-  const standaloneGame = pageOptions.get('standalone') === '1' && window.self === window.top;
-  const touchMedia = window.matchMedia('(any-pointer: coarse)');
-  const portraitMedia = window.matchMedia('(orientation: portrait)');
-  let touchPreference = pageOptions.get('touch') === '1' ? true : null;
-  let touchDetected = touchMedia.matches || navigator.maxTouchPoints > 0;
-  let landscapeRequested = false, landscapeAttempt = 0, viewportFrame = 0;
-  let nativeLandscapePending = false, nativeLandscapeLocked = false, viewportSettleTimer = 0;
-  document.body.classList.toggle('standalone-game', standaloneGame);
-  document.body.classList.toggle('embedded', standaloneGame || pageOptions.get('embed') === '1' || window.self !== window.top);
-  const canvas = $('game'), ctx = canvas.getContext('2d', { alpha: false });
-  const characters = {
-    angelo: { name: 'ANGELO PIERINO', rank: 'SENSEI · III DAN', short: 'ANGELO', belt: 'CINTURA NERA · 3 STRISCE', beltColor: 'black' },
-    samuel: { name: 'SAMUEL VILLANI', rank: 'SENPAI · 1 KYU', short: 'SAMUEL', belt: 'CINTURA MARRONE · 1 STRISCIA NERA', beltColor: 'brown' }
-  };
-  const config = { player: 'angelo', mode: 'cpu', difficulty: 'normal' };
-  const bg = new Image(); bg.src = window.__kyokushinAsset("assets/dojo-mirror.png");
-  let ready = false, active = false, paused = false, lastTime = performance.now(), clock = 0;
-  let screen = 'title', versusTimeout = null, transitionId = 0, loadFailed = false;
-  const heldKeys = new Map();
-  let shake = 0, flash = 0, toastTime = 0, resultShown = false, resultTimer = 0;
-  let particles = [], rings = [], floatTexts = [], lastHud = '';
-  const comboDisplay = [0, 1].map(() => ({ count: 0, damage: 0, moves: [], life: 0 }));
-  const defenseModels = [
-    {id:'angelo',x:200,y:247,facing:1,state:'block',guardType:'arms',blocking:true},
-    {id:'angelo',x:200,y:247,facing:1,state:'legBlock',guardType:'leg',legBlocking:true,blocking:true}
-  ];
-  const motionModels = [
-    {id:'angelo',x:110,y:264,facing:1,state:'walk',walkCycle:0},
-    {id:'angelo',x:200,y:264,facing:1,state:'idle',move:null,moveProgress:0,scale:.76}
-  ];
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  const sound = new window.DojoAudio();
-  let lastAudioButtonState = '';
-  function audioState() { return {scene:screen,paused:paused||!!document.querySelector('dialog[open]'),phase:game.getState().phase,visible:!document.hidden}; }
-  function syncAudioButton() {
-    const on=sound.enabled&&sound.status.ready;
-    const state=on?'playing':sound.enabled?'waiting':'muted';
-    if(state===lastAudioButtonState)return;
-    lastAudioButtonState=state;
-    for(const id of ['sound-button','mobile-sound-button']){
-      const button=$(id);if(!button)continue;
-      const label=button.querySelector('span');if(label)label.textContent=on?'AUDIO ON':sound.enabled?'ATTIVA AUDIO':'AUDIO OFF';
-      button.setAttribute('aria-label',on?'Disattiva musica ed effetti':'Attiva musica ed effetti');
-      button.title=on?'Disattiva musica ed effetti':'Attiva musica ed effetti';
-      button.setAttribute('aria-pressed',String(on));
-      button.classList.toggle('muted',!on);
-      button.dataset.audioState=state;
-    }
-  }
-  function toast(text, player=0) { $('move-toast').textContent=text;$('move-toast').style.left=player===0?'4%':'auto';$('move-toast').style.right=player===1?'4%':'auto';$('move-toast').classList.add('show');toastTime=1.05; }
-  function burst(x,y,color,count=18,power=1) {
-    for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,s=(80+Math.random()*310)*power;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-40,life:.2+Math.random()*.3,max:.5,color,size:2+Math.random()*4});}
-    rings.push({x,y,r:8,life:.24,max:.24,color});
-  }
-  function onEvent(e) {
-    if(!active)return;
-    if(e.type!=='announcement')sound.effect(e.type,{...e,special:e.move==='kaiten'});
-    if(e.type==='hit'){
-      const special=e.move==='kaiten',col=special?'#80ffff':'#fff1b4';burst(e.x,e.y,col,special?35:19,special?1.4:1);shake=special?12:6;flash=special?.16:.055;
-      const display=comboDisplay[e.player];
-      display.count=e.combo;display.damage=e.comboDamage;display.moves=[...(game.getState().fighters[e.player].comboMoves||[e.move])];display.life=1.1;
-      floatTexts.push({x:e.x,y:e.y-45,text:e.damage?'-'+Math.round(e.damage):'OSU!',life:.65,max:.65,color:'#fff8cf'});
-    } else if(e.type==='block'){burst(e.x,e.y,e.guardType==='leg'?'#f7d17e':'#9ae5f0',11,.65);toast(e.guardType==='leg'?'PARATA DI GAMBA':'PARATA DI BRACCIA',e.target ?? 1-e.player);}
-    else if(e.type==='special'){toast('KAITEN GERI',e.player);flash=.13;}
-    else if(e.type==='noKi'){toast('SERVONO 45 SPIRIT',e.player);}
-    else if(e.type==='ko'){shake=15;}
-    else if(e.type==='land'){burst(e.x,e.y,'#f8d6a0',e.heavy?12:5,.25);}
-    else if(e.type==='dash'){burst(e.x,e.y-3,e.back?'#bde9ee':'#ffe0a0',11,.22);}
-  }
-  const game = new window.KyokushinGame({onEvent});
-  const controls = new window.DojoControls({
-    element: $('touch-controls'),
-    setInput: (player,action,pressed,meta)=>game.setInput(player,action,pressed,{allowDash:meta?.phase!=='move'}),
-    canPlay: ()=>screen==='game'&&active&&!paused&&!resultShown&&!document.body.classList.contains('orientation-blocked')&&!document.querySelector('dialog[open]'),
-    onTouch: ()=>{if(!touchDetected){touchDetected=true;syncControlSurface();}}
-  });
-  function syncLandscapeLayout(){
-    const viewport=window.visualViewport;
-    const layout=window.DojoOrientation.resolve({
-      touchEnabled:touchPreference??touchDetected,
-      width:window.innerWidth,height:window.innerHeight,
-      visualWidth:viewport?.width,visualHeight:viewport?.height,
-      offsetLeft:viewport?.offsetLeft,offsetTop:viewport?.offsetTop
-    });
-    const root=document.documentElement;
-    for(const [name,value] of Object.entries({
-      'view-width':layout.width,'view-height':layout.height,'view-left':layout.left,'view-top':layout.top,
-      'layout-width':layout.logicalWidth,'layout-height':layout.logicalHeight
-    }))root.style.setProperty('--'+name,value+'px');
-    document.body.classList.toggle('landscape-requested',landscapeRequested);
-    document.body.classList.toggle('landscape-layout',layout.logicalWidth>layout.logicalHeight&&layout.logicalHeight<=650);
-    document.body.classList.toggle('landscape-short',layout.logicalWidth>layout.logicalHeight&&layout.logicalHeight<=380);
-    document.body.dataset.orientationMode=layout.blocked?'portrait':nativeLandscapePending?'native-pending':'native';
-    return layout;
-  }
-  function syncControlSurface(){
-    const layout=syncLandscapeLayout();
-    const enabled=touchPreference??touchDetected;
-    const rotate=layout.blocked;
-    const wasBlocked=document.body.classList.contains('orientation-blocked');
-    document.body.classList.toggle('orientation-blocked',rotate);
-    document.body.classList.toggle('touch-active',enabled);
-    document.body.classList.toggle('force-touch',touchPreference===true);
-    document.body.classList.toggle('touch-disabled',touchPreference===false);
-    document.body.classList.toggle('combat-paused',paused);
-    document.body.classList.toggle('match-complete',resultShown);
-    const playable=screen==='game'&&active&&!paused&&!resultShown&&enabled&&!rotate;
-    $('touch-controls').inert=!playable;
-    $('touch-controls').setAttribute('aria-hidden',String(!playable));
-    $('viewport').inert=rotate;
-    document.querySelector('.arena-topline').inert=rotate;
-    if($('rotate-screen')){$('rotate-screen').inert=!rotate;$('rotate-screen').setAttribute('aria-hidden',String(!rotate));}
-    if(rotate&&!wasBlocked)requestAnimationFrame(()=>$('rotate-fullscreen-button')?.focus({preventScroll:true}));
-    if(!rotate&&wasBlocked)requestAnimationFrame(()=>(paused?$('resume-button'):screen==='title'?$('title-start-button'):screen==='select'?$('start-button'):canvas)?.focus({preventScroll:true}));
-    const toggle=$('touch-toggle-button');
-    if(toggle){toggle.setAttribute('aria-pressed',String(enabled));toggle.setAttribute('aria-label',enabled?'Nascondi comandi touch':'Mostra comandi touch');toggle.title=enabled?'Nascondi comandi touch':'Mostra comandi touch';}
-    if(screen==='game')$('stage-tip').textContent=enabled?'JOYSTICK: MUOVI · 2× SCATTO · SWITCH: TECNICHE':'2× A/D: DASH · INDIETRO: PARATA · F: GINOCCHIO';
-    if(rotate&&active&&!paused&&!resultShown)togglePause(true);
-  }
-  // Exposed for automated smoke tests and deterministic bug reports.
-  window.dojo = { game, config, start:()=>beginVersus(), startMatch, menu:showSelection, title:showTitle, get screen(){return screen;}, get active(){return active;}, get ready(){return ready;} };
-
-  function showPanel(id, visible) {
-    const panel = $(id);
-    if(!panel)return;
-    panel.hidden = !visible;
-    panel.inert = !visible;
-    panel.classList.toggle('hidden', !visible);
-    panel.setAttribute('aria-hidden', String(!visible));
-  }
-  function clearCombatInput() {
-    controls.clear();game.clearInput();heldKeys.clear();
-  }
-  function setScreen(next, focusId) {
-    clearTimeout(versusTimeout);versusTimeout=null;transitionId++;
-    screen=next;document.body.dataset.screen=next;
-    for(const front of ['title','select','versus'])document.body.classList.toggle('front-'+front,next===front);
-    document.body.classList.toggle('playing',next==='game');
-    showPanel('title-screen',next==='title');showPanel('selection-panel',next==='select');showPanel('versus-screen',next==='versus');
-    $('versus-screen').tabIndex=-1;
-    canvas.tabIndex=next==='game'?0:-1;
-    $('pause-button').disabled=next!=='game';
-    syncControlSurface();
-    const hints=next==='title'?[['INVIO','INIZIA']]:next==='select'?[['← →','SCEGLI'],['INVIO','CONFERMA'],['ESC','TITOLO']]:next==='versus'?[['ESC','ANNULLA']]:[['ESC','PAUSA'],['F','GINOCCHIO']];
-    $('bottom-hint').replaceChildren();
-    hints.forEach(([key,label],i)=>{
-      if(i){const divider=document.createElement('span');divider.className='hint-divider';divider.textContent='/';$('bottom-hint').append(divider);}
-      const kbd=document.createElement('kbd');kbd.textContent=key;$('bottom-hint').append(kbd,document.createTextNode(' '+label+' '));
-    });
-    if(focusId)requestAnimationFrame(()=>{if(screen===next)$(focusId)?.focus({preventScroll:true});});
-  }
-  function clearMatchPresentation() {
-    resultShown=false;resultTimer=0;particles=[];floatTexts=[];rings=[];shake=0;flash=0;
-    comboDisplay.forEach(c=>{c.life=0;c.count=0;c.damage=0;c.moves=[];});
-    toastTime=0;$('move-toast').classList.remove('show');$('move-toast').textContent='';
-    $('announcer').replaceChildren();lastHud='';
-    showPanel('pause-panel',false);showPanel('result-panel',false);
-  }
-  function opponentId() {return config.player==='angelo'?'samuel':'angelo';}
-  function opponentTag() {return config.mode==='versus'?'GIOCATORE 02':config.mode==='training'?'PARTNER':'CPU';}
-  function modeName() {return config.mode==='versus'?'2 GIOCATORI':config.mode==='training'?'ALLENAMENTO':'VS CPU';}
-  function portrait(id, fighter, facing, bust=false) {
-    const surface=typeof id==='string'?$(id):id;
-    if(!surface||!ready||!window.FighterArt)return;
-    const p=surface.getContext('2d');p.clearRect(0,0,surface.width,surface.height);
-    if(window.FighterArt.drawSelectionPortrait)window.FighterArt.drawSelectionPortrait(p,fighter,0,0,surface.width,surface.height,{facing,bust});
-    else window.FighterArt.drawPortrait(p,fighter,0,0,surface.width,surface.height);
-  }
-  function drawFrontPortraits() {
-    portrait('title-angelo','angelo',1);portrait('title-samuel','samuel',-1);
-    portrait('select-p1-art',config.player,1);portrait('select-p2-art',opponentId(),-1);
-    portrait('versus-p1-art',config.player,1);portrait('versus-p2-art',opponentId(),-1);
-    document.querySelectorAll('[data-roster-portrait]').forEach(surface=>portrait(surface,surface.dataset.rosterPortrait,surface.dataset.rosterPortrait==='angelo'?1:-1,true));
-  }
-  function updateSelection() {
-    const ids=[config.player,opponentId()];
-    ids.forEach((id,i)=>{
-      const character=characters[id],prefix='select-p'+(i+1);
-      $(prefix+'-name').textContent=character.name;$(prefix+'-rank').textContent=character.rank;
-      const belt=$(prefix+'-belt');belt.textContent=character.belt;belt.dataset.belt=character.beltColor;
-      belt.classList.toggle('black',id==='angelo');belt.classList.toggle('brown',id==='samuel');
-      $('versus-p'+(i+1)+'-name').textContent=character.name;
-    });
-    $('select-p2-tag').textContent=opponentTag();$('versus-tag').textContent=modeName();
-    $('selection-status').textContent=characters[config.player].short+' SELEZIONATO · '+modeName()+' · PRONTO AL KUMITE';
-    document.querySelectorAll('[data-fighter]').forEach(button=>{const selected=button.dataset.fighter===config.player;button.classList.toggle('selected',selected);button.setAttribute('aria-pressed',String(selected));});
-    document.querySelectorAll('[data-mode]').forEach(button=>{const selected=button.dataset.mode===config.mode;button.classList.toggle('selected',selected);button.setAttribute('aria-pressed',String(selected));});
-    $('difficulty').disabled=config.mode!=='cpu';
-    drawFrontPortraits();
-  }
-  function resetPreview() {
-    active=false;paused=false;clearCombatInput();clearMatchPresentation();
-    game.start(config);game.pause(true);setNames();
-    $('stage-tip').textContent='CATANIA, ITALIA ●';
-  }
-  function showTitle(focus=true) {
-    if(ready&&screen!=='title')sound.effect('menuBack');
-    resetPreview();setScreen('title',focus?'title-start-button':null);
-    $('status-label').textContent='IL DOJO TI ASPETTA';
-  }
-  function showSelection() {
-    if(!ready){if(loadFailed)location.reload();return;}
-    resetPreview();updateSelection();setScreen('select','start-button');
-    $('status-label').textContent='SCEGLI IL TUO KARATEKA';
-    sound.init();sound.effect('menuConfirm');
-  }
-  function selectFighter(id) {
-    if(screen!=='select'||!characters[id])return;
-    if(config.player!==id){
-      config.player=id;game.start(config);game.pause(true);setNames();updateSelection();
-      sound.effect('menuMove');
-    }
-    // Selection is complete: Enter now activates the visible confirmation button.
-    $('start-button').focus({preventScroll:true});
-  }
-  function beginVersus(duration=1400) {
-    if(!ready||screen==='versus')return;
-    sound.init();sound.effect('menuConfirm');config.difficulty=$('difficulty').value;
-    active=false;paused=false;clearCombatInput();clearMatchPresentation();game.pause(true);
-    updateSelection();setScreen('versus','versus-screen');
-    $('status-label').textContent='IL KUMITE STA PER INIZIARE';
-    const token=transitionId;
-    versusTimeout=setTimeout(()=>{if(screen==='versus'&&transitionId===token)startMatch();},duration);
-  }
-
-  function setNames() {
-    const fighters=game.getState().fighters;
-    fighters.forEach((f,i)=>{const p='p'+(i+1),c=characters[f.id];$(p+'-name').textContent=c.name;$(p+'-rank').textContent=c.rank;});
-    $('p2-tag').textContent=config.mode==='versus'?'PLAYER 02':config.mode==='training'?'PARTNER':'CPU';
-    $('mode-label').textContent='TURBO 1.30× / '+(config.mode==='cpu'?'VS CPU':config.mode==='versus'?'2 GIOCATORI':'ALLENAMENTO');
-  }
-  function updateHud(dt) {
-    const s=game.getState();
-    s.fighters.forEach((f,i)=>{
-      const p='p'+(i+1),hp=Math.max(0,f.hp/f.maxHp*100)+'%';$(p+'-health').style.width=hp;$(p+'-ghost').style.width=hp;$(p+'-ki').style.width=f.ki+'%';
-      $(p+'-rounds').textContent=(f.wins>0?'●':'○')+' '+(f.wins>1?'●':'○');$(p+'-ki-label').textContent=f.ki>=45?'KAITEN READY':'SPIRIT';$(p+'-ki-label').classList.toggle('ready',f.ki>=45);
-      const display=comboDisplay[i],comboEl=$(p+'-combo');
-      if(!paused)display.life=Math.max(0,display.life-dt);
-      const showCombo=active&&!resultShown&&display.count>=2&&display.life>0;
-      comboEl.classList.toggle('visible',showCombo);comboEl.setAttribute('aria-hidden',!showCombo);
-      $(p+'-combo-count').textContent=display.count;
-      $(p+'-combo-moves').textContent=display.moves.map(m=>window.KyokushinMoves[m]?.shortName||m.toUpperCase()).join(' › ');
-      $(p+'-combo-damage').textContent=display.damage+' DANNI';
-    });
-    $('timer').textContent=s.timer===Infinity?'∞':Math.ceil(s.timer).toString().padStart(2,'0');
-    $('round-label').textContent=config.mode==='training'?'TRAINING':'ROUND '+s.round.toString().padStart(2,'0');
-    const ann=active&&!paused&&!resultShown?(s.announcement||''):'';
-    if(ann!==lastHud){lastHud=ann;$('announcer').replaceChildren();if(ann){$('announcer').append(document.createTextNode(ann));const small=document.createElement('small');small.textContent=s.announcementSub||'';$('announcer').append(small);}}
-    if(active&&!paused&&s.phase==='matchOver'&&!resultShown){resultTimer+=dt;if(resultTimer>1.7)showResult();}
-  }
-  function startMatch() {
-    if(!ready)return;
-    sound.init();clearCombatInput();clearMatchPresentation();active=true;paused=false;
-    config.difficulty=$('difficulty').value;
-    game.start(config);setNames();
-    setScreen('game','game');$('status-label').textContent=config.mode==='training'?'ALLENAMENTO LIBERO':'KUMITE IN CORSO';
-    syncControlSurface();canvas.focus({preventScroll:true});
-    if(window.innerWidth<700&&!document.body.classList.contains('embedded'))$('arcade').scrollIntoView({behavior:'instant',block:'start'});
-    if(document.hidden||document.querySelector('dialog[open]'))togglePause(true);
-  }
-  function togglePause(force) {
-    if(screen!=='game'||!active||resultShown)return;
-    paused=typeof force==='boolean'?force:!paused;sound.effect(paused?'pause':'resume');clearCombatInput();game.pause(paused);showPanel('pause-panel',paused);
-    syncControlSurface();
-    $('status-label').textContent=paused?'COMBATTIMENTO IN PAUSA':config.mode==='training'?'ALLENAMENTO LIBERO':'KUMITE IN CORSO';
-    (paused?$('resume-button'):canvas).focus({preventScroll:true});
-  }
-  function showResult() {
-    resultShown=true;const s=game.getState(),winner=s.winner;sound.effect('victory',{winner});
-    showPanel('result-panel',true);$('announcer').replaceChildren();
-    $('result-title').textContent=winner===null?'HIKIWAKE':characters[s.fighters[winner].id].short+' VINCE';
-    $('result-eyebrow').textContent=winner===0?'OSU! · LO SPIRITO HA VINTO':'OSU! · OGNI SFIDA È UN INIZIO';
-    $('result-text').textContent='ROUND '+s.fighters[0].wins+' — '+s.fighters[1].wins+' · Rispetto al tuo avversario. Ci si rivede sul tatami.';
-    $('status-label').textContent='MATCH COMPLETATO';clearCombatInput();syncControlSurface();$('rematch-button').focus({preventScroll:true});
-  }
-
-  function drawBackground(t) {
-    if(bg.complete&&bg.naturalWidth)ctx.drawImage(bg,0,0,1280,720);else{ctx.fillStyle='#8a7053';ctx.fillRect(0,0,1280,720);}
-    // Sparse motes catch the dojo's late-afternoon light.
-    ctx.save();ctx.globalCompositeOperation='screen';
-    for(let i=0;i<21;i++){const x=(i*163+t*(3+i%5))%1280,y=200+(i*61)%365+Math.sin(t*.5+i)*12;ctx.globalAlpha=.13+Math.sin(t+i)*.08;ctx.fillStyle='#fff0c3';ctx.beginPath();ctx.arc(x,y,.9+(i%3)*.45,0,Math.PI*2);ctx.fill();}ctx.restore();
-  }
-  function drawFighter(f,t,preview=false) {
-    const ground=preview?f.y:625;
-    ctx.save();ctx.globalAlpha=.24;ctx.fillStyle='#27172d';ctx.beginPath();ctx.ellipse(f.x,ground+2,preview?76:62,10,0,0,Math.PI*2);ctx.fill();ctx.restore();
-    if(window.FighterArt)window.FighterArt.draw(ctx,f,t);
-    if(f.state==='attack'&&f.move&&f.moveProgress>.12&&f.moveProgress<.65){
-      const p=f.moveProgress,def=window.KyokushinMoves[f.move],kick=['mae','mawashi','ushiro','gedan','kaiten'].includes(f.move);
-      if(kick&&f.move!=='kaiten'){ctx.save();ctx.translate(f.x,f.y-120);ctx.scale(f.facing,1);ctx.globalAlpha=Math.sin((p-.12)/.53*Math.PI)*.5;ctx.strokeStyle=f.move==='kaiten'?'#acffff':'#fff2c5';ctx.lineWidth=f.move==='kaiten'?10:4;ctx.beginPath();const r=f.move==='kaiten'?135:110;ctx.arc(15,-15,r,-1.6+p*.8,.15+p*.8);ctx.stroke();ctx.restore();}
-    }
-  }
-  function drawEffects(dt) {
-    for(const p of particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=400*dt;ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.color;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.atan2(p.vy,p.vx));ctx.fillRect(-p.size*2,-p.size/2,p.size*4,p.size);ctx.restore();}particles=particles.filter(p=>p.life>0);ctx.globalAlpha=1;
-    for(const r of rings){r.life-=dt;r.r+=dt*220;ctx.globalAlpha=Math.max(0,r.life/r.max);ctx.strokeStyle=r.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,Math.PI*2);ctx.stroke();}rings=rings.filter(r=>r.life>0);ctx.globalAlpha=1;
-    for(const p of floatTexts){p.life-=dt;p.y-=dt*85;ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.font='italic 24px Impact, sans-serif';ctx.textAlign='center';ctx.strokeStyle='#743c2b';ctx.lineWidth=3;ctx.strokeText(p.text,p.x,p.y);ctx.fillStyle=p.color;ctx.fillText(p.text,p.x,p.y);}floatTexts=floatTexts.filter(p=>p.life>0);ctx.globalAlpha=1;
-  }
-  function drawDefenseGuide(t) {
-    if(!ready||!$('help-dialog').open)return;
-    ['arms-demo','leg-demo'].forEach((id,i)=>{
-      const demo=$(id), dc=demo.getContext('2d'), f=defenseModels[i];
-      f.id=config.player;f.walkCycle=i===0?t*8:0;
-      dc.clearRect(0,0,demo.width,demo.height);
-      dc.fillStyle='#b4ad9766';dc.beginPath();dc.ellipse(200,248,68,8,0,0,Math.PI*2);dc.fill();
-      window.FighterArt.draw(dc,f,t);
-    });
-  }
-  function drawMotionGuide(t) {
-    if(!ready||!$('help-dialog').open)return;
-    const walk=motionModels[0],cycle=t%4.2;
-    walk.id=config.player;walk.guardType=null;walk.blocking=false;walk.retreating=false;walk.dashRemaining=0;
-    let label='IN GUARDIA';
-    if(cycle<1.35){walk.x=110+60*cycle/1.35;walk.state='walk';walk.movement=1;label='PASSO AVANTI';}
-    else if(cycle<1.53){walk.dashProgress=(cycle-1.35)/.18;walk.x=170+120*walk.dashProgress;walk.state='dash';walk.dashDirection=1;walk.dashBack=false;walk.dashRemaining=1.53-cycle;label='DOPPIO D · DASH AVANTI';}
-    else if(cycle<2.88){walk.x=290-60*(cycle-1.53)/1.35;walk.state='block';walk.movement=-1;walk.retreating=true;walk.blocking=true;walk.guardType='arms';label='ARRETRA IN GUARDIA';}
-    else if(cycle<3.08){walk.dashProgress=(cycle-2.88)/.20;walk.x=230-120*walk.dashProgress;walk.state='dash';walk.dashDirection=-1;walk.dashBack=true;walk.dashRemaining=3.08-cycle;label='DOPPIO A · DASH INDIETRO';}
-    else {walk.x=110;walk.state='idle';walk.movement=0;}
-    if(walk.state==='walk'||walk.retreating)walk.walkCycle=t*12;
-    $('walk-demo-caption').textContent=label;
-    const kick=motionModels[1],duration=window.KyokushinMoves.kaiten.duration,phase=t%2.5-.5;
-    kick.id=config.player;kick.state=phase>=0&&phase<duration?'attack':'idle';kick.move=kick.state==='attack'?'kaiten':null;
-    kick.moveProgress=kick.state==='attack'?phase/duration:0;kick.moveTime=Math.max(0,phase);
-    $('kaiten-demo-caption').textContent=kick.state==='idle'?'O · 45 SPIRIT':kick.moveProgress<.16?'PREPARAZIONE':kick.moveProgress<.32?'TUFFO':kick.moveProgress<.60?'CALCIO IN ROTAZIONE':kick.moveProgress<.82?'RIENTRO':'ATTERRAGGIO';
-    ['walk-demo','kaiten-demo'].forEach((id,i)=>{
-      const surface=$(id),dc=surface.getContext('2d'),f=motionModels[i];
-      dc.clearRect(0,0,surface.width,surface.height);
-      dc.strokeStyle='#c3beaa';dc.lineWidth=1;dc.beginPath();dc.moveTo(12,269);dc.lineTo(388,269);dc.stroke();
-      dc.fillStyle='#a99f8260';dc.beginPath();dc.ellipse(f.x,267,i===0?49:62,7,0,0,Math.PI*2);dc.fill();
-      window.FighterArt.draw(dc,f,t);
-    });
-  }
-  function frame(now) {
-    const dt=Math.min((now-lastTime)/1000,.05);lastTime=now;clock+=dt;
-    if(active&&!paused)game.update(dt);
-    ctx.save();
-    if(shake>0&&!reducedMotion){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake*.55);}shake=Math.max(0,shake-dt*45);
-    drawBackground(clock);
-    if(active)game.getState().fighters.forEach(f=>drawFighter(f,clock));
-    drawEffects(paused?0:dt);ctx.restore();
-    if(flash>0){if(!reducedMotion){ctx.globalAlpha=flash;ctx.fillStyle='#fff7ca';ctx.fillRect(0,0,1280,720);ctx.globalAlpha=1;}flash=Math.max(0,flash-dt*.8);}
-    if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('move-toast').classList.remove('show');}
-    updateHud(dt);drawDefenseGuide(clock);drawMotionGuide(clock);sound.update(audioState());syncAudioButton();requestAnimationFrame(frame);
-  }
-
-  const p1={KeyA:'left',KeyD:'right',KeyW:'jump',Space:'block',KeyF:'legBlock',KeyJ:'tsuki',KeyH:'shita',KeyN:'kagi',KeyK:'mae',KeyL:'mawashi',KeyU:'ushiro',KeyI:'gedan',KeyO:'kaiten'};
-  const p2={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'jump',ShiftRight:'block',ShiftLeft:'block',Digit0:'legBlock',Numpad0:'legBlock',Digit1:'tsuki',Digit2:'mae',Digit3:'mawashi',Digit4:'ushiro',Digit5:'gedan',Digit6:'kaiten',Digit7:'shita',Digit8:'kagi',Numpad1:'tsuki',Numpad2:'mae',Numpad3:'mawashi',Numpad4:'ushiro',Numpad5:'gedan',Numpad6:'kaiten',Numpad7:'shita',Numpad8:'kagi'};
-  function keyboard(e,pressed){
-    // Release keys even if focus has since moved onto a menu control.
-    if(!pressed){const held=heldKeys.get(e.code);if(held){controls.release('key:'+e.code);heldKeys.delete(e.code);e.preventDefault();}return;}
-    if(document.querySelector('dialog[open]')||document.body.classList.contains('orientation-blocked')||e.ctrlKey||e.metaKey||e.altKey)return;
-    if(e.code==='Escape'&&!e.repeat){
-      if(screen==='select'){e.preventDefault();showTitle();}
-      else if(screen==='versus'){e.preventDefault();showSelection();}
-      else if(screen==='game'){e.preventDefault();togglePause();}
-      return;
-    }
-    if(e.target.closest?.('select,input,textarea,[contenteditable="true"]'))return;
-    if(e.code==='Enter'&&e.repeat){e.preventDefault();return;}
-    const nativeControl=!!e.target.closest?.('button,a[href],summary');
-    if(screen==='versus'){
-      if(nativeControl&&(e.code==='Enter'||e.code==='Space'))return;
-      if(p1[e.code]||p2[e.code]||e.code==='Enter')e.preventDefault();
-      return;
-    }
-    if(screen==='title'){
-      if(e.code==='Enter'&&!e.repeat&&!nativeControl){e.preventDefault();showSelection();}
-      return;
-    }
-    if(screen==='select'){
-      if(['ArrowLeft','ArrowRight','KeyA','KeyD'].includes(e.code)&&!e.repeat){e.preventDefault();selectFighter(opponentId());}
-      else if(e.code==='Enter'&&!e.repeat&&!nativeControl){e.preventDefault();beginVersus();}
-      return;
-    }
-    // Buttons keep native Enter/Space activation; they never start unrelated matches.
-    if(nativeControl&&(e.code==='Enter'||e.code==='Space'))return;
-    if(e.code==='Enter'&&!e.repeat){
-      if(resultShown){e.preventDefault();beginVersus(900);}
-      else if(paused){e.preventDefault();togglePause(false);}
-      return;
-    }
-    if(!active||paused||resultShown)return;
-    if(e.code==='KeyS'||e.code==='ArrowDown'){e.preventDefault();return;}
-    let action=p1[e.code],player=0;if(!action&&config.mode==='versus'){action=p2[e.code];player=1;}
-    if(action){e.preventDefault();if(!e.repeat){controls.press('key:'+e.code,player,action);heldKeys.set(e.code,{player,action});}}
-  }
-  window.addEventListener('keydown',e=>keyboard(e,true));window.addEventListener('keyup',e=>keyboard(e,false));
-  window.addEventListener('blur',()=>{if(active&&!paused&&!resultShown)togglePause(true);clearCombatInput();});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(active&&!paused&&!resultShown)togglePause(true);clearCombatInput();}sound.update(audioState());});
-  const viewportChanged=()=>{
-    if(!viewportFrame)viewportFrame=requestAnimationFrame(()=>{viewportFrame=0;syncControlSurface();});
-    // Mobile engines can dispatch orientation/fullscreen before their final resize.
-    clearTimeout(viewportSettleTimer);viewportSettleTimer=setTimeout(syncControlSurface,160);
-  };
-  const orientationChanged=()=>{
-    clearCombatInput();
-    if(!nativeLandscapePending&&window.innerHeight>window.innerWidth)nativeLandscapeLocked=false;
-    syncControlSurface();viewportChanged();
-  };
-  window.addEventListener('orientationchange',orientationChanged);
-  window.screen.orientation?.addEventListener('change',orientationChanged);
-  portraitMedia.addEventListener('change',orientationChanged);
-  window.addEventListener('resize',viewportChanged);
-  window.visualViewport?.addEventListener('resize',viewportChanged);
-  window.visualViewport?.addEventListener('scroll',viewportChanged);
-  touchMedia.addEventListener('change',()=>{touchDetected=touchMedia.matches||navigator.maxTouchPoints>0;clearCombatInput();syncControlSurface();});
-  $('touch-toggle-button')?.addEventListener('click',()=>{touchPreference=!(touchPreference??touchDetected);clearCombatInput();syncControlSurface();});
-  $('title-start-button').addEventListener('click',showSelection);
-  $('selection-back-button').addEventListener('click',()=>showTitle());
-  $('start-button').addEventListener('click',()=>beginVersus());$('rematch-button').addEventListener('click',()=>beginVersus(900));$('restart-button').addEventListener('click',()=>beginVersus(900));
-  $('pause-button').addEventListener('click',()=>togglePause());$('resume-button').addEventListener('click',()=>togglePause(false));$('menu-button').addEventListener('click',showSelection);$('result-menu-button').addEventListener('click',showSelection);
-  document.querySelector('.brand')?.addEventListener('click',e=>{e.preventDefault();showTitle();});
-  document.querySelectorAll('[data-fighter]').forEach(button=>button.addEventListener('click',()=>selectFighter(button.dataset.fighter)));
-  document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>{
-    if(screen!=='select')return;config.mode=button.dataset.mode;game.start(config);game.pause(true);setNames();updateSelection();sound.effect('menuMove');
-  }));
-  $('difficulty').addEventListener('change',()=>{config.difficulty=$('difficulty').value;if(screen==='select')updateSelection();sound.effect('menuMove');});
-  const unlockAudio=()=>{
-    // Call resume synchronously inside the gesture, before fullscreen can consume it.
-    const pending=sound.init();sound.update(audioState());syncAudioButton();
-    pending.then(syncAudioButton);
-  };
-  const audioButtonTarget=e=>!!e.target?.closest?.('#sound-button, #mobile-sound-button');
-  for(const id of ['sound-button','mobile-sound-button'])$(id)?.addEventListener('click',()=>{
-    if(sound.enabled&&!sound.status.ready)unlockAudio();
-    else {sound.toggle();sound.update(audioState());syncAudioButton();}
-  });
-  window.addEventListener('pointerdown',e=>{
-    if(e.pointerType==='mouse'&&!audioButtonTarget(e))unlockAudio();
-    if(e.pointerType==='touch'&&!touchDetected){touchDetected=true;syncControlSurface();}
-  },{capture:true});
-  window.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse'&&!audioButtonTarget(e))unlockAudio();},{capture:true});
-  // iOS grants touch activation on release; pointerdown alone can leave resume pending.
-  window.addEventListener('touchend',e=>{if(!audioButtonTarget(e))unlockAudio();},{capture:true,passive:true});
-  window.addEventListener('click',e=>{if(!audioButtonTarget(e))unlockAudio();},{capture:true});
-  window.addEventListener('keydown',e=>{if(!e.repeat&&!audioButtonTarget(e))unlockAudio();},{capture:true});
-  function syncFullscreenButton(){
-    const expanded=!!document.fullscreenElement||$('arcade').classList.contains('expanded')||landscapeRequested;
-    const hosted=!!displayHostOrigin();
-    const label=hosted?(expanded?'Esci dalla vista orizzontale':'Gioca in orizzontale'):(expanded?'Esci da schermo intero':'Schermo intero');
-    $('fullscreen-button').setAttribute('aria-label',label);$('fullscreen-button').title=label;
-  }
-  function displayHostOrigin(){
-    if(!window.parent||window.parent===window||pageOptions.get('hostdisplay')!=='1')return null;
-    try{
-      const origin=new URL(document.referrer).origin;
-      if(['https://kyokushinkaicataniadojo.it','https://www.kyokushinkaicataniadojo.it','https://editor.flazio.com'].includes(origin))return origin;
-      if(['localhost','127.0.0.1'].includes(location.hostname)&&origin===location.origin)return origin;
-    }catch{}
-    return null;
-  }
-  function requestHostDisplay(action){
-    const origin=displayHostOrigin();
-    if(!origin)return false;
-    window.parent.postMessage({type:'kyokushin:display',action},origin);
-    return true;
-  }
-  $('fullscreen-button').addEventListener('click',async()=>{
-    clearCombatInput();
-    if(document.fullscreenElement||$('arcade').classList.contains('expanded')||landscapeRequested){
-      landscapeRequested=false;landscapeAttempt++;nativeLandscapePending=false;nativeLandscapeLocked=false;$('arcade').classList.remove('expanded');
-      requestHostDisplay('exit');
-      try{window.screen.orientation?.unlock?.();}catch{}
-      try{if(document.fullscreenElement)await document.exitFullscreen();}catch{}
-    }else{
-      if(touchPreference??touchDetected){openLandscape();return;}
-      const attempt=++landscapeAttempt;
-      $('arcade').classList.add('expanded');
-      try{await $('game-shell').requestFullscreen?.();}catch{/* The cabinet still fills the available browser viewport. */}
-      if(attempt!==landscapeAttempt&&!landscapeRequested&&!$('arcade').classList.contains('expanded')){
-        try{if(document.fullscreenElement===$('game-shell'))await document.exitFullscreen();}catch{}
-      }
-    }
-    syncFullscreenButton();syncControlSurface();
-  });
-  document.addEventListener('fullscreenchange',()=>{
-    if(!document.fullscreenElement){
-      nativeLandscapeLocked=false;
-      if(nativeLandscapePending){landscapeAttempt++;nativeLandscapePending=false;}
-      try{window.screen.orientation?.unlock?.();}catch{}
-    }
-    clearCombatInput();syncFullscreenButton();syncControlSurface();viewportChanged();
-  });
-  async function openLandscape(){
-    clearCombatInput();
-    const attempt=++landscapeAttempt;
-    // In Flazio the parent owns the visible screen and its adaptive scaling.
-    // Let it resize the SAME iframe. The child never rotates its own arena.
-    if(requestHostDisplay('landscape')){
-      landscapeRequested=true;nativeLandscapePending=false;nativeLandscapeLocked=false;
-      $('arcade').classList.add('expanded');syncFullscreenButton();syncControlSurface();
-      return;
-    }
-    
-    nativeLandscapePending=true;nativeLandscapeLocked=false;
-    // Only the device/browser may rotate the screen. The portrait gate stays
-    // visible until the actual viewport is landscape, even if a native API fails.
-    let fullscreen;
-    try{if(!document.fullscreenElement)fullscreen=$('game-shell').requestFullscreen?.();}catch{}
-    landscapeRequested=true;$('arcade').classList.add('expanded');
-    syncFullscreenButton();syncControlSurface();
-    try{await fullscreen;}catch{/* Continue with the same game when fullscreen is unavailable. */}
-    if(attempt!==landscapeAttempt){
-      try{if(!landscapeRequested&&!$('arcade').classList.contains('expanded')&&document.fullscreenElement===$('game-shell'))await document.exitFullscreen();}catch{}
-      return;
-    }
-    const orientation=window.screen.orientation;
-    try{
-      if(typeof orientation?.lock==='function'){
-        await orientation.lock('landscape');
-        if(attempt===landscapeAttempt)nativeLandscapeLocked=true;
-      }
-    }catch{/* Rotate the phone physically when the browser cannot lock landscape. */}
-    if(attempt!==landscapeAttempt){try{if(!landscapeRequested||!document.fullscreenElement)orientation?.unlock?.();}catch{}return;}
-    nativeLandscapePending=false;
-    syncFullscreenButton();syncControlSurface();viewportChanged();
-  }
-  $('rotate-fullscreen-button')?.addEventListener('click',openLandscape);
-  window.addEventListener('message',event=>{
-    const origin=displayHostOrigin();
-    if(!origin||event.origin!==origin||event.source!==window.parent||event.data?.type!=='kyokushin:display-state'||typeof event.data.landscapeRequested!=='boolean')return;
-    landscapeRequested=event.data.landscapeRequested;
-    $('arcade').classList.toggle('expanded',landscapeRequested);
-    clearCombatInput();syncFullscreenButton();syncControlSurface();viewportChanged();
-  });
-  if(displayHostOrigin()){
-    $('rotate-action-label').textContent='GIOCA IN ORIZZONTALE';
-    $('rotate-description').textContent='Ruota il telefono oppure tocca il pulsante: il gioco si adatta in orizzontale anche con la rotazione bloccata.';
-    syncFullscreenButton();
-  }
-  function showDialog(id){if(active&&!paused&&!resultShown)togglePause(true);sound.effect('menuMove');$('game-shell').append($(id));$(id).showModal();}
-  $('help-button').addEventListener('click',()=>showDialog('help-dialog'));$('all-moves-button').addEventListener('click',()=>showDialog('help-dialog'));$('credits-button').addEventListener('click',()=>showDialog('credits-dialog'));
-  $('mobile-help-button')?.addEventListener('click',()=>showDialog('help-dialog'));
-  document.querySelectorAll('dialog').forEach(d=>{d.querySelector('.close-dialog').addEventListener('click',()=>d.close());d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}});});
-  for(const [title,url] of [['Il sito del dojo','https://www.kyokushinkaicataniadojo.it/'],['Kyokushinkai Catania Dojo su Instagram','https://www.instagram.com/kyokushinkaicataniadojo/'],['Fitness & Wellness BodyPlanet su Instagram','https://www.instagram.com/fitnesswellness_bodyplanet/']]){const a=document.createElement('a');a.textContent=title+' ↗';a.href=url;a.target='_blank';a.rel='noopener noreferrer';$('source-links').append(a);}
-  async function boot(){
-    $('title-start-button').disabled=true;$('start-button').disabled=true;$('title-load-label').textContent='CARICAMENTO…';
-    syncAudioButton();showTitle(false);
-    try{
-      await Promise.all([bg.decode(),window.FighterArt.load()]);ready=true;
-      $('title-start-button').disabled=false;$('title-load-label').textContent='INIZIA';
-      $('start-button').disabled=false;$('start-label').textContent='COMBATTI';
-      updateSelection();showTitle(false);
-      // Prepare the first arena frame before revealing it. A hidden loading
-      // iframe may not receive animation frames, so readiness must not await one.
-      drawBackground(clock);
-      window.DojoLoading?.report('ready');
-      (document.body.classList.contains('orientation-blocked')?$('rotate-fullscreen-button'):$('title-start-button'))?.focus({preventScroll:true});
-    }
-    catch(err){
-      console.error('Asset loading failed',err);loadFailed=true;ready=false;
-      $('title-load-label').textContent='RICARICA IL DOJO';$('title-start-button').disabled=false;
-      $('status-label').textContent='Non riesco a caricare le immagini. Ricarica la pagina.';
-      window.DojoLoading?.report('error', 'Non riesco a caricare le immagini del dojo. Controlla la connessione e riprova.');
-    }
-  }
-  boot();requestAnimationFrame(frame);
-})();
-
-</script>
+<script src="scripts/mobile-controls.js"></script>
+<script src="scripts/orientation.js"></script>
+<script src="scripts/display-controller.js"></script>
+<script src="scripts/arcade.js"></script>
+<script src="scripts/leaderboard-config.js"></script>
+<script src="scripts/leaderboard.js"></script>
+<script src="scripts/arcade-atlas.js"></script>
+<script src="scripts/arcade-art.js"></script>
+<script src="scripts/arcade-ui.js"></script>
+<script src="scripts/main.js"></script>
 </body>
 </html>

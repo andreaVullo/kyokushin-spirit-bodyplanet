@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=1200,initial-scale=1"><title>Verifica componente HTML Flazio</title>
+<style>html,body{margin:0;min-width:1200px;background:#eee8da;color:#17251f;font:16px system-ui}main{width:1200px;min-height:1400px;transform:scale(.8);transform-origin:0 0;padding:24px;box-sizing:border-box}iframe{display:block;width:320px;height:180px;border:2px dashed #64735e}button{font:inherit;padding:12px;margin:12px 0}pre{max-width:800px;white-space:pre-wrap}</style></head>
+<body><main><h1>Iframe HTML dentro la pagina adaptive</h1><p>Il gioco deve aprirsi sulla pagina principale e mantenere la stessa partita dopo ogni rotazione.</p><iframe id="component" title="Componente HTML Flazio" src="flazio-component.html"></iframe><button id="replace" type="button">Ricrea il componente</button> <button id="delayed-adaptive" type="button">Ricalcola adaptive fra 3 secondi</button><pre id="diagnostics"></pre></main>
+<script>
+document.getElementById('replace').onclick=function(){var frame=document.getElementById('component');frame.src='flazio-component.html?rebuild='+Date.now();};
+document.getElementById('delayed-adaptive').onclick=function(){setTimeout(function(){document.documentElement.style.zoom='.68';document.body.style.transform='scale(.68)';document.querySelector('meta[name="viewport"]').content='width=1200, initial-scale=.68';},3000);};
+setInterval(function(){var launcher=window.KyokushinLauncher,state=launcher&&launcher.getState();document.getElementById('diagnostics').textContent=JSON.stringify({version:launcher&&launcher.version,innerWidth:innerWidth,innerHeight:innerHeight,opened:state&&state.opened,layout:state&&state.layout,topPageGameFrames:document.querySelectorAll('#kyokushin-host-v6 iframe').length},null,2);},500);
+</script></body></html>

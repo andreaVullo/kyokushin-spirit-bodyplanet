@@ -1,30 +1,48 @@
 # Kyokushin Spirit — BodyPlanet Dojo
 
-Picchiaduro 2D arcade per browser, ambientato nel dojo Fitness & Wellness BodyPlanet di Catania. Due karateka, combinazioni di pugni e calci, guardia, salti, scatti e kaiten, con musica ed effetti originali. Nessuna installazione o dipendenza esterna necessaria per giocare.
+Picchiaduro 2D arcade per browser, ambientato nel dojo Fitness & Wellness BodyPlanet di Catania. Nove karateka (dieci scelte, con due versioni di Marco Tabacco), un creatore di personaggi per la scalata Arcade dalla cintura bianca al 10° Dan, combinazioni di pugni e calci, guardia, salti, scatti e kaiten. Nessuna installazione o dipendenza esterna necessaria per giocare; la classifica pubblica richiede una connessione a GitHub.
 
 ## Gioca subito
 
-Fai doppio clic su **`Gioca.html`**. È la versione completa in un solo file: funziona offline, senza installazioni e senza server. Puoi copiarla altrove da sola; include anche immagini, logo e audio.
+Fai doppio clic su **`Gioca.html`**. Funziona offline, senza installazioni e senza server. Mantieni accanto al file le cartelle **`scripts/`** e **`assets/`**: contengono il roster ampliato e le animazioni. Per trasferire il gioco copia tutta la cartella, non soltanto il file HTML.
 
 All’apertura compare **Caricamento del dojo…**: il titolo e i comandi diventano disponibili solo quando grafica e gioco sono pronti. Se l’attesa si prolunga, puoi continuare ad attendere oppure premere **Riprova**. La barra animata indica l’attesa, senza percentuali stimate.
 
 1. Nella schermata del titolo premi **Invio** oppure il pulsante di avvio.
-2. Scegli modalità e difficoltà; seleziona Angelo o Samuel con **← / →** oppure cliccando sul suo ritratto.
+2. Scegli modalità e difficoltà; seleziona il tuo karateka con **← / →** oppure cliccando sul ritratto. Premi **↑ / ↓** o **Avversario** per scegliere anche CPU, secondo giocatore o partner di allenamento.
 3. Premi **Invio** o **Combatti**: dopo la presentazione **VS**, inizia il kumite.
 
-Nella selezione, **Esc** o la freccia **Titolo** riportano alla schermata iniziale. Durante il combattimento, **Esc** apre la pausa: puoi riprendere, ricominciare o tornare alla scelta del personaggio. Al termine dell’incontro, scegli **Rivincita** per rigiocare. L’audio si attiva dopo un clic, un tasto o un tocco completo dentro il gioco. Il pulsante **Audio** in alto permette di silenziarlo, riattivarlo o ritentarne l’avvio dopo un’interruzione.
+Per la nuova scalata premi **Arcade** dal titolo o dalla scelta della modalità: scegli nome, uomo o donna e una delle cinque capigliature, quindi **Entra nel tatami**. **Classifica**, sul titolo, apre il muro dei risultati pubblici del dojo.
 
-**`index.html` nella cartella principale** è l’ingresso della versione sorgente modificabile e usa gli altri file del progetto: avvialo con il server locale descritto sotto. **`github-pages/index.html` è invece un piccolo reindirizzamento a `Gioca.html`**: non sostituirlo con l’index dei sorgenti quando aggiorni il repository pubblico.
+Nella selezione, **Esc** o la freccia **Titolo** riportano alla schermata iniziale. Durante il combattimento, **Esc** apre la pausa. Nelle modalità classiche puoi riprendere, ricominciare o tornare alla scelta del personaggio; al termine dell’incontro, **Rivincita** permette di rigiocare. In Arcade puoi riprendere o terminare la scalata: non si ricomincia lo stesso incontro per conservare l’avanzamento. L’audio si attiva dopo un clic, un tasto o un tocco completo dentro il gioco. Il pulsante **Audio** in alto permette di silenziarlo, riattivarlo o ritentarne l’avvio dopo un’interruzione.
 
-Su macOS puoi anche fare doppio clic su **`launch.command`**: avvia il gioco all’indirizzo [http://127.0.0.1:8765](http://127.0.0.1:8765) e apre il browser. Richiede Python 3; per fermare il server premi **Ctrl+C** nella finestra del Terminale. Se la porta è occupata, il programma avvisa senza interrompere altri processi.
+**`index.html`** reindirizza a `Gioca.html`, conservando i parametri per incorporamento e touch. La cartella può essere pubblicata su GitHub Pages senza compilazione. Le immagini vengono caricate dal sito stesso e funzionano anche offline.
 
-In alternativa, dalla cartella del progetto:
+Per eseguire il gioco con un server locale, dalla cartella del progetto:
 
 ```sh
 python3 -m http.server 8765 --bind 127.0.0.1
 ```
 
 Poi apri [http://127.0.0.1:8765](http://127.0.0.1:8765).
+
+## Nuovi karateka
+
+Oltre ad Angelo Pierino e Samuel Villani sono disponibili Marco Tabacco, Gabriele Carbonaro, Leonardo Cappellani, Gabriele Randazzo, Matteo Spata, Oscar Gueli e Andrea Vullo. Marco Tabacco ha due versioni selezionabili, **collage** e **foto di gruppo**. I colori e le strisce delle cinture seguono i riferimenti forniti.
+
+Tutti possono combattere su entrambi i lati nelle modalità VS CPU, 2 giocatori e Allenamento, anche contro lo stesso personaggio. Entrano inoltre nel gruppo degli avversari della scalata Arcade, dove il giocatore usa il karateka creato. Ogni nuovo riferimento include pugni, calci, kaiten, passi, scatto, salto, parate, reazioni, caduta, KO, ripresa e vittoria. Il volto aggiornato di Gabriele Carbonaro è usato in tutte le sue sequenze.
+
+I 40 PNG sono conservati senza ricompressione dentro piccoli file JavaScript separati in `assets/karateka/`: questo permette di ritagliare correttamente le sagome anche aprendo il gioco da disco. Si caricano inizialmente solo i ritratti; le altre mosse si caricano per i due combattenti scelti, prima della presentazione VS. In caso di errore si può premere **Riprova**. Le animazioni degli incontri precedenti vengono liberate dalla memoria.
+
+`scripts/karateka-atlas.js` contiene i rettangoli reali, gli appoggi e le scale. Tre fogli difesa hanno due pose che si toccano: per il ritorno in guardia e la vittoria vengono usate pose integre dello stesso personaggio. Le immagini restano inalterate e il renderer esclude i frammenti dei fotogrammi vicini. Il contatto dei nove attacchi coincide con le finestre del motore; danni e regole restano quelli originali.
+
+Verifica automatica del motore e del renderer:
+
+```sh
+node --test tests/*.test.cjs
+```
+
+La pagina `tests/render-preview.html`, con server locale, carica tutti i 40 fogli e mostra 144 pose nelle due direzioni per il controllo visivo. `assets/karateka/checksums.json` documenta l’impronta SHA-256 dei PNG sorgenti. Per misurare nuovamente i PNG, usa `python3 tools/measure-karateka.py CARTELLA_SPRITE coordinate.json` (richiede Pillow e NumPy); poi `python3 tools/import-karateka.py CARTELLA_SPRITE coordinate.json` rigenera gli involucri senza alterare le immagini.
 
 ## Comandi
 
@@ -35,10 +53,10 @@ I comandi touch compaiono automaticamente sui dispositivi touch. Il pulsante del
 - **Pollice sinistro:** trascina il joystick per muoverti e spingilo verso l’alto per saltare. Due spinte rapide nella stessa direzione, tornando al centro tra i due movimenti, eseguono il dash.
 - **Pollice destro:** quattro pulsanti circolari mostrano solo icone delle tecniche. Il singolo tasto **↻** passa ciclicamente fra tre gruppi: pugni → calci → speciale/difese → pugni. I tre puntini indicano il gruppo attivo. **Ushiro** si trova nel secondo e nel terzo gruppo; tieni premuta l’icona delle braccia o del ginocchio nel terzo gruppo per parare.
 - Si possono tenere premuti più comandi contemporaneamente, per esempio movimento e attacco. È possibile scorrere il dito tra i pulsanti per collegare le tecniche.
-- **Su mobile si gioca in orizzontale.** Sul sito del dojo, dopo **Entra nel dojo**, ruota il telefono oppure premi **Gioca in orizzontale**. Il contenitore adatta la stessa partita anche con la rotazione bloccata; rimuove l’adattamento quando il browser è già orizzontale, evitando la doppia rotazione.
-- **Aprendo `Gioca.html` direttamente o in un iframe generico**, ruota fisicamente il telefono. In verticale compare l’avviso e il combattimento va in pausa: torna in orizzontale e premi **Riprendi**. Il comando **Schermo intero** richiede il fullscreen nativo se disponibile, altrimenti usa la vista espansa nella pagina. Le barre del browser possono restare visibili anche sul sito del dojo.
+- **Su mobile si gioca in orizzontale.** Con il launcher Flazio V6, **Entra nel dojo** adatta subito la stessa partita allo spazio visibile. Il telefono può restare verticale con il blocco rotazione attivo. Quando il browser diventa orizzontale, il gioco rimuove la rotazione aggiunta: non occorre cambiare le impostazioni del dispositivo.
+- **Aprendo `Gioca.html` direttamente o in un iframe generico**, premi **Gioca in orizzontale** o **Schermo intero** per adattare il gioco anche con la rotazione bloccata. Il fullscreen nativo è facoltativo: se il browser lo rifiuta, resta disponibile la vista adattata. In un iframe generico lo spazio resta quello concesso dalla pagina ospitante; il launcher Flazio gestisce invece l’intera area visibile del sito. Le barre del browser possono restare visibili.
 - Pausa, cambio app, cambio orientamento e rilascio/interruzione del tocco azzerano i comandi: nessuna direzione rimane bloccata.
-- **VS CPU** e **Allenamento** sono giocabili interamente su touch. La modalità **2 giocatori** richiede una tastiera per il secondo giocatore.
+- **Arcade**, **VS CPU** e **Allenamento** sono giocabili interamente su touch. La modalità **2 giocatori** richiede una tastiera per il secondo giocatore.
 
 Per attivare musica ed effetti, tocca e rilascia un comando dentro il gioco. Il pulsante **♪** nella barra dell’arena controlla entrambi: se l’audio è stato interrotto dal browser, premilo per ritentarne l’attivazione.
 
@@ -79,17 +97,47 @@ Per attivare musica ed effetti, tocca e rilascia un comando dentro il gioco. Il 
 
 Il **kaiten costa 45 punti Spirit**: la barra parte da 45, aumenta colpendo e si rigenera gradualmente. Mantieni la distanza e aggiungi i comandi durante la sequenza: la coda contiene al massimo tre attacchi futuri. Sono disponibili anche pulsanti touch.
 
-I pugni usano nuove sequenze illustrate a corpo intero per ciascun karateka: preparazione, estensione, contatto e ritorno. Queste sostituiscono l’animazione che ritagliava e ruotava singole parti delle braccia. Il gyaku mantiene il pugno posteriore: il fotogramma intermedio che cambiava braccio è escluso dalla sequenza. Anche gedan, mae, mawashi e ushiro hanno fasi distinte di caricamento del ginocchio, contatto e richiamo, senza schiacciare orizzontalmente il corpo. I fotogrammi di contatto seguono le finestre dei colpi nel motore; `renderer-punch.test.cjs` verifica sequenze, tempi, specchiatura e assenza del vecchio montaggio delle braccia.
+I pugni usano nuove sequenze illustrate a corpo intero per ciascun karateka: preparazione, estensione, contatto e ritorno. Queste sostituiscono l’animazione che ritagliava e ruotava singole parti delle braccia. Il gyaku mantiene il pugno posteriore: il fotogramma intermedio che cambiava braccio è escluso dalla sequenza. Anche gedan, mae, mawashi e ushiro hanno fasi distinte di caricamento del ginocchio, contatto e richiamo, senza schiacciare orizzontalmente il corpo. I fotogrammi di contatto seguono le finestre dei colpi nel motore.
 
 Il kaiten ha nuove fasi illustrate di preparazione, rotazione, calcio e atterraggio; la camminata alterna appoggi reali, anche arretrando in guardia. Nella guida **Come si gioca** trovi le dimostrazioni animate di passi, scatti e kaiten.
 
 ## Modalità e regole
 
+- **Arcade:** crea il tuo karateka e affronta una scalata di venti vittorie, dalla cintura bianca al 10° Dan. Ogni incontro vinto vale una promozione; una sconfitta conclude la sfida.
 - **VS CPU:** affronta il computer, con tre difficoltà: Principiante, Karateka e Kyokushin.
 - **2 giocatori:** sfida locale sulla stessa tastiera.
 - **Allenamento:** prova le tecniche con tempo illimitato e vita che si rigenera.
 
 Nelle sfide vince chi conquista **due round**. Ogni round dura **60 secondi reali**: porta a zero la vita avversaria oppure conserva più vita allo scadere. Il ritmo delle azioni è accelerato del **30%**, mantenendo il conto alla rovescia in tempo reale. Le tecniche e il combattimento sono interpretati in chiave arcade.
+
+### Arcade: il tuo karateka, dalla bianca al 10° Dan
+
+Il creatore permette di scegliere **uomo o donna**, **cinque capigliature per ciascuno** e un nome da 2 a 24 caratteri. Sono ammessi lettere, numeri, spazi, punti, apostrofi e trattini. La scelta estetica non cambia danni o regole del combattimento. L’anteprima parte dalla cintura bianca; la cintura del personaggio cambia con le promozioni.
+
+La partenza è **bianca, senza grado (mukyu)**, prima del 10 Kyu. Questo ordine segue le indicazioni introduttive del [Kyokushinkaikan Honbu Daikanyama Dojo](https://branch.kyokushinkaikan.org/daikanyamadojo/english-information).
+
+| Gradi | Cintura |
+| --- | --- |
+| 10 Kyu → 9 Kyu | Arancione → arancione con striscia blu |
+| 8 Kyu → 7 Kyu | Blu → blu con striscia gialla |
+| 6 Kyu → 5 Kyu | Gialla → gialla con striscia verde |
+| 4 Kyu → 3 Kyu | Verde → verde con striscia marrone |
+| 2 Kyu → 1 Kyu | Marrone → marrone con striscia nera |
+| 1 Dan → 10 Dan | Nera, con una tacca dorata per Dan, fino a dieci |
+
+Colori, strisce e tacche seguono la sequenza pubblicata dalla [Kyokushin World Federation](https://kyokushinworldfederation.org/kyokushin/). La promozione a ogni vittoria è una regola del videogioco: rappresenta un percorso Arcade, non un esame o un grado reale.
+
+Dopo una vittoria scegli **Prossima sfida** per continuare oppure **Termina scalata** per chiudere con il risultato raggiunto. Gli avversari sono scelti dal roster del dojo e la difficoltà cresce durante il percorso. I punti premiano vittorie, vita rimasta, rapidità, colpi, parate e combinazioni; il completamento al 10° Dan assegna un bonus finale. Una sconfitta conserva nel risultato l’ultimo grado conquistato. **Nuova scalata** riparte dalla bianca.
+
+**Il progresso non è salvabile.** La sfida vive soltanto nella memoria della pagina: ricaricare, chiudere il gioco o chiudere il pannello Flazio perde l’avanzamento. Il cambio di orientamento mantiene invece la stessa partita aperta. Solo dopo sconfitta, abbandono o completamento si può pubblicare un risultato finale; la classifica non permette di riprendere la sfida.
+
+### Classifica pubblica su GitHub
+
+Dal risultato finale, **Salva in classifica** invia il nome scelto e il punteggio al servizio del dojo, che li archivia su GitHub. **Al giocatore non serve un account:** basta il nome del karateka. Nome e dati del risultato diventano pubblici. Il gioco mostra la conferma solo dopo la risposta del servizio; **Verifica in classifica** permette di ricontrollare la presenza del record.
+
+La classifica legge i risultati pubblici online e mostra i primi 50, ordinati per grado, punteggio e durata. Un problema di rete o un limite temporaneo delle API non impedisce di giocare; si può riprovare con **Aggiorna classifica**. È una classifica amatoriale: i risultati sono calcolati dal browser, non certificati da un server. I dettagli di formato, moderazione e limite di lettura sono in [CLASSIFICA.md](CLASSIFICA.md).
+
+Questa versione contiene client e servizio in `server/leaderboard-server.cjs`. **Il servizio di pubblicazione va ancora ospitato e collegato:** GitHub Pages serve i file del gioco, ma non esegue il codice server. L’endpoint in `scripts/leaderboard-config.js` è inizialmente vuoto; finché non viene configurato, il gioco segnala che la pubblicazione non è attiva e non dichiara salvati i risultati. Il token GitHub resta soltanto nell’ambiente del server, mai nel gioco. Le istruzioni sono in [server/README.md](server/README.md).
 
 ## Musica ed effetti
 
@@ -112,86 +160,70 @@ Lo scenario riprende la palestra fornita come riferimento: tatami rosso, insegna
 
 ## File del progetto
 
-| File | Contenuto |
+| File o cartella | Contenuto |
 | --- | --- |
-| `Gioca.html` | Gioco completo in un solo file, pronto per il doppio clic e l’uso offline |
-| `build_portable.py` | Ricostruisce `Gioca.html` dai sorgenti usando solo Python 3 |
-| `build_web_package.py` | Ricostruisce il gioco e lo ZIP con generatore iframe e istruzioni |
-| `index.html` | Interfaccia, selezione dei personaggi, guida e crediti |
-| `styles.css` | Aspetto grafico e adattamento dello schermo |
-| `game.js` | Regole, collisioni, combinazioni e avversario CPU |
-| `renderer.js` | Disegno del dojo, personaggi, animazioni ed effetti |
-| `audio.js` | Colonna sonora originale, effetti, volume e gestione dell’audio |
-| `mobile-controls.js` | Joystick multitouch, quattro pulsanti con banchi di tecniche e tastiera |
-| `orientation.js` | Layout e avviso verticale in base alla viewport del gioco; la rotazione dell’iframe Flazio è gestita dal launcher esterno |
-| `main.js` | Comandi, interfaccia, collegamento degli effetti e avvio del gioco |
-| `assets/` | Scenario, illustrazioni dei karateka e logo |
-| `assets/attacks-angelo.png` / `assets/attacks-samuel.png` | Sequenze a corpo intero per tsuki, gyaku, shita e kagi |
-| `assets/guards.png` | Pose originali di Angelo e Samuel per guardia con le braccia e parata con il ginocchio |
-| `assets/motion-angelo.png` / `assets/motion-samuel.png` | Fasi illustrate dei passi e del kaiten per ciascun karateka |
-| `assets/portraits.png` | Ritratti illustrati per titolo, selezione personaggio e presentazione VS |
-| `art-prompts.txt` | Istruzioni creative usate per generare i personaggi |
-| `attack-art-prompts.txt` | Istruzioni creative per le nuove sequenze dei pugni |
-| `guard-art-prompts.txt` | Istruzioni creative per le quattro pose difensive, generate con ImageGen integrato |
-| `motion-art-prompts.txt` | Istruzioni creative per i nuovi passi e il kaiten |
-| `portrait-art-prompts.txt` | Istruzioni creative per i ritratti delle schermate iniziali |
-| `background-prompts.txt` | Istruzioni creative e correzioni dello scenario |
-| `research.json` | Fonti verificate, riferimenti tecnici e note di ricerca |
-| `game.test.cjs` | Verifiche automatiche del motore di combattimento |
-| `audio.test.cjs` | Avvio e mute, risorse audio, canale multimediale iOS, interruzioni e recupero del tempo audio bloccato |
-| `renderer-punch.test.cjs` | Sequenze illustrate di pugni e calci, contatto, specchiatura e assenza del precedente montaggio delle braccia |
-| `mobile-controls.test.cjs` | Verifiche simultaneità, rilascio, interruzioni e scorrimento dei comandi touch |
-| `orientation.test.cjs` | Verifiche del gate verticale, dimensioni, zoom e valori della viewport in ritardo |
-| `main-orientation.test.cjs` | Verifiche delle richieste asincrone di fullscreen, incluse cancellazioni e risposte tardive |
-| `main-audio.test.cjs` | Verifiche dei gesti touch, del pulsante audio e del recupero dopo interruzioni |
-| `loading.test.cjs` | Verifiche del caricamento iniziale, dell’attesa delle immagini e della conferma di gioco pronto |
-| `landscape-launcher.test.cjs` / `adaptive-launcher.test.cjs` | Launcher sul sito, viewport mobile, rotazione singola, istanza persistente e ripristino alla chiusura |
-| `launcher-loading.test.cjs` | Verifiche del loading Flazio, dei messaggi validati, dell’attesa lunga, dei tentativi e della chiusura |
-| `Incorpora.html` | Generatore di iframe responsive con anteprima giocabile e copia del codice |
-| `INCORPORA.txt` | Istruzioni e codice di esempio per il proprio hosting |
-| `iframe-flazio-html.html` | Frammento consigliato per il componente Flazio in modalità HTML, verificato sulla pagina pubblica |
-| `iframe-flazio.html` | Variante alternativa per il componente Flazio in modalità Script |
-| `launch.command` | Avvio facoltativo su macOS con server locale |
+| `Gioca.html` | Pagina di gioco; richiede le cartelle `scripts/` e `assets/` accanto |
+| `index.html` | Reindirizzamento a `Gioca.html`, conservando parametri e ancora |
+| `scripts/` | Motore, roster, animazioni, controlli, layout e gestione della vista |
+| `scripts/arcade.js` / `scripts/arcade-ui.js` | Scalata, promozioni, creazione del karateka e interfaccia dei risultati |
+| `scripts/arcade-art.js` / `scripts/arcade-atlas.js` | Animazioni del personaggio personalizzato, capigliature, cinture ed effetti dei colpi |
+| `scripts/leaderboard.js` / `scripts/leaderboard-config.js` / `CLASSIFICA.md` | Lettura dei record pubblici GitHub, invio anonimo e configurazione dell’endpoint |
+| `server/leaderboard-server.cjs` / `server/README.md` | Servizio Node per pubblicare su GitHub senza account giocatore, con credenziale esclusivamente server-side |
+| `scripts/flazio-launcher.js` | Launcher Flazio V6; la stessa sorgente è incorporata nei due frammenti da incollare |
+| `assets/karateka/` | Tutti i fogli dei nuovi karateka, caricati dal gioco quando servono |
+| `assets/arcade/` | Fogli uomo/donna, teste, pose aggiuntive ed effetti visivi, con involucri JavaScript per l’uso offline |
+| `tests/flazio-host.html` | Pagina locale di prova con un contenitore adaptive largo 1200 px e trasformato |
+| `tests/flazio-launcher.test.cjs` | Rotazione del contenitore, iframe persistente, fullscreen, messaggi, caricamento e ripristino del sito |
+| `tests/display-controller.test.cjs` / `tests/orientation-regression.test.cjs` / `tests/rotated-controls.test.cjs` | Gestione della vista, formati verticali/orizzontali e comandi dopo la rotazione |
+| `tests/roster-game.test.cjs` / `tests/karateka-renderer.test.cjs` | Roster e animazioni dei karateka |
+| `tests/arcade.test.cjs` / `tests/leaderboard.test.cjs` / `tests/leaderboard-server.test.cjs` | Progressione, punteggi, creazione del personaggio e classifica GitHub anonima |
+| `tests/render-preview.html` | Anteprima delle pose del roster nelle due direzioni |
+| `Incorpora.html` | Generatore dell’iframe generico con anteprima e copia del codice |
+| `INCORPORA.txt` | Istruzioni di pubblicazione e di inserimento nel sito |
+| `iframe-flazio-html.html` | Frammento HTML completo da incollare nella modalità HTML di Flazio |
+| `iframe-flazio.html` | Solo JavaScript da incollare nella modalità Script di Flazio, senza aggiungere tag HTML |
 
-Dopo aver modificato i sorgenti, aggiorna la versione portatile dalla cartella del progetto:
-
-```sh
-python3 build_portable.py
-```
-
-Il file generato incorpora il foglio di stile, gli script del gioco e ogni immagine necessaria una sola volta. Non modificare `Gioca.html` manualmente: la ricostruzione ne sostituisce il contenuto.
+Per verificare il progetto esegui `node --test tests/*.test.cjs`. Questa cartella è il pacchetto da pubblicare: conserva i percorsi relativi di `scripts/` e `assets/`. Non distribuire `Gioca.html` da solo.
 
 ## Inserire il gioco in un sito web
 
-La pagina di gioco è [Gioca del dojo](https://kyokushinkaicataniadojo.it/play). Il file completo è ospitato su [GitHub Pages](https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html?embed=1), nel repository [kyokushin-spirit-bodyplanet](https://github.com/andreaVullo/kyokushin-spirit-bodyplanet).
+La pagina del dojo è [Gioca del dojo](https://kyokushinkaicataniadojo.it/play). L’indirizzo del gioco usato dai frammenti è [GitHub Pages](https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html?embed=1&hostdisplay=1), nel repository [kyokushin-spirit-bodyplanet](https://github.com/andreaVullo/kyokushin-spirit-bodyplanet). Le modifiche locali diventano disponibili sul sito soltanto dopo avere pubblicato il pacchetto aggiornato e sostituito il frammento Flazio.
 
-### Flazio adaptive
+### Pubblicare l’aggiornamento completo
 
-Usa **`iframe-flazio-html.html`**, launcher **`onsite-dialog-v5`**: apri il componente Codice/Script, seleziona la modalità **HTML** e incolla tutto il frammento. **`iframe-flazio.html`** contiene la variante per la sola modalità **Script**. Non scambiare i due frammenti tra le modalità.
+1. Aggiorna **`Gioca.html` e le cartelle intere `scripts/` e `assets/`** sullo stesso hosting HTTPS, mantenendo nomi e percorsi. Servono anche per i nuovi karateka, la modalità Arcade, le capigliature, le cinture e gli effetti dei colpi. Conserva `index.html` come reindirizzamento al gioco.
+2. Apri il collegamento pubblico a `Gioca.html` e controlla caricamento, selezione dei karateka, creazione Arcade e avvio dell’incontro. Controlla la lettura della classifica online senza inviare risultati di prova come record reali. `localhost` e `127.0.0.1` funzionano soltanto sul computer di sviluppo.
+3. Su Flazio sostituisci il precedente frammento con **una sola** delle due varianti V6 qui sotto, nella modalità corrispondente. Non tenere attivo anche il vecchio launcher.
+4. Per la pubblicazione dei punteggi senza account, ospita il servizio descritto in **`server/README.md`**, configura il token solo sul server e inserisci l’URL HTTPS pubblico in **`scripts/leaderboard-config.js`**. Pubblicare soltanto il gioco su GitHub Pages non attiva il servizio di scrittura.
 
-**Entra nel dojo** mostra subito **Caricamento del dojo…** in un pannello sopra il sito, mantenendo l’indirizzo `/play`. Il gioco diventa visibile e interattivo dopo la conferma che grafica e avvio sono completi. Dopo 25 secondi compare **Riprova**, senza ricaricamenti automatici. Un nuovo tentativo sostituisce il precedente: resta una sola istanza. Il pannello è indipendente dal componente adaptive e conserva la stessa partita quando Flazio ricrea i propri elementi durante un cambio di orientamento.
+### Flazio adaptive — launcher V6
 
-Mentre il gioco è aperto su un dispositivo touch, il launcher usa temporaneamente `width=device-width, initial-scale=1, viewport-fit=cover` sulla pagina ospitante, neutralizza lo zoom del documento e applica uno sfondo scuro alla pagina. Misura nuovamente lo spazio dopo l’aggiornamento della viewport. Questo evita che la larghezza fissa del sito adaptive riduca o sposti il pannello e che le aree laterali dell’iPhone mostrino lo sfondo bianco del sito. Il gioco mantiene le proprie proporzioni nell’area disponibile.
+La versione è **`onsite-dialog-v6`**. Entrambi i frammenti contengono tutto il codice del launcher; non devono scaricare un ulteriore script per avviarlo.
 
-Se il telefono è già orizzontale, l’invito **Apri a schermo intero** compare al centro dell’area visibile sopra il sito. **Non ora** lo nasconde fino al successivo passaggio verticale → orizzontale. Non viene avviata una partita prima del tocco.
+- **Modalità HTML, consigliata:** apri il componente Codice/Script di Flazio, seleziona **HTML** e incolla l’intero contenuto di **`iframe-flazio-html.html`**, compresi pulsante e tag `<script>`.
+- **Modalità Script:** seleziona **Script** e incolla l’intero contenuto di **`iframe-flazio.html`**. Il file contiene **solo JavaScript**, nonostante l’estensione `.html`: non aggiungere tag `<script>`, `<iframe>` o un documento HTML.
 
-Dopo l’ingresso, **Gioca in orizzontale** mantiene il comportamento introdotto dal launcher V4: se la pagina è verticale, ruota una sola volta il solo iframe, scambiandone larghezza e altezza. Quando il telefono/browser diventa realmente orizzontale, rimuove la trasformazione. Il gioco interno usa le dimensioni dell’iframe e non applica un’altra rotazione. L’adattamento mantiene la stessa sessione e non apre una pagina GitHub. Il fullscreen nativo dipende dal browser: le sue barre possono restare visibili.
+**Entra nel dojo** apre il gioco sopra la pagina `/play` e richiede subito la vista orizzontale. Non occorre sbloccare la rotazione del telefono. Il launcher misura l’area visibile disponibile dopo avere riservato spazio ai comandi e alle aree sicure: se questa area è verticale, ruota soltanto l’iframe di 90° e ne scambia le dimensioni; quando diventa orizzontale, rimuove la trasformazione. Anche nei formati quasi quadrati la decisione segue lo spazio realmente utilizzabile. La decisione non dipende dall’orientamento hardware dichiarato dal dispositivo. Il gioco interno riceve la conferma del contenitore ed evita di ruotare di nuovo la propria interfaccia.
 
-**Torna al sito** chiude partita e audio e ripristina viewport, zoom, sfondo e scorrimento della pagina sottostante. Una nuova apertura riparte dal titolo. Se il documento ospitante non è accessibile, il componente mostra un messaggio senza aprire un sito esterno.
+Il pannello vive fuori dal componente adaptive, nel livello superiore del browser quando disponibile. Flazio può ricreare i propri elementi senza sostituire l’iframe della partita. Il launcher imposta temporaneamente `width=device-width, initial-scale=1, viewport-fit=cover`, neutralizza zoom e trasformazioni della pagina, considera le aree sicure del telefono e tiene il pulsante **Chiudi** accessibile. Dimensioni e posizione vengono aggiornate anche quando cambiano le barre del browser o la viewport visiva.
 
-Il parametro `hostdisplay=1` abilita il protocollo di visualizzazione solo con gli host riconosciuti dal gioco. I messaggi di caricamento, richiesta di adattamento e stato della vista sono controllati per origine e finestra mittente; non contengono dati personali. `landscape-launcher.test.cjs`, `adaptive-launcher.test.cjs` e `launcher-loading.test.cjs` coprono apertura, caricamento, dimensioni, rotazione e pulizia. Le prove nel browser non certificano da sole il comportamento su un iPhone fisico.
+Il fullscreen nativo viene richiesto quando disponibile, ma un rifiuto non impedisce la vista orizzontale. Il launcher non forza il blocco dell’orientamento di sistema. Le barre del browser possono restare visibili. Il pulsante della vista e quello interno al gioco permettono di uscire dall’adattamento e riattivarlo.
 
-### Iframe generico e pubblicazione
+Durante l’avvio compare **Caricamento del dojo…**; il gioco diventa interattivo dopo la conferma di avvio. Dopo 25 secondi compare **Riprova**. Non ci sono ricaricamenti automatici: un nuovo tentativo sostituisce solo il precedente iframe e i suoi eventuali messaggi tardivi vengono ignorati.
 
-Apri **`Incorpora.html`** per provare un iframe, inserire l’indirizzo pubblico del gioco e copiare il codice. Le istruzioni essenziali sono anche in **`INCORPORA.txt`**. L’iframe generico non include la gestione della pagina adaptive e della rotazione del launcher Flazio: sul telefono richiede una viewport orizzontale del browser.
+**Chiudi ×** termina partita e audio e ripristina viewport, stili, zoom e posizione di scorrimento della pagina. Una nuova apertura riparte dal titolo. I messaggi tra gioco e launcher vengono controllati sia per origine sia per finestra mittente; gli identificativi delle richieste evitano che conferme obsolete prevalgano su comandi successivi.
 
-1. Usa il [file pubblico su GitHub Pages](https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html?embed=1), oppure carica **`Gioca.html`** sul tuo hosting HTTPS. Il file è completo e non richiede gli altri sorgenti.
-2. Inserisci l’URL pubblico nel generatore. `embed=1` attiva la vista compatta con audio, aiuto, pausa e schermo intero; `touch=1` mostra esplicitamente i comandi touch anche sul computer. `standalone=1`, in una pagina principale, aggiunge il collegamento **Torna al sito**.
-3. Copia il codice nel blocco HTML/embed del sito. L’hosting deve consentire l’incorporamento in iframe. `127.0.0.1` e `localhost` sono utilizzabili solo sul computer di sviluppo.
+Per provare il contenitore senza pubblicare, avvia il server locale e apri **`tests/flazio-host.html`**. La pagina simula larghezza fissa, trasformazioni e ricostruzione del componente. Le prove automatiche e nel browser non sostituiscono una verifica su un telefono fisico.
 
-Il gioco non usa cookie e, una volta caricato, non richiede risorse esterne. Il permesso fullscreen è incluso nell’iframe; l’avvio dell’audio richiede comunque un gesto dell’utente.
+### Iframe generico
 
-Dopo una modifica, ricostruisci il file portatile e aggiorna quello pubblicato. La cartella **`github-pages/`** contiene il materiale per il repository pubblico: il suo `index.html` è un reindirizzamento, diverso dall’index dei sorgenti. Non sostituirlo durante la copia. Il pacchetto **`Kyokushin-Spirit-Mobile-Web.zip`** contiene **`Gioca.html`**, **`Incorpora.html`**, **`INCORPORA.txt`**, **`iframe-flazio-html.html`** e **`iframe-flazio.html`**; per aggiornarlo esegui `python3 build_web_package.py`.
+Apri **`Incorpora.html`** per inserire l’indirizzo pubblico del gioco, provarlo e copiare un iframe responsive. Le istruzioni essenziali sono anche in **`INCORPORA.txt`**. Su Flazio adaptive usa i frammenti V6: il codice generico non controlla zoom, viewport o ricostruzione della pagina ospitante.
+
+`embed=1` attiva la vista compatta con audio, aiuto, pausa e schermo intero; `touch=1` mostra esplicitamente i comandi touch anche sul computer. `standalone=1`, in una pagina principale, aggiunge il collegamento **Torna al sito**. Riserva `hostdisplay=1` al launcher previsto dal progetto.
+
+Il comando **Schermo intero** può adattare il gioco in orizzontale senza obbligare a sbloccare la rotazione. Se il browser nega il fullscreen, un iframe generico conserva lo spazio assegnato dal sito: per gestire tutto lo schermo di una pagina Flazio serve il launcher V6. L’hosting deve permettere gli iframe; l’audio richiede comunque un gesto dell’utente.
+
+Per ogni aggiornamento distribuisci nuovamente il pacchetto completo, comprese `scripts/` e `assets/`. Se cambia `scripts/flazio-launcher.js`, aggiorna anche le copie incorporate in entrambi i frammenti e sostituisci quello incollato su Flazio.
 
 ## Fonti
 

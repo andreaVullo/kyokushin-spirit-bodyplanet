@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=1200, initial-scale=1">
+  <title>Verifica Flazio adaptive — Kyokushin Spirit</title>
+  <style>
+    html,body{margin:0;min-width:1200px;background:#eee8da;color:#17251f;font:17px/1.5 system-ui,sans-serif}
+    #adaptive{width:1200px;min-height:1800px;transform-origin:0 0;transform:scale(.8);position:relative;margin:0 auto;background:#faf7f0}
+    header{padding:40px;background:#17251f;color:#fff}main{padding:44px;max-width:800px}button{padding:14px 20px;border:1px solid #64735e;border-radius:8px;background:#fff;font:inherit;cursor:pointer}#component{padding:40px;border:2px dashed #64735e;margin:30px 0}code{font-size:.88em}footer{position:absolute;top:1400px;left:44px}#diagnostics{white-space:pre-wrap;font:13px/1.4 monospace;background:#eee;padding:20px}
+  </style>
+</head>
+<body>
+  <div id="adaptive">
+    <header><h1>Pagina adaptive di prova</h1><p>Contenitore largo 1200 px, trasformazione e viewport fissa, come un sito adaptive.</p></header>
+    <main><p>Apri il dojo, cambia formato o orientamento e richiudilo. La partita deve restare la stessa; la pagina deve tornare al proprio formato iniziale.</p>
+      <div id="component"><button data-kyokushin-open type="button">Entra nel dojo</button><script src="../scripts/flazio-launcher.js" data-game-url="../Gioca.html"></script></div>
+      <p><button id="replace" type="button">Ricrea il componente adaptive</button> <button id="zoom" type="button">Attiva zoom 0,75 del sito</button> <button id="delayed-adaptive" type="button">Ricalcola adaptive fra 3 secondi</button></p>
+      <p>Il pulsante di ricostruzione sostituisce il componente del sito, senza ricreare il gioco. Si può usare anche <code>window.recreateFlazioComponent()</code> mentre il pannello è aperto.</p>
+      <pre id="diagnostics"></pre>
+    </main><footer>Fondo della pagina di prova</footer>
+  </div>
+  <script>
+    window.recreateFlazioComponent=function(){var old=document.getElementById('component'),node=document.createElement('div');node.id='component';node.innerHTML='<button type="button" data-kyokushin-open>Entra nel dojo · componente ricreato</button>';old.replaceWith(node);return window.KyokushinLauncher.getState().frame;};
+    document.getElementById('replace').onclick=window.recreateFlazioComponent;
+    document.getElementById('zoom').onclick=function(){document.body.style.zoom=document.body.style.zoom?'':'.75';};
+    document.getElementById('delayed-adaptive').onclick=function(){setTimeout(function(){document.documentElement.style.zoom='.68';document.body.style.transform='scale(.68)';document.querySelector('meta[name="viewport"]').content='width=1200, initial-scale=.68';},3000);};
+    setInterval(function(){var s=window.KyokushinLauncher.getState();document.getElementById('diagnostics').textContent=JSON.stringify({innerWidth:innerWidth,innerHeight:innerHeight,visualViewport:window.visualViewport?{width:visualViewport.width,height:visualViewport.height,scale:visualViewport.scale}:null,opened:s.opened,landscape:s.landscapeRequested,layout:s.layout,iframeCount:document.querySelectorAll('#kyokushin-host-v6 iframe').length},null,2)},500);
+  </script>
+</body>
+</html>

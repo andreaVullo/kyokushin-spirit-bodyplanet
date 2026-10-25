@@ -1,0 +1,24 @@
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;background:#121212;overflow:hidden}
+*{box-sizing:border-box}
+.st{position:relative;width:100%;height:100%;overflow:hidden;background:#121212 url(https://globaluserfiles.com/media/313908_9314d91ce6abcb1b44ff7259b763539fc1537501.jpeg) center/cover no-repeat;font-family:Archivo,Arial,sans-serif;color:#F6F2EC}
+.st:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,18,18,0) 40%,rgba(18,18,18,.82) 70%,rgba(18,18,18,.97) 86%);pointer-events:none}
+.tag{position:absolute;top:16px;left:16px;font:12px/1 Archivo Black,Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;background:#E00000;color:#F6F2EC;padding:9px 12px}
+.ui{position:absolute;left:0;right:0;bottom:0;padding:clamp(16px,3.6vw,36px);display:flex;align-items:center;gap:14px 26px;flex-wrap:wrap}
+.play{display:inline-flex;align-items:center;justify-content:center;gap:14px;background:#E00000;color:#F6F2EC;border:0;border-radius:0;padding:0 30px;height:60px;font:15px/1 Archivo Black,Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:background .25s ease,color .25s ease}
+.play:hover,.play:focus-visible{background:#F6F2EC;color:#121212;outline:none}
+.play svg{width:15px;height:15px;flex:none}
+.note{margin:0;font-size:15px;line-height:1.5;max-width:440px}
+.game{position:absolute;left:0;top:0;width:100%;height:calc(100% - 48px);border:0;background:#000}
+.bar{position:absolute;left:0;right:0;bottom:0;height:48px;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 6px 0 14px;background:#121212;z-index:3}.bar span{margin-right:auto;font-size:13px;color:#F6F2EC;opacity:.85}
+.bar button,.bar a{height:36px;padding:0 14px;border:1px solid rgba(246,242,236,.55);background:rgba(18,18,18,.78);color:#F6F2EC;font:11px/1 Archivo Black,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;text-decoration:none}
+.bar button:hover,.bar a:hover{background:#E00000;border-color:#E00000}
+@media (max-width:520px){.st{background-size:100% auto;background-position:center 52px}.st:before{background:linear-gradient(180deg,rgba(18,18,18,0) 45%,rgba(18,18,18,.9) 58%,#121212 64%)}.play{width:100%;height:54px}.note{font-size:14px}.tag{font-size:11px;top:12px;left:12px}}
+</style>
+<div class="st" id="st">
+<span class="tag">Gratis · dal browser</span>
+<div class="ui"><button class="play" id="go" type="button" data-kyokushin-open><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1l12 7-12 7z" fill="currentColor"/></svg>Gioca ora</button><p class="note" id="note">Scegli un karateka o crea il tuo personaggio Arcade. Il gioco si adatta allo schermo anche quando ruoti il telefono.</p></div>
+</div>
+
+<script src="https://andreavullo.github.io/kyokushin-spirit-bodyplanet/scripts/flazio-launcher.js?v=20261025-v7" data-game-url="https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html?v=20261025-arcade"></script>

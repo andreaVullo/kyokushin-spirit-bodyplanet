@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Regressione mobile: geometria effettiva</title>
+<style>
+body{margin:20px;font:14px/1.5 system-ui;background:#e9edf2;color:#172333}h1{font-size:24px}table{border-collapse:collapse;width:100%;background:white}td,th{padding:9px;text-align:left;border-bottom:1px solid #cdd5df}.pass{color:#17653d}.fail{color:#ad251e}iframe{border:1px solid #4d6279;display:block;max-width:none;margin:12px 0}details{margin-top:24px}#fixtures{overflow:auto}
+</style>
+<h1>Geometria mobile e aree sicure</h1>
+<p>Le prove usano gli stili reali del gioco in finestre isolate. Gli inset di schermo sono simulati; le misure sono lette dal layout del browser.</p>
+<p id="status">Caricamento…</p>
+<table><thead><tr><th>Configurazione</th><th>Esito</th><th>Dettagli</th></tr></thead><tbody id="results"></tbody></table>
+<details open><summary>Visualizza le finestre di prova</summary><div id="fixtures"></div></details>
+<script>
+(async()=>{
+  const source=await fetch('../Gioca.html').then(r=>r.text());
+  const doc=new DOMParser().parseFromString(source,'text/html');
+  const sheets=[...doc.querySelectorAll('style')].map(e=>e.outerHTML).join('')+
+    [...doc.querySelectorAll('link[rel="stylesheet"]')].map(e=>e.outerHTML).join('');
+  const title=doc.querySelector('#title-screen').outerHTML;
+  const pause=doc.querySelector('#pause-panel').outerHTML.replace('overlay-panel hidden','overlay-panel');
+  const cases=[
+    {name:'568×320 · gioco · notch a sinistra',w:568,h:320,s:[0,0,21,44]},
+    {name:'568×390 · gioco · notch a destra',w:568,h:390,s:[0,47,21,0]},
+    {name:'844×390 · gioco · inset superiore',w:844,h:390,s:[47,0,21,0]},
+    {name:'390×844 → orizzontale · gioco',w:390,h:844,s:[47,21,0,0],virtual:true},
+    {name:'280×653 → orizzontale · gioco',w:280,h:653,s:[0,0,0,0],virtual:true},
+    {name:'844×390 · host gestisce gli inset',w:844,h:390,s:[0,0,0,0],host:true},
+    ...['title','select','versus','create'].map(screen=>({name:`568×320 · ${screen} · notch laterali`,w:568,h:320,s:[0,40,21,12],screen})),
+    {name:'568×280 · titolo senza ritagli',w:568,h:280,s:[0,0,0,0],screen:'title',content:true},
+    {name:'568×280 · pausa senza ritagli',w:568,h:280,s:[0,0,0,0],paused:true,content:true},
+    {name:'568×240 · titolo con barre del browser',w:568,h:240,s:[0,0,0,0],screen:'title',content:true},
+    {name:'568×240 · pausa con barre del browser',w:568,h:240,s:[0,0,0,0],paused:true,content:true}
+  ];
+  let failures=0;
+  for(const c of cases){
+    const lw=c.virtual?c.h:c.w,lh=c.virtual?c.w:c.h;
+    const state=c.screen?'front-'+c.screen:'playing';
+    const classes=[state,'touch-active','landscape-layout','landscape-requested',lh<=380?'landscape-short':'',lh<=330?'landscape-tiny':'',c.virtual?'virtual-landscape':'',c.host?'host-display-managed':''];
+    const style=`--view-width:${c.w}px;--view-height:${c.h}px;--layout-width:${lw}px;--layout-height:${lh}px;--view-left:0px;--view-top:0px;`;
+    const safe=['top','right','bottom','left'].map((edge,i)=>`--safe-${edge}:${c.s[i]}px`).join(';');
+    const iframe=document.createElement('iframe');iframe.width=c.w;iframe.height=c.h;
+    iframe.title=c.name;
+    document.getElementById('fixtures').append(iframe);
+    const loaded=new Promise(resolve=>iframe.addEventListener('load',resolve,{once:true}));
+    iframe.srcdoc=`<!doctype html><html style="${style}"><head><base href="${new URL('../',location.href).href}"><meta name="viewport" content="width=device-width,initial-scale=1">${sheets}</head><body class="${classes.join(' ')}" style="${safe}"><main><div id="game-shell"><section id="arcade" class="arcade expanded"><header class="arena-topline"><span>BODYPLANET</span><div class="arena-utilities"><button>⛶</button></div></header><div id="viewport" class="viewport"><canvas id="game" width="1280" height="720"></canvas>${c.screen==='title'?title:c.paused?pause:''}</div></section></div></main></body></html>`;
+    await loaded;
+    const d=iframe.contentDocument,v=d.querySelector('#viewport'),arcade=d.querySelector('#arcade'),head=d.querySelector('.arena-topline');
+    if(c.screen==='title'){
+      const start=d.querySelector('#title-start-button');start.disabled=false;start.textContent='PREMI PER INIZIARE';
+      const extra=d.createElement('div');extra.className='title-extra-actions';extra.innerHTML='<button>ARCADE<span>DALLA BIANCA AL 10º DAN</span></button><button>CLASSIFICA<span>I MIGLIORI KARATEKA</span></button>';
+      d.querySelector('#title-start-button').after(extra);
+    }
+    await new Promise(resolve=>iframe.contentWindow.requestAnimationFrame(()=>iframe.contentWindow.requestAnimationFrame(resolve)));
+    const errors=[],tol=1.1;
+    const expect=(ok,msg)=>{if(!ok)errors.push(msg)};
+    const w=v.clientWidth,h=v.clientHeight,x=v.offsetLeft,y=v.offsetTop;
+    expect(Math.abs(arcade.clientWidth-lw)<=tol&&Math.abs(arcade.clientHeight-lh)<=tol,`cabinet ${arcade.clientWidth}×${arcade.clientHeight}, atteso ${lw}×${lh}`);
+    expect(y>=44+c.s[0]-tol,`campo y=${y} entra nell'header alto ${44+c.s[0]}`);
+    expect(x>=c.s[3]-tol&&x+w<=lw-c.s[1]+tol,`campo x=${x}, larghezza=${w} oltre area sicura`);
+    expect(y+h<=lh-c.s[2]+tol,`campo termina a ${y+h}, limite ${lh-c.s[2]}`);
+    expect(head.clientHeight>=44+c.s[0]-tol,'header non comprende inset superiore');
+    if(!c.screen)expect(Math.abs(w/h-16/9)<.012,`rapporto campo ${(w/h).toFixed(3)}`);
+    if(c.content){
+      const container=c.screen==='title'?d.querySelector('#title-screen'):d.querySelector('#pause-panel');
+      const bounds=container.getBoundingClientRect();
+      for(const child of container.querySelectorAll('button')){
+        let r=child.getBoundingClientRect();
+        const canScroll=/^(auto|scroll)$/.test(iframe.contentWindow.getComputedStyle(container).overflowY);
+        if(canScroll&&(r.top<bounds.top-tol||r.bottom>bounds.bottom+tol)){
+          container.scrollTop+=r.top<bounds.top?r.top-bounds.top:r.bottom-bounds.bottom;
+          r=child.getBoundingClientRect();
+        }
+        expect(r.top>=bounds.top-tol&&r.bottom<=bounds.bottom+tol,`azione “${child.textContent.trim()}” tagliata e non raggiungibile`);
+      }
+    }
+    if(errors.length)failures++;
+    const row=document.createElement('tr');
+    for(const value of [c.name,errors.length?'ERRORE':'OK',errors.join('; ')||`campo ${w}×${h}, posizione ${x}, ${y}`]){const cell=document.createElement('td');cell.textContent=value;row.append(cell)}
+    row.children[1].className=errors.length?'fail':'pass';document.getElementById('results').append(row);
+  }
+  const status=document.getElementById('status');status.textContent=`${cases.length-failures}/${cases.length} prove superate`;
+  status.dataset.failures=String(failures);status.className=failures?'fail':'pass';
+})().catch(error=>{document.getElementById('status').textContent=error.message;document.getElementById('status').dataset.failures='error'});
+</script>

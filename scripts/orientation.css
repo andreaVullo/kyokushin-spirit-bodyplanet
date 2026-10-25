@@ -1,0 +1,71 @@
+/* Physical safe areas become local edges when the cabinet rotates clockwise. */
+body.virtual-landscape {
+  --safe-top:env(safe-area-inset-right);--safe-right:env(safe-area-inset-bottom);
+  --safe-bottom:env(safe-area-inset-left);--safe-left:env(safe-area-inset-top);
+}
+/* The Flazio host has already inset the iframe around the notch and toolbar. */
+body.host-display-managed {--safe-top:0px;--safe-right:0px;--safe-bottom:0px;--safe-left:0px}
+body.landscape-requested #game-shell {position:fixed;inset:0;z-index:100;background:#101820;overflow:hidden}
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested) #arcade,
+body.landscape-requested #arcade.expanded {
+  position:fixed;inset:auto;left:var(--view-left,0px);top:var(--view-top,0px);
+  width:var(--layout-width,100vw);height:var(--layout-height,100dvh);
+  max-width:none;max-height:none;transform:none;transform-origin:0 0;
+}
+body.virtual-landscape #arcade.expanded {
+  left:calc(var(--view-left,0px) + var(--view-width,100vw));top:var(--view-top,0px);
+  width:var(--layout-width);height:var(--layout-height);transform:rotate(90deg);
+}
+body.landscape-layout #arcade>.arena-topline {
+  padding-left:max(10px,var(--safe-left,env(safe-area-inset-left)));
+  padding-right:max(10px,var(--safe-right,env(safe-area-inset-right)));
+  padding-top:var(--safe-top,env(safe-area-inset-top));
+  height:calc(44px + var(--safe-top,env(safe-area-inset-top)));
+  min-height:calc(44px + var(--safe-top,env(safe-area-inset-top)));
+  flex-basis:calc(44px + var(--safe-top,env(safe-area-inset-top)));
+}
+/* Match the cabinet rules' specificity: these dimensions must also win on touch. */
+body.landscape-layout:is(.touch-active,.force-touch,.landscape-requested).playing #arcade>.viewport {
+  top:calc(44px + var(--safe-top,env(safe-area-inset-top)));
+  left:var(--safe-left,env(safe-area-inset-left));right:var(--safe-right,env(safe-area-inset-right));
+  --arena-height:calc(var(--layout-height) - 44px - var(--safe-top,env(safe-area-inset-top)) - var(--safe-bottom,env(safe-area-inset-bottom)));
+  width:min(calc(100% - var(--safe-left,env(safe-area-inset-left)) - var(--safe-right,env(safe-area-inset-right))),calc(var(--arena-height)*16/9));
+  height:min(var(--arena-height),calc((var(--layout-width) - var(--safe-left,env(safe-area-inset-left)) - var(--safe-right,env(safe-area-inset-right)))*9/16));
+}
+/* Front screens share the same safe rectangle, including their scrollable edges. */
+body.landscape-layout:is(.touch-active,.force-touch,.embedded,.landscape-requested):is(.front-title,.front-select,.front-versus,.front-create) #arcade>.viewport {
+  width:calc(100% - var(--safe-left,env(safe-area-inset-left)) - var(--safe-right,env(safe-area-inset-right)));
+  margin:0 var(--safe-right,env(safe-area-inset-right)) var(--safe-bottom,env(safe-area-inset-bottom)) var(--safe-left,env(safe-area-inset-left));
+}
+body.virtual-landscape #touch-controls {
+  padding-left:max(12px,var(--safe-left));padding-right:max(12px,var(--safe-right));padding-bottom:max(9px,var(--safe-bottom));
+}
+/* Native modal dialogs remain upright and readable above a rotated cabinet. */
+body.virtual-landscape #game-shell>dialog {transform:none;width:calc(var(--view-width) - 24px);max-height:calc(var(--view-height) - 24px)}
+body.landscape-tiny.landscape-layout #selection-panel.expanded-roster {
+  grid-template-columns:minmax(0,1fr);grid-template-rows:26px auto auto;gap:5px;padding:5px 12px;
+}
+body.landscape-tiny.landscape-layout #selection-panel .select-stage {display:none}
+body.landscape-tiny.landscape-layout #selection-panel .roster-section {grid-column:1;grid-row:2}
+body.landscape-tiny.landscape-layout #selection-panel .select-footer {grid-column:1;grid-row:3;padding-top:4px}
+body.landscape-tiny.landscape-layout #selection-panel .fighter-option {height:46px;min-height:44px}
+body.landscape-tiny.landscape-layout #selection-panel .roster-instruction {margin-bottom:4px}
+body.landscape-tiny.landscape-layout #selection-panel .selection-status {margin-top:3px}
+body.landscape-tiny.landscape-layout #selection-panel .select-heading h2 {font-size:19px;margin:0}
+body.landscape-tiny.landscape-layout #selection-panel .select-heading>div>span {display:none}
+body.landscape-tiny.landscape-layout #selection-panel .roster-name small {display:none}
+body.landscape-tiny.landscape-layout #selection-panel .roster-name>span {font-size:6px}
+body.landscape-tiny.landscape-layout #selection-panel .roster-name>strong {font-size:8px}
+
+/* Browser bars can leave less vertical room than the phone's nominal height. */
+body.landscape-tiny.landscape-layout #title-screen {
+  align-items:flex-start;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+}
+body.landscape-tiny.landscape-layout #title-screen .title-content {
+  height:auto;min-height:100%;flex-shrink:0;justify-content:flex-start;justify-content:safe center;
+}
+body.landscape-tiny.landscape-layout #pause-panel {
+  overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+  justify-content:flex-start;justify-content:safe center;padding:8px;
+}
+body.landscape-tiny.landscape-layout #pause-panel>* {flex-shrink:0}

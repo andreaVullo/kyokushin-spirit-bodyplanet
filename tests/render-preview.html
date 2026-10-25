@@ -1,0 +1,29 @@
+<!doctype html><meta charset="utf-8"><title>Verifica animazioni karateka</title>
+<style>body{margin:0;padding:24px;background:#18222b;color:#fff;font:16px Arial}canvas{display:block;width:100%;background:#e8e0d4;margin:12px 0 30px}h2{font-size:20px}#status{position:sticky;top:0;background:#18222b;padding:12px}</style>
+<div id="status">Caricamento e verifica dei 40 fogli…</div>
+<script>window.FighterArt={height:228,ready:true,load:()=>Promise.resolve()};</script>
+<script src="../scripts/roster.js"></script><script src="../scripts/karateka-atlas.js"></script><script src="../scripts/game.js"></script><script src="../scripts/karateka-art.js"></script>
+<script>
+(async()=>{
+ const types=['tsuki','gyaku','shita','kagi','gedan','mae','mawashi','ushiro','kaiten'];
+ let verified=0;
+ for(const [id,c] of Object.entries(KyokushinRoster).filter(([id,c])=>c.assetId)){
+  await FighterArt.loadFighters([id]);
+  const h=document.createElement('h2');h.textContent=c.name+(c.variant?' · '+c.variant:'');document.body.append(h);
+  const canvas=document.createElement('canvas');canvas.width=1500;canvas.height=860;document.body.append(canvas);const ctx=canvas.getContext('2d');
+  const poses=[...types.map(move=>({state:'attack',move,moveProgress:(KyokushinMoves[move].start+KyokushinMoves[move].end)/2/KyokushinMoves[move].duration})),{state:'block'},{state:'legBlock'},{state:'walk',walkCycle:2},{state:'dash',dashProgress:.5},{state:'jump',vy:-200,airborne:true,y:200},{state:'hit',stun:.2},{state:'ko',hp:0},{state:'hit',knockdown:true,recovery:.06,stun:0},{state:'victory'}];
+  poses.forEach((p,i)=>{
+   const x=(i%6)*250,y=Math.floor(i/6)*280;ctx.save();ctx.translate(x,y);
+   ctx.fillStyle='#554f46';ctx.font='14px Arial';ctx.fillText(p.move||p.state,10,20);ctx.strokeStyle='#c1b5a4';ctx.beginPath();ctx.moveTo(0,260);ctx.lineTo(250,260);ctx.stroke();
+   const f={id,x:90,y:260,hp:1000,facing:i%2?-1:1,scale:.8,...p};
+   if(p.state==='jump')f.y=225;
+   ctx.globalAlpha=0;FighterArt.draw(ctx,f,0);ctx.globalAlpha=1;FighterArt.draw(ctx,f,.2);
+   ctx.restore();
+   const rgba=ctx.getImageData(x,y+25,250,230).data;let count=0;for(let k=3;k<rgba.length;k+=4)if(rgba[k]>100)count++;
+   if(count<300)throw new Error(id+' '+(p.move||p.state)+' invisibile');
+  });
+  verified++;document.getElementById('status').textContent=verified+' / 8 karateka verificati';
+ }
+ document.getElementById('status').textContent='PASS · 40 fogli caricati · 144 pose renderizzate · entrambe le direzioni';
+})().catch(e=>{document.getElementById('status').textContent='ERRORE · '+e.message;console.error(e);});
+</script>

@@ -1,0 +1,11 @@
+Sprite Arcade originali generati tramite ImageGen integrato.
+male-body.png e female-body.png: 36 pose a corpo intero ciascuno.
+heads.png: 5 capelli uomo e 5 donna, fronte 3/4 e retro 3/4 (20 teste).
+vfx.png: 36 frame / 6 categorie di effetti colpo, colpo forte, parata, scia, polvere, critico.
+supplement.png: 12 pose correttive, usate per le parate complete dell'uomo e i calci bassi/rotanti della donna.
+male-reactions.png: 4 pose correttive, usate per le due reazioni al colpo e l'inchino dell'uomo.
+I PNG sono conservati senza modificare alpha o ricomprimere. Il gioco usa atlanti misurati e composizione runtime per capelli/cinture.
+Il renderer usa 36 pose per sesso: 2 pose specifiche per ciascuna delle 9 tecniche (preparazione e contatto), guardia, camminata, dash, salto, parate alte/basse, due reazioni, caduta, KO, rialzata, vittoria, inchino, atterraggio. Preparazione/contatto/ritorno sono sincronizzati ai tempi del motore.
+Le 10 capigliature hanno viste 3/4 anteriore e posteriore, con registrazione testa specifica per ogni posa. Le cinture cambiano colore e applicano la striscia kyu o 1–10 tacche dorate Dan a runtime.
+atlas.json contiene i metadati definitivi, uguali a scripts/arcade-atlas.js nel gioco. prompts.json documenta ImageGen integrato, riferimenti e prompt.
+Verifica visiva: tests/arcade-art-preview.html nel gioco; 5 test automatici in tests/arcade-art.test.cjs.

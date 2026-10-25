@@ -1,0 +1,52 @@
+{
+  "tool": "Built-in image_gen.imagegen",
+  "mode": "reference-based generation and targeted supplementary generation",
+  "transparent_background": true,
+  "baseBodyPrompt": "Use case: stylized-concept. Asset type: production transparent spritesheet for a 2D Kyokushin fighting game, same illustrated arcade art style as the supplied reference sheet: hand-inked dark contours, warm skin, realistic athletic anatomy, off-white karate gi with blue-gray cloth shadows, small black Kyokushin chest calligraphy, bare feet. Input reference: visual style only.\nProduce ONE square 2048x2048 RGBA transparent image with EXACTLY 36 separate complete full-body figures in a perfectly regular 6 columns by 6 rows grid. Each cell has generous empty transparent margin, no figure crosses its cell. All characters same adult person, body proportions and scale; never crop hands/feet. No ground shadow, no text, no labels, no grid lines, no background, no props, no extra effects. Character has completely BALD bare scalp because hairstyle/head will be supplied by separate game layers. Every pose wears a vivid solid CYAN turquoise belt (#00c8ce) with dark teal folds, waist knot and TWO long hanging ends, no colored stripes. This is a technical recoloring palette.\nAll poses attack toward the viewer's RIGHT; mostly three-quarter side view. Match anatomy and details consistently. Pose order, left-to-right then top-to-bottom is mandatory:\nRow 1: neutral fighting guard; forward walking step left foot; forward walking step right foot; forward low dash; rising jump knees flexed; descending jump ready to land.\nRow 2: lead straight punch chamber; full extended lead straight punch RIGHT; reverse punch chamber torso twists; full extended reverse punch RIGHT; crouched body uppercut chamber; short upward body punch extension RIGHT.\nRow 3: hook punch chamber; hook punch extension RIGHT; low round kick knee chamber; low round kick extended RIGHT below waist; front kick knee chamber; front kick fully extended RIGHT horizontally.\nRow 4: high roundhouse kick chamber; high roundhouse kick fully extended RIGHT at head height; spinning back kick torso turns; spinning back kick extended RIGHT; rolling kick forward entry crouch; airborne rolling wheel kick with body rotated diagonally and foot kicking RIGHT.\nRow 5: high forearm guard rising; high forearm guard braced; low knee/shin guard lifting; low knee/shin guard braced; small impact recoil torso; large impact recoil bending backward.\nRow 6: falling backward knocked off feet; KO lying horizontally on ground, head left feet right; recovering crouch one knee near ground; victory fist raised; respectful standing karate bow; landing crouch.\nEnsure each pose is a usable isolated sprite and the grid is complete.",
+  "headPrompt": "Use case: stylized-concept. Asset type: modular head sprites for the supplied Kyokushin fighting-game body sheets. Reference 1 is adult MALE body; reference 2 is adult FEMALE body. Match exactly their face proportions, warm olive skin, shaded hand-inked arcade illustration, crisp dark contours. Produce a complete transparent RGBA sprite atlas, 5 columns by 4 rows, exactly TWENTY separate heads, each head centered in a generously spaced equal grid cell, no overlapping, no labels, no grid, no text, no shoulders or clothing. Include head, hair and a tiny neck stump only. All hair is dark brown, with coherent cool highlights.\nRows 1 and 2 same original adult masculine face, rows 3 and 4 same original adult feminine face. Five distinct hairstyles per sex, with exact column meanings shared across rows: column1 short neat cropped hair (female pixie crop); column2 swept side-part quiff (female side-swept short bob); column3 short compact curly hair; column4 medium-length hair pulled into a short ponytail behind head (female ponytail); column5 very close buzz cut with visible dark stubble.\nRow1: the five MALE heads facing RIGHT in a three-quarter side view, no beard, focused calm fighting expression. Keep eyes, nose, chin at same location and head size in each cell regardless of hairstyle.\nRow2: those same five MALE heads viewed from back-right three-quarter, exact hairstyle match to row1.\nRow3: those five FEMALE heads facing RIGHT in a three-quarter side view, focused calm fighting expression. Keep eyes, nose, chin at same location and head size in each cell.\nRow4: those same five FEMALE heads viewed from back-right three-quarter, exact hairstyle match to row3.\nNo floating face pieces: each head is intact including skin/head/hair/ears/nose/chin. Transparent background only. Maximum quality and consistent registered head scale.",
+  "reactionCorrectionPrompt": "Use case: precise-object-edit. Supplement sprite sheet for the supplied original male bald Kyokushin fighter. EXACT 2 columns and 2 rows, 4 COMPLETE full body male sprites on transparent alpha RGBA. Match inked realistic arcade style, same bald face, white gi with blue gray shadows, black chest insignia, pure cyan turquoise belt with two hanging ends, barefeet. Left-to-right row1: taking light punch to torso, body recoils slightly backward with standing feet planted; taking heavy punch to torso, upper body leaning strongly backward with arms recoiling, both whole bare feet still visible planted on floor. Row2: falling backwards off feet fully airborne, complete body headtofeet; standing respectful karate bow, hands near thighs, head bowed forward, all barefeet fully visible. Generous TRANSPARENT margins around EACH entire figure: scalp, fingers and all toes may never touch cell edges or another figure. No shadows, no blood, no VFX, no labels, no background. Avoid any cropped limbs. This is a correction of two incomplete hit-reaction sprites.",
+  "assets": [
+    {
+      "file": "male-body.png",
+      "role": "36 original male poses; bald head, cyan technical palette belt",
+      "source": "exec-427973ba-e7d2-4495-a9e1-186528b43c09.png"
+    },
+    {
+      "file": "female-body.png",
+      "role": "36 original female poses; bald head, cyan technical palette belt",
+      "source": "exec-afe425f6-3a5b-486e-a733-4fb0ba11dd03.png"
+    },
+    {
+      "file": "heads.png",
+      "role": "5 hairstyles per gender, front and back three-quarter;20 modular heads",
+      "source": "exec-88a42eb7-87a5-4c4f-9fe4-7a43ef12af06.png"
+    },
+    {
+      "file": "vfx.png",
+      "role": "6 animated effect categories x6frames: punch,heavy,block,trail,dust,critical",
+      "source": "exec-2f2a7bc3-3fb2-48da-93cf-862d7d716ca8.png"
+    },
+    {
+      "file": "supplement.png",
+      "role": "12 correction poses: four complete male guards;female lowkick/wheelkick,hit/recovery/victory",
+      "source": "exec-1ec271cf-537a-4451-89c2-8ab5ff4ba7c0.png"
+    },
+    {
+      "file": "male-reactions.png",
+      "role": "4 complete male hit/fall/bow correction poses",
+      "source": "exec-0f3f57b9-c3b0-4612-b291-26a445184368.png"
+    }
+  ],
+  "vfxPrompt": "Transparent RGBA 6x6 spritesheet. Illustrated arcade fighting game, white/yellow/cyan cel-shaded accents. Row1 gold/orange ivory punch impact starburst. Row2 heavy kick impact. Row3 cyan/white shield parry. Row4 white/cyan crescent outgoing attack trail. Row5 ivory dust landing/dash. Row6 magenta/gold critical impact. Six animation frames each from small beginning through full expansion to fading fragments. No text, people, blood, background or labels.",
+  "supplementaryPrompt": "Transparent 4x3 atlas, match original male/female body refs, bald heads, white gi, cyan belt, whole bodies including all toes with generous margin. Row1 male highguardprep/highguardbrace/lowguardlift/lowguardbrace. Row2 female lowkickchamber/rightwardlowkick/rollingwheelentry/wheelextensionheadleftfootright. Row3 malefall/malecrouch/femalerecovery/femalevictory.",
+  "references": [
+    "../nuovi-karateka-completo/08-andrea-vullo/base.png"
+  ],
+  "runtime": "Original PNGs copied unchanged. Offline envelopes contain exact bytes. Runtime silhouettes extracted using connected alpha components; belts palette-mapped and hairstyles composited using individually measured pose anchors. No PNG editing or recompression.",
+  "totalGeneratedFrames": {
+    "body": 88,
+    "heads": 20,
+    "vfx": 36
+  },
+  "runtimeBodyPoses": 72
+}
