@@ -1,0 +1,49 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><title>Effetti sincronizzati ai colpi</title>
+<style>body{margin:24px;background:#101b29;color:#f5e8cb;font:15px system-ui}canvas{display:block;width:100%;max-width:1200px;background:#253343;margin-top:18px}button,select{padding:10px;margin:6px;font:inherit}#status{color:#eac47d}pre{white-space:pre-wrap}</style>
+<h1>Effetti sincronizzati ai colpi</h1><p id="status">Caricamento…</p>
+<label>Karateka <select id="fighter"></select></label><button id="mirror">Cambia direzione</button><button id="animate">Anima le mosse</button>
+<p>Scia breve sul pugno o sul piede durante la fase attiva. Nessun effetto durante preparazione e recupero.</p>
+<canvas id="preview" width="1200" height="840"></canvas><pre id="report"></pre>
+<script>
+(async()=>{
+ const html=await fetch('../Gioca.html').then(r=>r.text()), parsed=new DOMParser().parseFromString(html,'text/html');
+ const load=(src)=>new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=new URL('../'+src,location.href);s.onload=resolve;s.onerror=reject;document.head.append(s)});
+ for(const source of parsed.querySelectorAll('script')){
+  const src=source.getAttribute('src');
+  if(src&&/scripts\/(roster|game|strike-point|portrait-framing|karateka-atlas|karateka-art|arcade-atlas|arcade-art)\.js/.test(src))await load(src);
+  else if(!src&&(source.textContent.includes('const assets = Object.freeze')||source.textContent.includes('/* renderer.js */'))){const s=document.createElement('script');s.textContent=source.textContent;document.head.append(s);}
+ }
+ for(const gender of ['male','female'])ArcadeArt.setCharacter({id:'qa-'+gender,name:'Arcade '+gender,gender,hair:2,rank:{color:'#ee792b'}});
+ const entries=[...Object.entries(KyokushinRoster),['qa-male',{name:'Arcade uomo'}],['qa-female',{name:'Arcade donna'}]];
+ const select=document.querySelector('#fighter');for(const [id,entry] of entries){const option=document.createElement('option');option.value=id;option.textContent=entry.name;select.append(option)}
+ const moves=Object.keys(KyokushinMoves),ctx=document.querySelector('canvas').getContext('2d');
+ let facing=1,animate=false,t=0,loaded=false;
+ const render=()=>{
+  if(!loaded)return;ctx.clearRect(0,0,1200,840);ArcadeVFX.clear();
+  moves.forEach((move,i)=>{
+   const def=KyokushinMoves[move],x=i%3*400,y=Math.floor(i/3)*280;
+   const progress=animate?(t%(def.duration+.4))/def.duration:(def.start+def.end)/2/def.duration;
+   const f={id:select.value,x:facing===1?145:255,y:257,facing,state:progress<=1?'attack':'idle',move,moveTime:progress*def.duration,moveProgress:Math.min(1,progress),attack:{def,hitApplied:false},hp:1000};
+   ctx.save();ctx.translate(x,y);ctx.fillStyle='#f5e8cb';ctx.font='16px system-ui';ctx.fillText(def.shortName,16,24);ctx.strokeStyle='#677583';ctx.beginPath();ctx.moveTo(12,259);ctx.lineTo(388,259);ctx.stroke();
+   FighterArt.draw(ctx,f,0);ArcadeVFX.draw(ctx,0,{state:{phase:'fight',fighters:[f]}});ctx.restore();
+  });
+ };
+ await ArcadeVFX.load();let checked=0,missing=[];
+ for(const [id] of entries){
+  await FighterArt.loadFighters([id]);
+  for(const move of moves)for(const dir of [1,-1]){
+   const d=KyokushinMoves[move],f={id,x:300,y:625,facing:dir,move,state:'attack',moveTime:(d.start+d.end)/2,moveProgress:(d.start+d.end)/2/d.duration,hp:1000};
+   const point=FighterArt.strikePoint(f);checked++;
+   if(!point||!Number.isFinite(point.x)||!Number.isFinite(point.y))missing.push(id+'/'+move+'/'+dir);
+  }
+  document.querySelector('#status').textContent=checked+' posizioni controllate…';
+ }
+ document.querySelector('#report').textContent=JSON.stringify({checked,missing},null,2);
+ document.querySelector('#status').textContent=(missing.length?'FAIL':'PASS')+' · '+checked+' punti di aggancio, entrambe le direzioni';
+ document.querySelector('#status').dataset.result=missing.length?'FAIL':'PASS';
+ const change=async()=>{loaded=false;await FighterArt.loadFighters([select.value]);loaded=true;render()};select.onchange=change;
+ document.querySelector('#mirror').onclick=()=>{facing*=-1;render()};
+ document.querySelector('#animate').onclick=()=>{animate=!animate;t=0;document.querySelector('#animate').textContent=animate?'Ferma al contatto':'Anima le mosse';render()};
+ await change();let last=performance.now();function tick(now){t+=(now-last)/1000;last=now;if(animate)render();requestAnimationFrame(tick)}requestAnimationFrame(tick);
+})().catch(e=>{document.querySelector('#status').textContent='ERROR: '+e.stack;document.querySelector('#status').dataset.result='ERROR'});
+</script></html>

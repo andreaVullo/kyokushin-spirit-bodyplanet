@@ -248,3 +248,9 @@ Per ogni aggiornamento distribuisci nuovamente il pacchetto completo, comprese `
 
 Ricerca effettuata il **3 ottobre 2026**. Il grado di Samuel e l’ordine dei riferimenti fotografici provengono dalle indicazioni dell’utente.
 
+
+### Effetti di combattimento
+
+Le scie vengono disegnate soltanto nella finestra attiva della tecnica, seguendo il pugno o il piede visibile della posa, con scala, direzione e rotazione del karateka. Un contatto o un'interruzione elimina subito la scia. Gli impatti e le parate seguono il bersaglio durante il contraccolpo; la polvere compare soltanto negli atterraggi pesanti. Le esplosioni a terra non vengono usate sui colpi al corpo e gli effetti sprite sostituiscono le particelle duplicate. Pausa, hitstop, cambio round e movimento ridotto sono rispettati.
+
+`tests/combat-vfx-preview.html` verifica 234 agganci (nove mosse, undici karateka più i due corpi Arcade, entrambe le direzioni) e permette di animare le tecniche. `tests/combat-vfx.test.cjs` copre finestre attive, interruzioni, impatti, inseguimento del bersaglio, pausa e trasformazioni delle pose.

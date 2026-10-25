@@ -218,6 +218,16 @@
     ctx.restore();
   }
 
+  function strikePoint(f) {
+    const assetId = roster[f.id]?.assetId;
+    if (!assetId) return original.strikePoint?.(f);
+    const [category, index] = pose(f, 0, { since: 0 });
+    const art = resolvedFrame(assetId, category, index);
+    if (!art) return null;
+    const [sx, sy, , , ax, ay] = art.frame.region, scale = art.scale * (f.scale ?? 1);
+    return window.FighterStrikePoint?.point(f, art.source, { x: (sx - ax) * scale, y: (sy - ay) * scale, scale });
+  }
+
   function drawSelectionPortrait(ctx, id, x, y, width, h, options = {}) {
     const assetId = roster[id]?.assetId;
     if (!assetId) return original.drawSelectionPortrait(ctx, id, x, y, width, h, options);
@@ -228,7 +238,7 @@
     return window.FighterPortraits.draw(ctx, art.source, { center, top, headHeight, headWidth }, x, y, width, h, options);
   }
 
-  window.FighterArt = { load, loadFighters, draw, drawSelectionPortrait,
+  window.FighterArt = { load, loadFighters, draw, drawSelectionPortrait, strikePoint,
     drawPortrait: (ctx, id, x, y, w, h) => drawSelectionPortrait(ctx, id, x, y, w, h, { bust: true }),
     get ready() { return original.ready; }, height };
 })();

@@ -239,6 +239,15 @@
     ctx.restore();
   }
 
+  function strikePoint(f) {
+    const model = appearances.get(f.id);
+    if (!model) return previous.strikePoint?.(f);
+    const art = frameFor(model, pose(f, 0, { since: 0 }));
+    if (!art) return null;
+    const scale = previous.height / art.meta.nominal * (f.scale ?? 1);
+    return global.FighterStrikePoint?.point(f, art.canvas, { x: art.offsetX * scale, y: art.offsetY * scale, scale });
+  }
+
   function drawPreview(ctx, value, x, y, width, height, options = {}) {
     options = { ...value, ...options };
     const model = appearance(value), art = frameFor(model, options.pose ?? 0);
@@ -270,7 +279,7 @@
       const custom = ids.filter(id => appearances.has(id));
       await Promise.all([previous.loadFighters(ids.filter(id => !appearances.has(id))),
         ...[...new Set(custom.map(id => appearances.get(id).gender))].map(gender => load({ gender }))]);
-    }, draw, drawSelectionPortrait,
+    }, draw, drawSelectionPortrait, strikePoint,
     drawPortrait: (ctx, id, x, y, width, height) => drawSelectionPortrait(ctx, id, x, y, width, height, { bust: true }),
     get ready() { return previous.ready; }, height: previous.height };
 
@@ -279,40 +288,75 @@
   const vfxRows = { hit: 0, heavy: 1, block: 2, attack: 3, dust: 4, critical: 5 };
   const vfxColumns = [0, 209, 410, 618, 860, 1063, 1254];
   const vfxBands = [0, 216, 410, 634, 835, 1017, 1254];
-  function emit(event) {
-    if (!event || !['hit', 'block', 'attack', 'land', 'dash'].includes(event.type)) return;
-    let type = event.type, x = event.x || 0, y = event.y || 0, size = 106, duration = .28, delay = 0;
-    if (type === 'attack') {
-      const move = global.KyokushinMoves?.[event.move];
-      x += (event.facing || 1) * ((move?.reach || 150) * .65); y -= move?.height || 150;
-      size = event.move === 'kaiten' ? 180 : 115; duration = .22;
-      delay = (move?.start || 0) * .65;
-    } else if (type === 'land' || type === 'dash') { type = 'dust'; size = event.heavy ? 170 : 108; y -= 14; duration = .34; }
-    else if (type === 'hit') { type = event.knockdown || event.combo >= 5 ? 'critical' : event.damage >= 130 ? 'heavy' : 'hit'; size = type === 'critical' ? 158 : type === 'heavy' ? 133 : 98; }
-    if (effects.length > 28) effects.shift();
-    effects.push({ type, x, y, size, duration, life: -delay, facing: event.facing || event.direction || 1 });
+  function emit(event, state) {
+    if (event?.type === 'round') { effects.length = 0; return false; }
+    if (!vfxReady || !event || !['hit', 'block', 'land'].includes(event.type)) return false;
+    // A tatami does not explode under every step, dash or ordinary landing.
+    if (event.type === 'land' && !event.heavy) return false;
+    const target = state?.fighters?.[event.target];
+    let type = event.type, x = event.x, y = event.y, size = 72, duration = .17;
+    if (type === 'land') { type = 'dust'; size = 88; y -= 25; duration = .24; }
+    else {
+      if (!target || !Number.isFinite(x) || !Number.isFinite(y)) return false;
+      x = target.x - (event.facing || 1) * (type === 'block' ? 36 : 24);
+      if (type === 'block' && event.guardType === 'leg') y = target.y - 105;
+      if (type === 'hit') {
+        // The atlas's "heavy" row is a ground explosion, not a body impact.
+        type = event.move === 'kaiten' || event.comboLimit ? 'critical' : 'hit';
+        size = type === 'critical' ? 108 : event.damage >= 130 ? 88 : 68;
+        duration = type === 'critical' ? .22 : .16;
+      }
+    }
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return false;
+    if (effects.length >= 28) effects.shift();
+    effects.push({ type, x, y, size, duration, life: 0, facing: event.facing || 1,
+      target, offsetX: target ? x - target.x : 0, offsetY: target ? y - target.y : 0 });
+    return true;
   }
-  function drawEffectFrame(ctx, type, frame, x, y, size, facing = 1, alpha = .92) {
+  function drawEffectFrame(ctx, type, frame, x, y, size, facing = 1, alpha = .92, angle = 0) {
     if (!vfxReady) return;
     const row = vfxRows[type] ?? 0, index = clamp(Math.trunc(frame), 0, 5);
     const sx = vfxColumns[index];
     const sy = row === 1 && index === 2 ? 202 : vfxBands[row];
     const bottom = row === 0 && index === 2 ? 202 : vfxBands[row + 1];
     const sw = vfxColumns[index + 1] - sx, sh = bottom - sy;
-    ctx.save(); ctx.translate(x, y); ctx.scale(facing < 0 ? -1 : 1, 1); ctx.globalAlpha = alpha;
+    ctx.save(); ctx.translate(x, y); ctx.scale(facing < 0 ? -1 : 1, 1); ctx.rotate(angle); ctx.globalAlpha = alpha;
     ctx.drawImage(images.get('vfx'), sx, sy, sw, sh, -size * sw / 418, -size * sh / 418, size * sw / 209, size * sh / 209); ctx.restore();
+  }
+  function drawStrikes(ctx, state) {
+    if (reducedMotion || state?.phase !== 'fight') return;
+    for (const fighter of state.fighters) {
+      const attack = fighter.attack, def = attack?.def;
+      if (fighter.state !== 'attack' || !def || attack.hitApplied || fighter.stun > 0 || fighter.knockdown ||
+          fighter.moveTime < def.start || fighter.moveTime > def.end) continue;
+      const tip = global.FighterArt.strikePoint?.(fighter);
+      if (!tip) continue;
+      const progress = clamp((fighter.moveTime - def.start) / (def.end - def.start), 0, 1);
+      const kick = ['gedan', 'mae', 'mawashi', 'ushiro', 'kaiten'].includes(fighter.move);
+      const size = (kick ? 82 : 48) * (fighter.scale ?? 1);
+      const angle = ({ shita: -.65, kagi: -.15, gedan: .3, mawashi: -.4, kaiten: .55 })[fighter.move] || 0;
+      // Keep the bright leading edge on the visible extremity, never at a
+      // delayed snapshot of the fighter's starting position.
+      const facing = fighter.facing === -1 ? -1 : 1;
+      drawEffectFrame(ctx, 'attack', Math.min(5, Math.floor(progress * 6)),
+        tip.x - facing * Math.cos(angle) * size * .28, tip.y - Math.sin(angle) * size * .28,
+        size, facing, .28 + Math.sin(progress * Math.PI) * .18, angle);
+    }
   }
   function drawVFX(ctx, dt = 0, options = {}) {
     if ('reducedMotion' in options) reducedMotion = !!options.reducedMotion;
     if (!vfxReady) { effects.length = 0; return; }
+    drawStrikes(ctx, options.state);
+    const step = options.state?.paused || options.state?.hitstop > 0 ? 0 : Math.max(0, Math.min(.1, dt));
     for (let i = effects.length - 1; i >= 0; i--) {
-      const effect = effects[i]; effect.life += Math.max(0, Math.min(.1, dt));
-      if (effect.life >= effect.duration) { effects.splice(i, 1); continue; }
-      if (effect.life < 0) continue;
-      if (reducedMotion && (effect.type === 'attack' || effect.type === 'dust')) continue;
+      const effect = effects[i]; effect.life += step;
+      if (effect.life >= effect.duration || (effect.target && !options.state?.fighters.includes(effect.target))) { effects.splice(i, 1); continue; }
+      if (reducedMotion && effect.type === 'dust') continue;
       const frame = reducedMotion ? 1 : Math.min(5, Math.floor(effect.life / effect.duration * 6));
       const size = effect.size * (reducedMotion ? .65 : 1);
-      drawEffectFrame(ctx, effect.type, frame, effect.x, effect.y, size, effect.facing, reducedMotion ? .55 : .92);
+      const x = effect.target ? effect.target.x + effect.offsetX : effect.x;
+      const y = effect.target ? effect.target.y + effect.offsetY : effect.y;
+      drawEffectFrame(ctx, effect.type, frame, x, y, size, effect.facing, reducedMotion ? .55 : effect.type === 'dust' ? .4 : .9);
     }
   }
   global.ArcadeVFX = { async load() { await loadImage('vfx'); vfxReady = true; }, emit, draw: drawVFX, drawFrame: drawEffectFrame,

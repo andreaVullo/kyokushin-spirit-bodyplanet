@@ -794,6 +794,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 </script>
 <script src="scripts/roster.js?v=20261025-5"></script>
 <script src="scripts/game.js?v=20261025-2"></script>
+<script src="scripts/strike-point.js?v=20261025-10"></script>
 <script>
 /* renderer.js */
 /* Original arcade character artwork, generated from the supplied references.
@@ -1137,7 +1138,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     return f.retreating ? (4 - frame) % 4 : frame;
   }
 
-  function drawKaiten(ctx, id, f, p) {
+  function kaitenTransform(f, p) {
     const size = f.scale ?? 1;
     let frame = 4, angle = 0, lift = 0, pivot = -108 * size;
     if (p < .16) {
@@ -1166,25 +1167,18 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       lift = 18 * (1 - q);
       pivot = 0;
     }
+    return { frame, angle, lift: lift * size, pivot };
+  }
+
+  function drawKaiten(ctx, id, f, p) {
+    const size = f.scale ?? 1;
+    const { frame, angle, lift: liftPixels, pivot } = kaitenTransform(f, p);
+    const lift = liftPixels / size;
     ctx.save();
     ctx.translate(f.x, f.y);
     ctx.scale(f.facing === -1 ? -1 : 1, 1);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    // A short heel trail describes the strike's overhead-to-forward path.
-    // Its visible interval matches the engine's .32–.54 contact window.
-    if (p >= .29 && p <= .62) {
-      const q = clamp((p - .29) / .33, 0, 1), tip = -1.23 + q * 1.65;
-      ctx.save();
-      ctx.scale(size, size);
-      ctx.globalAlpha = Math.sin(q * Math.PI) * .62;
-      ctx.strokeStyle = '#8fe7ff'; ctx.lineWidth = 18; ctx.lineCap = 'round';
-      ctx.shadowColor = '#79ddff'; ctx.shadowBlur = 12;
-      ctx.beginPath(); ctx.arc(15, -128, 148, tip - .80, tip); ctx.stroke();
-      ctx.shadowBlur = 0; ctx.strokeStyle = '#f2ffff'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(15, -128, 151, tip - .59, tip); ctx.stroke();
-      ctx.restore();
-    }
     const pose = (alpha, trailAngle = 0, trailX = 0) => {
       ctx.save();
       ctx.translate(trailX * size, -lift * size);
@@ -1421,13 +1415,36 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     return window.FighterPortraits.draw(ctx, portraitTextures[id], profile, x, y, width, height, options);
   }
 
-  window.FighterArt = { load, draw, drawPortrait, drawSelectionPortrait, get ready() { return ready; }, height: HEIGHT };
+  function strikePoint(f) {
+    if (!ready || f.state !== 'attack') return null;
+    const id = regions[f.id] ? f.id : 'angelo', size = f.scale ?? 1;
+    let source, region, scale, transform;
+    if (f.move === 'kaiten') {
+      transform = kaitenTransform(f, f.moveProgress || 0);
+      source = motionTextures[id]?.[transform.frame]; region = motionRegions[id][transform.frame];
+      scale = HEIGHT / (id === 'angelo' ? 426 : 433) * size;
+    } else if (punchTiming[f.move]) {
+      const { phase } = punchMotion(f.move, f.moveProgress || 0);
+      if (phase < 0) return null;
+      const frame = punchRows[f.move] * 4 + punchFrames[f.move][phase];
+      source = attackTextures[id][frame]; region = attackRegions[id][frame]; scale = attackScales[id] * size;
+    } else if (kickTiming[f.move]) {
+      const frame = kickTiming[f.move].frame;
+      source = textures[id]?.[frame]; region = regions[id][frame];
+      scale = HEIGHT / (id === 'angelo' ? 359 : 348) * size;
+    }
+    if (!source || !region) return null;
+    const [sx, sy, , , ax, ay] = region;
+    return window.FighterStrikePoint?.point(f, source, { x: (sx - ax) * scale, y: (sy - ay) * scale, scale }, transform);
+  }
+
+  window.FighterArt = { load, draw, drawPortrait, drawSelectionPortrait, strikePoint, get ready() { return ready; }, height: HEIGHT };
 })();
 
 </script>
 <script src="scripts/portrait-framing.js?v=20261025-4"></script>
 <script src="scripts/karateka-atlas.js?v=20261025-5"></script>
-<script src="scripts/karateka-art.js?v=20261025-5"></script>
+<script src="scripts/karateka-art.js?v=20261025-8"></script>
 <script>
 /* audio.js */
 /* Original synthesized score and sound design for Kyokushin Spirit. */
@@ -1997,9 +2014,9 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <script src="scripts/leaderboard-config.js?v=20261025-2"></script>
 <script src="scripts/leaderboard.js?v=20261025-4"></script>
 <script src="scripts/arcade-atlas.js?v=20261025-3"></script>
-<script src="scripts/arcade-art.js?v=20261025-4"></script>
+<script src="scripts/arcade-art.js?v=20261025-8"></script>
 <script src="scripts/name-keyboard.js?v=20261025-7"></script>
 <script src="scripts/arcade-ui.js?v=20261025-7"></script>
-<script src="scripts/main.js?v=20261025-4"></script>
+<script src="scripts/main.js?v=20261025-8"></script>
 </body>
 </html>

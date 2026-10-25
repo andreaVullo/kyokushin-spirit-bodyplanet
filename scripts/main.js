@@ -62,23 +62,22 @@
   }
   function onEvent(e) {
     if(!active)return;
-    window.ArcadeVFX?.emit(e);
+    const spriteEffect=window.ArcadeVFX?.emit(e,game.getState());
     if(arcadeRun && arcadeStats){
       if(e.type==='hit' && e.player===0){arcadeStats.hits++;arcadeStats.maxCombo=Math.max(arcadeStats.maxCombo,e.combo||1);}
       if(e.type==='block' && e.target===0)arcadeStats.blocks++;
     }
     if(e.type!=='announcement')sound.effect(e.type,{...e,special:e.move==='kaiten'});
     if(e.type==='hit'){
-      const special=e.move==='kaiten',col=special?'#80ffff':'#fff1b4';burst(e.x,e.y,col,special?35:19,special?1.4:1);shake=special?12:6;flash=special?.16:.055;
+      const special=e.move==='kaiten',col=special?'#80ffff':'#fff1b4';if(!spriteEffect)burst(e.x,e.y,col,special?16:9,special?1.1:.7);shake=special?12:6;flash=special?.16:.055;
       const display=comboDisplay[e.player];
       display.count=e.combo;display.damage=e.comboDamage;display.moves=[...(game.getState().fighters[e.player].comboMoves||[e.move])];display.life=1.1;
       floatTexts.push({x:e.x,y:e.y-45,text:e.damage?'-'+Math.round(e.damage):'OSU!',life:.65,max:.65,color:'#fff8cf'});
-    } else if(e.type==='block'){burst(e.x,e.y,e.guardType==='leg'?'#f7d17e':'#9ae5f0',11,.65);toast(e.guardType==='leg'?'PARATA DI GAMBA':'PARATA DI BRACCIA',e.target ?? 1-e.player);}
-    else if(e.type==='special'){toast('KAITEN GERI',e.player);flash=.13;}
+    } else if(e.type==='block'){if(!spriteEffect)burst(e.x,e.y,e.guardType==='leg'?'#f7d17e':'#9ae5f0',11,.65);toast(e.guardType==='leg'?'PARATA DI GAMBA':'PARATA DI BRACCIA',e.target ?? 1-e.player);}
+    else if(e.type==='special'){toast('KAITEN GERI',e.player);}
     else if(e.type==='noKi'){toast('SERVONO 45 SPIRIT',e.player);}
     else if(e.type==='ko'){shake=15;}
-    else if(e.type==='land'){burst(e.x,e.y,'#f8d6a0',e.heavy?12:5,.25);}
-    else if(e.type==='dash'){burst(e.x,e.y-3,e.back?'#bde9ee':'#ffe0a0',11,.22);}
+    else if(e.type==='land'&&e.heavy&&!spriteEffect){burst(e.x,e.y,'#f8d6a0',5,.15);}
   }
   const game = new window.KyokushinGame({onEvent});
   const controls = new window.DojoControls({
@@ -497,13 +496,10 @@
     const ground=preview?f.y:625;
     ctx.save();ctx.globalAlpha=.24;ctx.fillStyle='#27172d';ctx.beginPath();ctx.ellipse(f.x,ground+2,preview?76:62,10,0,0,Math.PI*2);ctx.fill();ctx.restore();
     if(window.FighterArt)window.FighterArt.draw(ctx,f,t);
-    if(f.state==='attack'&&f.move&&f.moveProgress>.12&&f.moveProgress<.65){
-      const p=f.moveProgress,def=window.KyokushinMoves[f.move],kick=['mae','mawashi','ushiro','gedan','kaiten'].includes(f.move);
-      if(kick&&f.move!=='kaiten'){ctx.save();ctx.translate(f.x,f.y-120);ctx.scale(f.facing,1);ctx.globalAlpha=Math.sin((p-.12)/.53*Math.PI)*.5;ctx.strokeStyle=f.move==='kaiten'?'#acffff':'#fff2c5';ctx.lineWidth=f.move==='kaiten'?10:4;ctx.beginPath();const r=f.move==='kaiten'?135:110;ctx.arc(15,-15,r,-1.6+p*.8,.15+p*.8);ctx.stroke();ctx.restore();}
-    }
+
   }
   function drawEffects(dt) {
-    window.ArcadeVFX?.draw(ctx,dt,{reducedMotion});
+    window.ArcadeVFX?.draw(ctx,dt,{reducedMotion,state:game.getState()});
     for(const p of particles){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=400*dt;ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.color;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.atan2(p.vy,p.vx));ctx.fillRect(-p.size*2,-p.size/2,p.size*4,p.size);ctx.restore();}particles=particles.filter(p=>p.life>0);ctx.globalAlpha=1;
     for(const r of rings){r.life-=dt;r.r+=dt*220;ctx.globalAlpha=Math.max(0,r.life/r.max);ctx.strokeStyle=r.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,Math.PI*2);ctx.stroke();}rings=rings.filter(r=>r.life>0);ctx.globalAlpha=1;
     for(const p of floatTexts){p.life-=dt;p.y-=dt*85;ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.font='italic 24px Impact, sans-serif';ctx.textAlign='center';ctx.strokeStyle='#743c2b';ctx.lineWidth=3;ctx.strokeText(p.text,p.x,p.y);ctx.fillStyle=p.color;ctx.fillText(p.text,p.x,p.y);}floatTexts=floatTexts.filter(p=>p.life>0);ctx.globalAlpha=1;
