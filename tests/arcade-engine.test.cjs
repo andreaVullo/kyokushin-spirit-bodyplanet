@@ -152,6 +152,8 @@ test('twenty actual engine matches promote the custom fighter through the full A
   }
   assert.deepEqual([...seenDifficulties], ['easy', 'normal', 'hard']);
   assert.equal(seenOpponents.size, Object.keys(context.KyokushinRoster).length);
+  assert.equal(seenOpponents.has('marco-tabacco-collage'), true);
+  assert.equal(seenOpponents.has('marco-tabacco-foto-gruppo'), false);
   assert.equal(play.run.finalRecord().rankLabel, '10 DAN');
   assert.equal(play.run.finalRecord().matches, 20);
   assert.equal(play.run.finalRecord().completed, true);

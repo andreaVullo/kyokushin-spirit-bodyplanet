@@ -9,7 +9,7 @@
     const pixels = source.getContext('2d').getImageData(0, 0, width, height).data;
     let left = width, top = height, right = 0, bottom = 0;
     for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-      if (pixels[(y * width + x) * 4 + 3] < 80) continue;
+      if (pixels[(y * width + x) * 4 + 3] < 100) continue;
       left = Math.min(left, x); right = Math.max(right, x + 1);
       top = Math.min(top, y); bottom = Math.max(bottom, y + 1);
     }
@@ -43,7 +43,8 @@
     ctx.translate(x + width / 2, y + offsetY);
     if (facing !== nativeFacing) ctx.scale(-1, 1);
     ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(source, -center * scale, -top * scale, source.width * scale, source.height * scale);
+    const image = global.GiBranding?.forFacing(source, facing === nativeFacing ? 1 : -1) || source;
+    ctx.drawImage(image, -center * scale, -top * scale, source.width * scale, source.height * scale);
     ctx.restore(); return true;
   }
 

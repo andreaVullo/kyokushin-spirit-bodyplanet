@@ -91,6 +91,7 @@ function harness() {
   });
   context.window = context;
   vm.runInContext(fs.readFileSync(path.join(root, 'scripts/game.js'), 'utf8'), context);
+  vm.runInContext(fs.readFileSync(path.join(root, 'scripts/fighter-geometry.js'), 'utf8'), context);
   vm.runInContext(fs.readFileSync(path.join(root, 'scripts/portrait-framing.js'), 'utf8'), context);
   vm.runInContext(adapterSource, context);
   return { art: context.FighterArt, moves: context.KyokushinMoves, requests, failures, held, waiting, originalCalls,

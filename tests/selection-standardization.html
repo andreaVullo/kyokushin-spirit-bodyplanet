@@ -1,0 +1,98 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><title>Verifica scelta personaggio e VS</title>
+<style>
+body{margin:0;padding:20px;background:#111c27;color:#f4ead5;font:14px system-ui}h1{margin:0 0 8px;font-size:24px}p{margin:8px 0}button{padding:8px 14px;margin:6px 6px 12px 0;background:#27394b;border:1px solid #caa65f;color:#fff;font:inherit;cursor:pointer}button[aria-pressed=true]{background:#caa65f;color:#111c27}#status{color:#f0cd78;font-weight:700}.grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}.card{min-width:0;background:#1e2f3f;border:1px solid #687074}.card canvas{display:block;width:100%;height:auto;background:linear-gradient(#34485b,#172330)}.name{height:32px;padding:7px 4px;text-align:center;font-size:10px;line-height:1.3}.measure{color:#c5d0d8;font-size:10px;padding:0 3px 5px;text-align:center}.large{grid-template-columns:repeat(5,minmax(0,1fr))}details{margin-top:18px}pre{white-space:pre-wrap;font-size:11px}#legend{color:#b4c5d1;font-size:12px}@media(max-width:900px){.grid{grid-template-columns:repeat(5,minmax(0,1fr))}.grid.large{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+<h1>Scelta personaggio e VS · scala e posizione comuni</h1>
+<p id="status">Caricamento dei renderer reali e delle immagini del gioco…</p>
+<p id="legend">10 karateka del dojo · 5 capigliature uomo · 5 capigliature donna. Linea oro: appoggio comune; linea azzurra: altezza comune.</p>
+<button id="full" aria-pressed="true">Figura intera / VS</button><button id="bust" aria-pressed="false">Ritratti elenco</button><button id="size">Ingrandisci</button>
+<div class="grid" id="grid"></div><details><summary>Misure e risultati</summary><pre id="report"></pre></details>
+<script src="load-real-art.js"></script>
+<script>
+(async () => {
+  const loaded = await loadRealFighterArt();
+  await window.GiBranding?.load();
+  await Promise.all([FighterArt.load(), ArcadeArt.load()]);
+  const entries = Object.entries(KyokushinRoster).map(([id, character]) => ({ id, name: character.name, type: 'dojo' }));
+  const hairstyles = ['Corti', 'Ciuffo', 'Ricci', 'Coda', 'Rasati'];
+  for (const gender of ['male', 'female']) for (let hair = 0; hair < 5; hair++) {
+    const id = `selection-qa-${gender}-${hair}`;
+    ArcadeArt.setCharacter({ id, gender, hair, rank: { color: '#f1eee7', dan: 0 } });
+    entries.push({ id, name: `${gender === 'male' ? 'UOMO' : 'DONNA'} · ${hairstyles[hair]}`, type: 'arcade' });
+  }
+  const probe = document.createElement('canvas'), context = probe.getContext('2d', { willReadFrequently: true });
+  let lastCamera;
+  const drawPortrait = FighterPortraits.draw;
+  FighterPortraits.draw = function (ctx, source, profile, x, y, width, height, options = {}) {
+    if (options.full) {
+      const occupied = FighterPortraits.bounds(source);
+      const camera = FighterPortraits.layout({ ...profile, bounds: occupied }, width, height, options);
+      lastCamera = { scale: camera.scale, height: occupied[3] * camera.scale,
+        bottom: y + camera.offsetY + (occupied[1] + occupied[3] - camera.top) * camera.scale,
+        center: x + width / 2 + (occupied[0] + occupied[2] / 2 - camera.center) * camera.scale };
+    }
+    return drawPortrait(ctx, source, profile, x, y, width, height, options);
+  };
+  function bounds() {
+    const width = probe.width, height = probe.height, pixels = context.getImageData(0, 0, width, height).data;
+    let left = width, top = height, right = 0, bottom = 0;
+    for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) if (pixels[(y * width + x) * 4 + 3] >= 100) {
+      left = Math.min(left, x); top = Math.min(top, y); right = Math.max(right, x + 1); bottom = Math.max(bottom, y + 1);
+    }
+    return { left, top, right, bottom, width: right - left, height: bottom - top, center: (left + right) / 2 };
+  }
+  const failures = [], measurements = [];
+  if (entries.filter(entry => entry.type === 'dojo').length !== 10) failures.push('Il roster deve contenere dieci karateka.');
+  if (entries.filter(entry => entry.name === 'MARCO TABACCO').length !== 1 || entries.some(entry => /foto.gruppo/.test(entry.id))) failures.push('Marco Tabacco compare più volte.');
+  for (const [width, height] of [[600, 640], [300, 320], [300, 260]]) {
+    probe.width = width; probe.height = height;
+    for (const entry of entries) for (const facing of [1, -1]) {
+      context.clearRect(0, 0, width, height);
+      FighterArt.drawSelectionPortrait(context, entry.id, 0, 0, width, height, { facing, full: true });
+      const actual = bounds(), expected = { height: height * .94, bottom: height * .97, center: width / 2 };
+      const label = `${entry.id}/${width}x${height}/${facing}`;
+      for (const field of ['height', 'bottom', 'center']) if (Math.abs(lastCamera[field] - expected[field]) > .0001) failures.push(label + ': geometria ' + field + ' ' + lastCamera[field]);
+      // Upsampling interpolates partially transparent edge pixels, so the
+      // raster's thresholded bounds can differ from the exact camera by up to
+      // one source pixel at each edge. This never permits a clipped silhouette.
+      const edgeTolerance = Math.max(1, lastCamera.scale);
+      if (Math.abs(actual.height - expected.height) > edgeTolerance * 2) failures.push(label + ': altezza raster ' + actual.height);
+      if (Math.abs(actual.bottom - expected.bottom) > edgeTolerance) failures.push(label + ': appoggio raster ' + actual.bottom);
+      if (Math.abs(actual.center - expected.center) > edgeTolerance) failures.push(label + ': centro raster ' + actual.center);
+      if (actual.left <= 0 || actual.top <= 0 || actual.right >= width || actual.bottom >= height) failures.push(label + ': sagoma tagliata');
+      measurements.push({ id: entry.id, format: `${width}x${height}`, facing, ...actual, camera: lastCamera });
+    }
+  }
+  for (const entry of entries) {
+    const card = document.createElement('article'); card.className = 'card';
+    const canvas = document.createElement('canvas'); canvas.width = 600; canvas.height = 640;
+    const name = document.createElement('div'); name.className = 'name'; name.textContent = entry.name;
+    const measure = document.createElement('div'); measure.className = 'measure';
+    const result = measurements.find(row => row.id === entry.id && row.format === '600x640' && row.facing === 1);
+    measure.textContent = `h ${result.camera.height.toFixed(1)} · suola ${result.camera.bottom.toFixed(1)}`;
+    card.append(canvas, name, measure); document.querySelector('#grid').append(card); entry.canvas = canvas;
+  }
+  function render(bust = false) {
+    for (const [index, entry] of entries.entries()) {
+      const canvas = entry.canvas, ctx = canvas.getContext('2d'); canvas.height = bust ? 520 : 640;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const facing = index % 2 ? -1 : 1;
+      FighterArt.drawSelectionPortrait(ctx, entry.id, 0, 0, canvas.width, canvas.height, { facing, full: !bust, bust });
+      if (!bust) {
+        ctx.lineWidth = 2;
+        for (const [y, color] of [[canvas.height * .03, '#829cb2'], [canvas.height * .97, '#e8be6e']]) {
+          ctx.strokeStyle = color; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+      }
+    }
+    document.querySelector('#full').setAttribute('aria-pressed', String(!bust)); document.querySelector('#bust').setAttribute('aria-pressed', String(bust));
+  }
+  document.querySelector('#full').onclick = () => render(false); document.querySelector('#bust').onclick = () => render(true);
+  document.querySelector('#size').onclick = () => document.querySelector('#grid').classList.toggle('large');
+  render();
+  const report = { result: failures.length ? 'FAIL' : 'PASS', characters: entries.length, renders: measurements.length, loaded, failures, measurements };
+  document.querySelector('#report').textContent = JSON.stringify(report, null, 2);
+  const status = document.querySelector('#status'); status.dataset.result = report.result;
+  status.textContent = `${report.result} · ${entries.length} personaggi · ${measurements.length} prove · 3 formati · entrambe le direzioni · ${failures.length} errori`;
+})().catch(error => { document.querySelector('#status').dataset.result = 'FAIL'; document.querySelector('#status').textContent = error.stack; });
+</script></html>

@@ -23,7 +23,6 @@ const names = {
   'gabriele-randazzo': 'GABRIELE RANDAZZO',
   'matteo-spata': 'MATTEO SPATA',
   'oscar-gueli': 'OSCAR GUELI',
-  'marco-tabacco-foto-gruppo': 'MARCO TABACCO',
   'andrea-vullo': 'ANDREA VULLO',
   'andrea-barbagallo': 'ANDREA BARBAGALLO',
 };
@@ -57,10 +56,12 @@ function readyAtContact(game) {
   return state.fighters;
 }
 
-test('all named characters are present and the two Marco variants retain distinct assets', () => {
+test('all named characters are present with only the retained Marco appearance', () => {
   assert.deepEqual(Object.keys(KyokushinRoster).sort(), ids.slice().sort());
   for (const [id, name] of Object.entries(names)) assert.equal(KyokushinRoster[id].short, name);
-  assert.notEqual(KyokushinRoster['marco-tabacco-collage'].assetId, KyokushinRoster['marco-tabacco-foto-gruppo'].assetId);
+  assert.equal(KyokushinRoster['marco-tabacco-collage'].assetId, '01-marco-tabacco-collage');
+  assert.equal(KyokushinRoster['marco-tabacco-foto-gruppo'], undefined);
+  assert.equal(Object.values(KyokushinRoster).filter(character => character.name === 'MARCO TABACCO').length, 1);
 });
 
 for (const mode of ['cpu', 'training', 'versus']) {
@@ -92,7 +93,7 @@ for (const mode of ['cpu', 'training', 'versus']) {
 }
 
 test('invalid selections fall back to original fighters without accepting inherited object keys', () => {
-  for (const invalid of ['unknown-fighter', '', '__proto__', 'constructor', 'toString', null, undefined, 42]) {
+  for (const invalid of ['unknown-fighter', 'marco-tabacco-foto-gruppo', '', '__proto__', 'constructor', 'toString', null, undefined, 42]) {
     const { game } = newGame({ player: invalid, opponent: invalid, mode: 'invalid', difficulty: 'invalid' });
     assert.deepEqual(fighterIds(game), ['angelo', 'samuel']);
     assert.equal(game.getState().mode, 'cpu');

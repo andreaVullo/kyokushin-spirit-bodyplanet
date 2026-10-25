@@ -29,7 +29,7 @@
   // directly from disk. The original PNG bytes are not recompressed or edited.
   window.__kyokushinRegisterSprite = (key, url) => sources.set(key, url);
 
-  function cutouts(image, meta, category) {
+  function cutouts(image, meta, category, assetId) {
     const w = image.naturalWidth, h = image.naturalHeight;
     const surface = document.createElement('canvas');
     surface.width = w; surface.height = h;
@@ -85,7 +85,10 @@
         if (belongs) pixels.data.set(rgba.subarray(pos * 4, pos * 4 + 4), (y * sw + x) * 4);
       }
       ctx.putImageData(pixels, 0, 0);
-      return canvas;
+      const branding = window.GiBranding;
+      const result = branding ? branding.apply(canvas, branding.namedOptions(assetId, category, index, meta.nominal_height)) : canvas;
+      window.FighterGeometry?.measure(result, pixels.data);
+      return result;
     });
     surface.width = surface.height = 0;
     return { frames, meta };
@@ -111,10 +114,12 @@
         if (!source) { fail(); return; }
         const image = new Image();
         image.onerror = fail;
-        image.onload = () => {
+        image.onload = async () => {
           if (settled) return;
           try {
-            const result = cutouts(image, atlas[assetId][category], category);
+            await window.GiBranding?.load();
+            if (settled) return;
+            const result = cutouts(image, atlas[assetId][category], category, assetId);
             cache.set(key, result);
             settled = true; clearTimeout(timeout); sources.delete(key); script.remove();
             resolve(result);
@@ -157,7 +162,18 @@
     if (!frame) return null;
     const sheet = cache.get(assetId + '/' + frame.source_sheet);
     const source = sheet?.frames[frame.source_frame];
-    return source ? { frame, source, scale: height / sheet.meta.nominal_height } : null;
+    if (!source) return null;
+    const sheetType = frame.source_sheet, sourceIndex = frame.source_frame;
+    const centerFeet = sheetType === 'pugni' || sheetType === 'base' ||
+      (sheetType === 'movimento' && sourceIndex < 8) ||
+      (sheetType === 'difesa' && (sourceIndex < 4 || (sourceIndex >= 8 && sourceIndex <= 11) || sourceIndex === 15));
+    const region = window.FighterGeometry?.region(frame.region, source, { centerFeet }) || frame.region;
+    // Use the actual idle silhouette as the reference: transparent padding and
+    // another pose's raised hair/hand must not change a fighter's standing size.
+    const nominal = sheetType === 'base'
+      ? window.FighterGeometry?.measure(sheet.frames[0])?.bounds[3] || sheet.meta.nominal_height
+      : sheet.meta.nominal_height;
+    return { frame: { ...frame, region }, source, scale: height / nominal };
   }
 
   function attackPhase(f) {
@@ -214,7 +230,7 @@
     const hit = clamp((f.hitFlash || 0) / .18, 0, 1), guard = clamp((f.guardFlash || 0) / .22, 0, 1);
     if (hit) ctx.filter = `brightness(${1 + hit * hit * 1.65}) saturate(${1 - hit * .55})`;
     else if (guard) ctx.filter = `brightness(${1 + guard * .45})`;
-    ctx.drawImage(art.source, (sx - ax) * scale, (sy - ay) * scale, sw * scale, sh * scale);
+    ctx.drawImage(window.GiBranding?.forFacing(art.source, f.facing) || art.source, (sx - ax) * scale, (sy - ay) * scale, sw * scale, sh * scale);
     ctx.restore();
   }
 

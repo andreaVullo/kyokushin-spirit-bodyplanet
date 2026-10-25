@@ -21,7 +21,7 @@
     "rank": "KARATEKA · BODYPLANET",
     "belt": "CINTURA ARANCIONE",
     "beltColor": "orange",
-    "variant": "COLLAGE",
+    "variant": "",
     "assetId": "01-marco-tabacco-collage"
   },
   "gabriele-carbonaro": {
@@ -68,15 +68,6 @@
     "beltColor": "blue",
     "variant": "",
     "assetId": "06-oscar-gueli"
-  },
-  "marco-tabacco-foto-gruppo": {
-    "name": "MARCO TABACCO",
-    "short": "MARCO TABACCO",
-    "rank": "KARATEKA · BODYPLANET",
-    "belt": "CINTURA ARANCIONE",
-    "beltColor": "orange",
-    "variant": "FOTO DI GRUPPO",
-    "assetId": "07-marco-tabacco-foto-gruppo"
   },
   "andrea-barbagallo": {
     "name": "ANDREA BARBAGALLO",

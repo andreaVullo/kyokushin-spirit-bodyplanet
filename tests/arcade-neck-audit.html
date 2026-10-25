@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="it"><meta charset="utf-8"><title>Arcade: colli e appoggio</title>
+<style>
+body{margin:20px;background:#111722;color:#e9edf5;font:15px system-ui}h1{font-size:24px}label{margin-right:20px}select{font:inherit;padding:7px}canvas{display:block;width:100%;height:auto;margin-top:16px;background:#1b2431}pre{white-space:pre-wrap}p{max-width:1100px}
+</style>
+<h1>Arcade · audit colli, scala e appoggio</h1>
+<p>Corpo alla scala effettiva di combattimento (stessa baseline verde per tutte le pose). Il riquadro a destra ingrandisce il collo. Rosso: perno del collo. Il valore “fondo” misura quanti pixel di gioco scendono sotto la baseline, includendo capelli e testa.</p>
+<label>Corpo <select id="gender"><option value="male">Uomo</option><option value="female">Donna</option></select></label>
+<label>Capelli <select id="hair"><option value="0">Corti</option><option value="1">Ciuffo</option><option value="2">Ricci</option><option value="3">Coda</option><option value="4">Rasati</option></select></label>
+<p id="status">Caricamento…</p><button id="verify" type="button">Verifica le 360 composizioni</button><p id="verification" role="status"></p><canvas id="audit" width="1600" height="2304"></canvas><img id="collage-preview" alt="Tutte le 360 composizioni Arcade" style="display:none;width:100%;height:auto"><pre id="measurements"></pre>
+<script>window.FighterArt={height:228,ready:true,load:async()=>{},loadFighters:async()=>{},draw(){},drawSelectionPortrait(){}};</script>
+<script src="../scripts/portrait-framing.js"></script><script src="../scripts/fighter-geometry.js"></script><script src="../scripts/gi-branding.js?v=neck-8"></script><script src="../scripts/arcade-atlas.js?v=neck-8"></script><script src="../scripts/arcade-art.js?v=neck-8"></script>
+<script>
+(async()=>{
+await ArcadeArt.load();
+const params=new URLSearchParams(location.search),selected=(params.get('poses')||'').split(',').filter(Boolean).map(Number).filter(value=>Number.isInteger(value)&&value>=0&&value<36);
+if(params.get('gender')==='female')document.getElementById('gender').value='female';if(params.has('hair'))document.getElementById('hair').value=String(Math.max(0,Math.min(4,Number(params.get('hair'))||0)));
+const slots=selected.length?selected:Array.from({length:36},(_,i)=>i),columns=selected.length?Math.min(2,selected.length):4;
+document.getElementById('audit').width=columns*400;document.getElementById('audit').height=Math.ceil(slots.length/columns)*256;
+const names=['guardia','passo A','passo B','scatto','salto su','salto giù','tsuki prep','tsuki','gyaku prep','gyaku','shita prep','shita','kagi prep','kagi','gedan prep','gedan','mae prep','mae','mawashi prep','mawashi','ushiro prep','ushiro','kaiten prep','kaiten','parata A','parata B','parata bassa A','parata bassa B','colpito A','colpito B','caduta','a terra','rialzata','vittoria','inchino','atterraggio'];
+const draw=()=>{
+ const gender=document.getElementById('gender').value,hair=Number(document.getElementById('hair').value),ctx=document.getElementById('audit').getContext('2d');
+ ctx.clearRect(0,0,1600,2304);const data=[];
+ for(let slot=0;slot<slots.length;slot++){
+  const pose=slots[slot];
+  const meta=ArcadeSpriteAtlas[gender][pose];let canvas;
+  const original=FighterPortraits.draw;FighterPortraits.draw=(context,source)=>{canvas=source;return true;};
+  ArcadeArt.drawPreview(ctx,{gender,hair,rank:{color:'#ee792b'}},0,0,100,100,{pose});FighterPortraits.draw=original;
+  const bounds=FighterPortraits.bounds(canvas),factor=228/meta.nominal,scale=.82*factor,x=slot%columns*400,y=Math.floor(slot/columns)*256;
+  const ax=meta.anchor[0]-meta.region[0]+30,ay=meta.anchor[1]-meta.region[1]+30;
+  const hx=meta.head[0]-meta.region[0]+30,hy=meta.head[1]-meta.region[1]+30;
+  ctx.strokeStyle='#48556c';ctx.strokeRect(x,y,400,256);ctx.fillStyle='#e9edf5';ctx.font='15px system-ui';ctx.fillText(pose+' · '+names[pose],x+9,y+20);
+  ctx.strokeStyle='#53bc86';ctx.beginPath();ctx.moveTo(x+4,y+218);ctx.lineTo(x+230,y+218);ctx.stroke();
+  ctx.save();ctx.beginPath();ctx.rect(x+2,y+25,228,207);ctx.clip();ctx.drawImage(canvas,x+116-ax*scale,y+218-ay*scale,canvas.width*scale,canvas.height*scale);ctx.restore();
+  ctx.save();ctx.beginPath();ctx.rect(x+235,y+30,160,188);ctx.clip();const zoom=3.5*factor;ctx.drawImage(canvas,x+314-hx*zoom,y+159-hy*zoom,canvas.width*zoom,canvas.height*zoom);ctx.strokeStyle='#ff7171';ctx.beginPath();ctx.moveTo(x+307,y+159);ctx.lineTo(x+321,y+159);ctx.moveTo(x+314,y+152);ctx.lineTo(x+314,y+166);ctx.stroke();ctx.restore();
+  const bottom=(bounds[1]+bounds[3]-ay)*factor,height=bounds[3]*factor;
+  ctx.fillStyle=bottom>2?'#ff7171':'#a9c7e6';ctx.font='12px system-ui';ctx.fillText('fondo '+bottom.toFixed(1)+' px · altezza '+height.toFixed(1)+' · nominale '+meta.nominal,x+9,y+244);
+  data.push({pose,name:names[pose],sheet:meta.sheet,bottom:+bottom.toFixed(2),height:+height.toFixed(2),neck:meta.head});
+ }
+ document.getElementById('status').textContent=gender+' / capelli '+hair+' · 36 pose caricate';document.getElementById('measurements').textContent=JSON.stringify(data,null,2);
+};
+document.getElementById('gender').onchange=document.getElementById('hair').onchange=draw;draw();
+document.getElementById('verify').onclick=()=>{
+ const failures=[],idles=[];let count=0,worst=0;const ctx=document.getElementById('audit').getContext('2d');
+ const collage=document.createElement('canvas');collage.width=1800;collage.height=36*154+32;const contact=collage.getContext('2d');contact.fillStyle='#172130';contact.fillRect(0,0,collage.width,collage.height);
+ for(const gender of ['male','female'])for(let hair=0;hair<5;hair++)for(let pose=0;pose<36;pose++){
+  let source;const original=FighterPortraits.draw;FighterPortraits.draw=(context,canvas)=>{source=canvas;return true;};
+  ArcadeArt.drawPreview(ctx,{gender,hair,rank:{color:'#ee792b'}},0,0,100,100,{pose});FighterPortraits.draw=original;
+  const meta=ArcadeSpriteAtlas[gender][pose],bounds=FighterPortraits.bounds(source),floor=meta.anchor[1]-meta.region[1]+30;
+  const bottom=(bounds[1]+bounds[3]-floor)*228/meta.nominal;worst=Math.max(worst,bottom);count++;
+  if(pose===0)idles.push({gender,hair,height:+(bounds[3]*228/meta.nominal).toFixed(3)});
+  const column=(gender==='male'?0:5)+hair,x=column*180,y=32+pose*154,scale=.52*228/meta.nominal;
+  contact.strokeStyle='#344558';contact.strokeRect(x,y,180,154);contact.fillStyle='#dce6ed';contact.font='12px system-ui';contact.fillText(pose+' '+names[pose],x+7,y+15);
+  contact.strokeStyle='#395c4e';contact.beginPath();contact.moveTo(x+3,y+145);contact.lineTo(x+177,y+145);contact.stroke();
+  contact.drawImage(source,x+90-(bounds[0]+bounds[2]/2)*scale,y+145-floor*scale,source.width*scale,source.height*scale);
+  if(pose===0){contact.fillStyle='#eac67b';contact.fillText((gender==='male'?'Uomo':'Donna')+' · '+['Corti','Ciuffo','Ricci','Coda','Rasati'][hair],x+8,22);}
+  if(bottom>1.5||bounds[2]<1||bounds[3]<1)failures.push({gender,hair,pose,bottom});
+ }
+ const facingChecks=[];
+ for(const gender of ['male','female'])for(const pose of [0,20]){
+  const canvases=[];for(const facing of [1,-1]){
+   const original=FighterPortraits.draw;FighterPortraits.draw=(context,canvas)=>{canvases.push(canvas);return true;};
+   ArcadeArt.drawPreview(ctx,{gender,hair:0,rank:{color:'#ee792b'}},0,0,100,100,{pose,facing});FighterPortraits.draw=original;
+  }
+  const [a,b]=canvases.map(canvas=>canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data);let changed=0,alphaChanged=0;
+  for(let i=0;i<a.length;i+=4){if(a[i]!==b[i]||a[i+1]!==b[i+1]||a[i+2]!==b[i+2])changed++;if(a[i+3]!==b[i+3])alphaChanged++;}
+  facingChecks.push({gender,pose,changed,alphaChanged});if(alphaChanged||(pose===0?changed===0:changed!==0))failures.push({gender,pose,reason:'facing-ink'});
+ }
+ const report={result:failures.length?'FAIL':'PASS',count,worstFloorFringe:+worst.toFixed(3),idles,facingChecks,failures};
+ document.getElementById('verification').textContent=JSON.stringify(report);document.getElementById('verification').dataset.result=report.result;
+  document.getElementById('collage-preview').src=collage.toDataURL('image/png');document.getElementById('collage-preview').style.display='block';
+};
+})().catch(error=>document.getElementById('status').textContent='ERRORE: '+error.message);
+</script></html>

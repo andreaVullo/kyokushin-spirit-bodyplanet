@@ -5,7 +5,7 @@
   const atlas = global.ArcadeSpriteAtlas;
   const root = new URL('../assets/arcade/', document.currentScript.src);
   const images = new Map(), pending = new Map(), sources = new Map(), sheets = new Map();
-  const appearances = new Map(), rendered = new Map(), states = new WeakMap();
+  const appearances = new Map(), rendered = new Map(), states = new WeakMap(), collars = new WeakMap();
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const DEFAULT = { id: 'arcade-player', name: 'Karateka', gender: 'male', hair: 0, rank: { color: '#f1eee7', stripe: null, dan: 0 } };
 
@@ -97,8 +97,12 @@
           let bottom = sh - 1;
           while (bottom >= Math.max(0, top - sy) && pixels.data[(bottom * sw + x) * 4 + 3] < 120) bottom--;
           if (bottom < top - sy) continue;
-          for (let y = bottom; y >= Math.max(0, bottom - depth); y--) {
-            const at = (y * sw + x) * 4, t = clamp((bottom - y - 2) / depth, 0, 1);
+          // Remove the complete inked cut before feathering the skin. Keeping
+          // fragments of its dark antialiasing creates a dotted necklace once
+          // the 240-pixel portrait is reduced to a 50-pixel game head.
+          const feather = Math.max(24, depth * 2), cut = 8;
+          for (let y = bottom; y >= Math.max(0, bottom - feather); y--) {
+            const at = (y * sw + x) * 4, t = clamp((bottom - y - cut) / (feather - cut), 0, 1);
             pixels.data[at + 3] *= t * t * (3 - 2 * t);
           }
         }
@@ -126,7 +130,7 @@
     const genders = options.gender ? [options.gender === 'female' ? 'female' : 'male'] : ['male', 'female'];
     const names = [...genders.map(gender => gender + '-body'), 'heads', 'supplement'];
     if (genders.includes('male')) names.push('male-reactions');
-    await Promise.all(names.map(loadImage));
+    await Promise.all([...names.map(loadImage), global.GiBranding?.load()]);
     names.forEach(prepare);
   }
 
@@ -166,11 +170,42 @@
     ctx.putImageData(image, 0, 0);
   }
 
-  function frameFor(model, index) {
-    const meta = atlas[model.gender][index], body = sheets.get(meta.sheet)?.get(meta.component);
+  function restoreCollar(ctx, body, meta, border) {
+    // The head is modular, but the gi opening belongs to this particular pose.
+    // Put only the original white/blue cloth back above the lower neck; never
+    // repaint the original bald scalp or the body's differently angled face.
+    if (collars.has(body)) { ctx.drawImage(collars.get(body), border, border); return; }
+    const [hx, hy, size, angle = 0] = meta.head;
+    const centerX = hx - meta.region[0], centerY = hy - meta.region[1];
+    const turn = angle * Math.PI / 180, cosine = Math.cos(turn), sine = Math.sin(turn);
+    const source = body.getContext('2d').getImageData(0, 0, body.width, body.height);
+    const mask = ctx.createImageData(body.width, body.height);
+    const radius = Math.ceil(size * .72);
+    const left = Math.max(0, Math.floor(centerX - radius)), right = Math.min(body.width, Math.ceil(centerX + radius));
+    const top = Math.max(0, Math.floor(centerY - radius)), bottom = Math.min(body.height, Math.ceil(centerY + radius));
+    for (let y = top; y < bottom; y++) for (let x = left; x < right; x++) {
+      const dx = x - centerX, dy = y - centerY;
+      const localX = dx * cosine + dy * sine, localY = -dx * sine + dy * cosine;
+      if (localX < -size * .58 || localX > size * .50 || localY < -size * .21 || localY > size * .20) continue;
+      const at = (y * body.width + x) * 4;
+      const r = source.data[at], g = source.data[at + 1], b = source.data[at + 2], alpha = source.data[at + 3];
+      const cloth = Math.min(r, g, b) > 72 && Math.max(r, g, b) - Math.min(r, g, b) < 78 && b > r * .82;
+      if (alpha && cloth) mask.data.set(source.data.subarray(at, at + 4), at);
+    }
+    const collar = document.createElement('canvas'); collar.width = body.width; collar.height = body.height;
+    collar.getContext('2d').putImageData(mask, 0, 0); collars.set(body, collar); ctx.drawImage(collar, border, border);
+  }
+
+  function frameFor(model, index, facing = 1) {
+    const meta = atlas[model.gender][index];
+    let body = sheets.get(meta.sheet)?.get(meta.component);
     if (!body) return null;
-    const key = [model.gender, model.hair, model.rank.color, model.rank.stripe, model.rank.dan, index].join(':');
+    const key = [model.gender, model.hair, model.rank.color, model.rank.stripe, model.rank.dan, index, facing === -1 ? -1 : 1].join(':');
     if (rendered.has(key)) return rendered.get(key);
+    if (global.GiBranding?.arcadeOptions) {
+      body = global.GiBranding.apply(body, global.GiBranding.arcadeOptions(model.gender, index, meta));
+      body = global.GiBranding.forFacing(body, facing);
+    }
     // Extra border accommodates the five hairstyles without clipping a ponytail.
     const border = 30, canvas = document.createElement('canvas');
     canvas.width = body.width + border * 2; canvas.height = body.height + border * 2;
@@ -195,7 +230,9 @@
         (headMeta.region[1] - headMeta.anchor[1]) * scale, head.width * scale, head.height * scale);
       ctx.restore();
     }
-    const result = { canvas, meta, offsetX: meta.region[0] - meta.anchor[0] - border, offsetY: meta.region[1] - meta.anchor[1] - border };
+    restoreCollar(ctx, body, meta, border);
+    const floor = global.FighterGeometry?.measure(body)?.floor ?? (meta.bounds[1] + meta.bounds[3] - meta.region[1]);
+    const result = { canvas, meta, offsetX: meta.region[0] - meta.anchor[0] - border, offsetY: -floor - border };
     rendered.set(key, result); return result;
   }
 
@@ -227,7 +264,7 @@
     let state = states.get(f);
     if (!state) { state = { current: f.state, since: time, previous: '' }; states.set(f, state); }
     if (state.current !== f.state) { state.previous = state.current; state.current = f.state; state.since = time; }
-    const art = frameFor(model, pose(f, time, state));
+    const art = frameFor(model, pose(f, time, state), f.facing);
     if (!art) return;
     const scale = previous.height / art.meta.nominal * (f.scale ?? 1);
     ctx.save(); ctx.translate(f.x, f.y); ctx.scale(f.facing === -1 ? -1 : 1, 1);
@@ -250,7 +287,7 @@
 
   function drawPreview(ctx, value, x, y, width, height, options = {}) {
     options = { ...value, ...options };
-    const model = appearance(value), art = frameFor(model, options.pose ?? 0);
+    const model = appearance(value), art = frameFor(model, options.pose ?? 0, options.facing);
     if (!art) return false;
     const [hx, hy, headSize, , back = 0] = art.meta.head;
     const head = atlas.heads[(model.gender === 'female' ? 10 : 0) + (back ? 5 : 0) + model.hair];

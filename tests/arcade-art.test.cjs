@@ -43,6 +43,24 @@ test('72 full-body poses and 20 hairstyle heads have valid per-pose geometry wit
     }
   }
 });
+test('all Arcade sheets retain the same anatomical head size at game scale', () => {
+  const h = harness();
+  for (const gender of ['male', 'female']) {
+    const frames = h.ArcadeSpriteAtlas[gender], expected = frames[0].head[2] / frames[0].nominal;
+    for (let pose = 0; pose < frames.length; pose++) {
+      const frame = frames[pose], worldHead = frame.head[2] / frame.nominal;
+      assert.ok(Math.abs(worldHead - expected) < .00001, `${gender} pose ${pose} changes head size between sheets`);
+    }
+  }
+});
+test('the browser atlas and editable atlas contain identical head rigs', () => {
+  const source = JSON.parse(fs.readFileSync(path.join(root, 'assets/arcade/atlas.json'), 'utf8'));
+  assert.deepEqual(JSON.parse(JSON.stringify(harness().ArcadeSpriteAtlas)), source);
+});
+test('Arcade floor anchors use the bottom edge of the silhouette rather than its last pixel center', () => {
+  const atlas = harness().ArcadeSpriteAtlas;
+  for (const frame of [...atlas.male, ...atlas.female]) assert.equal(frame.anchor[1], frame.bounds[1] + frame.bounds[3]);
+});
 test('each of the nine attacks has an intact preparation, contact and recovery pose at engine timing boundaries', () => {
   const h = harness();
   for (const [move, base] of Object.entries({ tsuki:6, gyaku:8, shita:10, kagi:12, gedan:14, mae:16, mawashi:18, ushiro:20, kaiten:22 })) {

@@ -107,7 +107,7 @@ body:is(.front-title,.front-select,.front-versus,.front-create) #game{visibility
 .versus-heading>span{display:block;color:#ffd78b;font:italic 29px Impact,Dojo,sans-serif;letter-spacing:2px}
 .versus-heading>strong{display:block;font-size:8px;letter-spacing:2px;color:#b4bfca;margin-top:9px}
 .versus-fighter{position:relative;min-width:0;animation:portrait-in .35s ease-out;overflow:hidden}
-.versus-fighter canvas{width:100%;height:100%;object-fit:contain;mask-image:linear-gradient(#000 65%,transparent 93%)}
+.versus-fighter canvas{width:100%;height:100%;object-fit:contain}
 .versus-fighter h2{position:absolute;left:12%;right:7%;bottom:16%;font:italic 400 clamp(26px,4.3vw,62px)/.98 Impact,Dojo,sans-serif;color:#fff0cc;text-shadow:3px 3px #142338;z-index:2;letter-spacing:.5px;margin:0;max-width:340px}
 .versus-right h2{text-align:right;margin-left:auto;left:7%;right:12%}
 .versus-fighter>span{position:absolute;bottom:10%;left:12%;font-size:8px;letter-spacing:3px;color:#f3c775}
@@ -187,7 +187,7 @@ body:is(.front-title,.front-select,.front-versus,.front-create) #game{visibility
   .versus-heading{top:31px}
   .versus-heading>span{font-size:27px}
   .versus-heading>strong{font-size:6px;letter-spacing:1.5px}
-  .versus-fighter canvas{position:static;width:125%;height:100%;max-width:none;aspect-ratio:auto;transform:translateX(-10%)}
+  .versus-fighter canvas{position:static;width:100%;height:100%;max-width:none;aspect-ratio:auto}
   .versus-fighter h2{font-size:27px;left:10%;right:4%;bottom:21%;max-width:140px}
   .versus-right h2{left:4%;right:10%}
   .versus-fighter>span{bottom:15%;font-size:6px;letter-spacing:1.5px;left:10%}
@@ -792,9 +792,11 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   }
 })();
 </script>
-<script src="scripts/roster.js?v=20261025-5"></script>
+<script src="scripts/roster.js?v=20261025-11"></script>
 <script src="scripts/game.js?v=20261025-2"></script>
 <script src="scripts/strike-point.js?v=20261025-10"></script>
+<script src="scripts/fighter-geometry.js?v=20261025-11"></script>
+<script src="scripts/gi-branding.js?v=20261025-11"></script>
 <script>
 /* renderer.js */
 /* Original arcade character artwork, generated from the supplied references.
@@ -810,6 +812,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   const attackTextures = {};
   const attackRegions = {};
   const attackScales = {};
+  const nativeHeights = {};
   const punchRows = { tsuki: 0, gyaku: 1, shita: 2, kagi: 3 };
   // The gyaku intermediate illustration extends the lead arm. Skip it rather
   // than change the striking arm midway through the rear-hand technique.
@@ -937,7 +940,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       sizes.push(bottom - top);
       cutouts.push(cutout);
     }
-    attackRegions[id] = crops;
+    attackRegions[id] = crops.map((region, i) => window.FighterGeometry?.region(region, cutouts[i], { centerFeet: true }) || region);
     attackTextures[id] = cutouts;
     // One fixed scale for the entire sheet preserves drawn knee compression.
     attackScales[id] = HEIGHT / Math.max(...sizes);
@@ -945,7 +948,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 
   // Extract the large, continuous silhouettes and their antialiased edges.
   // This prevents a neighbouring frame's hand entering an irregular rectangle.
-  function isolate(image, frameRegions) {
+  function isolate(image, frameRegions, options = {}) {
     const source = document.createElement('canvas');
     source.width = image.naturalWidth;
     source.height = image.naturalHeight;
@@ -982,7 +985,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       }
       if (tail > 10000) parts.push({ label, left, right, top, bottom, size: tail });
     }
-    return frameRegions.map((r) => {
+    return frameRegions.map((r, index) => {
       const [x, y, width, height] = r;
       const part = parts.reduce((best, p) => {
         const overlap = Math.max(0, Math.min(p.right, x + width) - Math.max(p.left, x)) *
@@ -1014,17 +1017,23 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
         }
       }
       target.putImageData(out, 0, 0);
-      return canvas;
+      return window.GiBranding?.apply(canvas, { ...options, ...(options.frames?.[index] || {}) }) || canvas;
     });
   }
 
   async function load() {
     if (loading) return loading;
+    await window.GiBranding?.load();
+    if (loading) return loading;
     const fighters = ['angelo', 'samuel'].map(id => new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
         sheets[id] = img;
-        textures[id] = isolate(img, regions[id]);
+        textures[id] = isolate(img, regions[id], { nominal: id === 'angelo' ? 359 : 348 });
+        if (window.FighterGeometry && textures[id]) {
+          regions[id] = regions[id].map((region, i) => [8, 9].includes(i) ? region : window.FighterGeometry.region(region, textures[id][i], { centerFeet: [0, 1, 2, 3, 10, 11].includes(i) }));
+          nativeHeights[id] = window.FighterGeometry.measure(textures[id][0]).bounds[3];
+        }
         resolve();
       };
       img.onerror = () => reject(new Error(`Impossibile caricare il personaggio ${id}`));
@@ -1034,9 +1043,11 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       const img = new Image();
       img.onload = () => {
         guardSheet = img;
-        const isolated = isolate(img, [...guardRegions.angelo, ...guardRegions.samuel]);
+        const isolated = isolate(img, [...guardRegions.angelo, ...guardRegions.samuel], { nominal: 573 });
         guardTextures.angelo = isolated?.slice(0, 2);
         guardTextures.samuel = isolated?.slice(2, 4);
+        if (window.FighterGeometry) for (const id of ['angelo', 'samuel']) if (guardTextures[id])
+          guardRegions[id] = guardRegions[id].map((region, i) => window.FighterGeometry.region(region, guardTextures[id][i], { centerFeet: i === 0 }));
         resolve();
       };
       img.onerror = () => reject(new Error('Impossibile caricare le pose di difesa'));
@@ -1062,7 +1073,8 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       const img = new Image();
       img.onload = () => {
         motionSheets[id] = img;
-        motionTextures[id] = isolate(img, motionRegions[id]);
+        motionTextures[id] = isolate(img, motionRegions[id], { nominal: id === 'angelo' ? 426 : 433 });
+        if (window.FighterGeometry && motionTextures[id]) motionRegions[id] = motionRegions[id].map((region, i) => [5, 6].includes(i) ? region : window.FighterGeometry.region(region, motionTextures[id][i], { centerFeet: i < 4 }));
         resolve();
       };
       img.onerror = () => reject(new Error(`Impossibile caricare le animazioni di ${id}`));
@@ -1095,6 +1107,12 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     return 0;
   }
 
+  function facingCutout(ctx, canvas) {
+    const m = ctx.getTransform?.();
+    const facing = m && m.a * m.d - m.b * m.c < 0 ? -1 : 1;
+    return window.GiBranding?.forFacing(canvas, facing) || canvas;
+  }
+
   function paint(ctx, id, frame, scale, alpha = 1) {
     const region = regions[id][frame], img = sheets[id];
     if (!img) return;
@@ -1102,7 +1120,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     const dx = (sx - ax) * scale, dy = (sy - ay) * scale;
     ctx.globalAlpha *= alpha;
     const cutout = textures[id]?.[frame];
-    if (cutout) ctx.drawImage(cutout, dx, dy, sw * scale, sh * scale);
+    if (cutout) ctx.drawImage(facingCutout(ctx, cutout), dx, dy, sw * scale, sh * scale);
     else ctx.drawImage(img, sx, sy, sw, sh, dx, dy, sw * scale, sh * scale);
   }
 
@@ -1114,7 +1132,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     const cutout = guardTextures[id]?.[frame];
     ctx.save();
     ctx.globalAlpha *= alpha;
-    if (cutout) ctx.drawImage(cutout, dx, dy, sw * scale, sh * scale);
+    if (cutout) ctx.drawImage(facingCutout(ctx, cutout), dx, dy, sw * scale, sh * scale);
     else ctx.drawImage(guardSheet, sx, sy, sw, sh, dx, dy, sw * scale, sh * scale);
     ctx.restore();
   }
@@ -1127,7 +1145,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     const cutout = motionTextures[id]?.[frame];
     ctx.save();
     ctx.globalAlpha *= alpha;
-    if (cutout) ctx.drawImage(cutout, dx, dy, sw * scale, sh * scale);
+    if (cutout) ctx.drawImage(facingCutout(ctx, cutout), dx, dy, sw * scale, sh * scale);
     else ctx.drawImage(motionSheets[id], sx, sy, sw, sh, dx, dy, sw * scale, sh * scale);
     ctx.restore();
   }
@@ -1193,7 +1211,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     pose(1 - recover);
     if (recover > 0) {
       ctx.save();
-      paint(ctx, id, 0, HEIGHT / (id === 'angelo' ? 359 : 348) * size, recover);
+      paint(ctx, id, 0, HEIGHT / (nativeHeights[id] || (id === 'angelo' ? 359 : 348)) * size, recover);
       ctx.restore();
     }
     ctx.restore();
@@ -1223,14 +1241,14 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     const [sx, sy, sw, sh, ax, ay] = attackRegions[id][frame];
     const scale = attackScales[id] * fighterScale;
     const cutout = attackTextures[id][frame];
-    ctx.drawImage(cutout, (sx - ax) * scale, (sy - ay) * scale, sw * scale, sh * scale);
+    ctx.drawImage(facingCutout(ctx, cutout), (sx - ax) * scale, (sy - ay) * scale, sw * scale, sh * scale);
   }
 
   function drawPunch(ctx, id, f, p) {
     const { phase } = punchMotion(f.move, p), size = f.scale ?? 1;
     ctx.save(); ctx.translate(f.x, f.y); ctx.scale(f.facing === -1 ? -1 : 1, 1);
     ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-    if (phase < 0) paint(ctx, id, 0, HEIGHT / (id === 'angelo' ? 359 : 348) * size);
+    if (phase < 0) paint(ctx, id, 0, HEIGHT / (nativeHeights[id] || (id === 'angelo' ? 359 : 348)) * size);
     else paintAttack(ctx, id, punchRows[f.move] * 4 + punchFrames[f.move][phase], size);
     ctx.restore();
   }
@@ -1257,7 +1275,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     ctx.save(); ctx.translate(f.x, f.y); ctx.scale(f.facing === -1 ? -1 : 1, 1);
     ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
     if (pose.phase === 'chamber' || pose.phase === 'recoil') paintGuard(ctx, id, 1, size);
-    else paint(ctx, id, pose.phase === 'contact' ? pose.frame : 0, HEIGHT / (id === 'angelo' ? 359 : 348) * size);
+    else paint(ctx, id, pose.phase === 'contact' ? pose.frame : 0, HEIGHT / (nativeHeights[id] || (id === 'angelo' ? 359 : 348)) * size);
     ctx.restore();
   }
 
@@ -1265,7 +1283,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     if (!ready) return;
     const id = regions[f.id] ? f.id : 'angelo';
     const frame = poseFor(f, t);
-    const base = HEIGHT / (id === 'angelo' ? 359 : 348);
+    const base = HEIGHT / (nativeHeights[id] || (id === 'angelo' ? 359 : 348));
     const scale = base * (f.scale ?? 1);
     const p = clamp(f.moveProgress || 0, 0, 1);
     let visual = motion.get(f);
@@ -1344,8 +1362,8 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
       pivotY = -103 * (f.scale ?? 1);
       stretchX = 1 - .16 * fall;
       stretchY = 1 - .05 * fall;
-      // Rotate around the torso rather than swinging the body from its feet.
-      // The rotated frame bounds keep the fallen silhouette on the tatami.
+      // Rotate around the torso and settle the visible silhouette on the mat.
+      // Transparent crop corners must not hold a fallen fighter above it.
       const [rx, ry, rw, rh, ax, ay] = regions[id][frame];
       let bottom = -Infinity;
       for (const bx of [rx, rx + rw]) {
@@ -1355,7 +1373,21 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
           bottom = Math.max(bottom, px * Math.sin(lean) + py * Math.cos(lean) + pivotY);
         }
       }
+      if (window.FighterGeometry?.support && textures[id]?.[frame]) bottom = window.FighterGeometry.support(textures[id][frame], {
+        anchorX: ax - rx, anchorY: ay - ry, scaleX: scale * stretchX,
+        scaleY: scale * stretchY, angle: lean, pivotY,
+      });
       offsetY = -bottom;
+    }
+    if (dashing && window.FighterGeometry?.support) {
+      const dashFrame = f.dashBack ? 3 : 0, cutout = motionTextures[id]?.[dashFrame];
+      if (cutout) {
+        const [sx, sy, , , ax, ay] = motionRegions[id][dashFrame];
+        const dashScale = HEIGHT / (id === 'angelo' ? 426 : 433) * (f.scale ?? 1);
+        const bottom = window.FighterGeometry.support(cutout, { anchorX: ax - sx, anchorY: ay - sy,
+          scaleX: dashScale * stretchX, scaleY: dashScale * stretchY, angle: lean });
+        offsetY -= Math.max(0, bottom + offsetY);
+      }
     }
     ctx.save();
     ctx.translate(f.x, f.y);
@@ -1409,6 +1441,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
   // These two source illustrations already stop at the upper legs.
   function drawSelectionPortrait(ctx, id, x, y, width, height, options = {}) {
     if (!ready || !portraitTextures[id]) return;
+    if (options.full && textures[id]?.[0]) return window.FighterPortraits.draw(ctx, textures[id][0], { facing: 1 }, x, y, width, height, options);
     const profile = id === 'angelo'
       ? { center: 355, top: 7, headHeight: 222, headWidth: 184, facing: 1 }
       : { center: 398, top: 7, headHeight: 239, headWidth: 201, facing: -1 };
@@ -1431,7 +1464,7 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
     } else if (kickTiming[f.move]) {
       const frame = kickTiming[f.move].frame;
       source = textures[id]?.[frame]; region = regions[id][frame];
-      scale = HEIGHT / (id === 'angelo' ? 359 : 348) * size;
+      scale = HEIGHT / (nativeHeights[id] || (id === 'angelo' ? 359 : 348)) * size;
     }
     if (!source || !region) return null;
     const [sx, sy, , , ax, ay] = region;
@@ -1442,9 +1475,9 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 })();
 
 </script>
-<script src="scripts/portrait-framing.js?v=20261025-4"></script>
+<script src="scripts/portrait-framing.js?v=20261025-11"></script>
 <script src="scripts/karateka-atlas.js?v=20261025-5"></script>
-<script src="scripts/karateka-art.js?v=20261025-8"></script>
+<script src="scripts/karateka-art.js?v=20261025-11"></script>
 <script>
 /* audio.js */
 /* Original synthesized score and sound design for Kyokushin Spirit. */
@@ -2013,10 +2046,10 @@ body.boot-loading>.masthead,body.boot-loading>main{visibility:hidden}
 <script src="scripts/arcade.js?v=20261025-2"></script>
 <script src="scripts/leaderboard-config.js?v=20261025-2"></script>
 <script src="scripts/leaderboard.js?v=20261025-4"></script>
-<script src="scripts/arcade-atlas.js?v=20261025-3"></script>
-<script src="scripts/arcade-art.js?v=20261025-8"></script>
+<script src="scripts/arcade-atlas.js?v=20261025-11"></script>
+<script src="scripts/arcade-art.js?v=20261025-11"></script>
 <script src="scripts/name-keyboard.js?v=20261025-7"></script>
 <script src="scripts/arcade-ui.js?v=20261025-7"></script>
-<script src="scripts/main.js?v=20261025-8"></script>
+<script src="scripts/main.js?v=20261025-11"></script>
 </body>
 </html>

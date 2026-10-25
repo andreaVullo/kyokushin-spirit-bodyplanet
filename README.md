@@ -1,6 +1,6 @@
 # Kyokushin Spirit — BodyPlanet Dojo
 
-Picchiaduro 2D arcade per browser, ambientato nel dojo Fitness & Wellness BodyPlanet di Catania. Nove karateka (dieci scelte, con due versioni di Marco Tabacco), un creatore di personaggi per la scalata Arcade dalla cintura bianca al 10° Dan, combinazioni di pugni e calci, guardia, salti, scatti e kaiten. Nessuna installazione o dipendenza esterna necessaria per giocare; la classifica pubblica richiede una connessione Internet.
+Picchiaduro 2D arcade per browser, ambientato nel dojo Fitness & Wellness BodyPlanet di Catania. Dieci karateka, un creatore di personaggi per la scalata Arcade dalla cintura bianca al 10° Dan, combinazioni di pugni e calci, guardia, salti, scatti e kaiten. Nessuna installazione o dipendenza esterna necessaria per giocare; la classifica pubblica richiede una connessione Internet.
 
 ## Gioca subito
 
@@ -28,13 +28,17 @@ Poi apri [http://127.0.0.1:8765](http://127.0.0.1:8765).
 
 ## Nuovi karateka
 
-Oltre ad Angelo Pierino e Samuel Villani sono disponibili Marco Tabacco, Gabriele Carbonaro, Leonardo Cappellani, Gabriele Randazzo, Matteo Spata, Oscar Gueli, Andrea Vullo e **Andrea Barbagallo (9 Kyu, cintura arancione)**. Marco Tabacco ha due versioni selezionabili, **collage** e **foto di gruppo**. I colori e le strisce delle cinture seguono i riferimenti forniti.
+Oltre ad Angelo Pierino e Samuel Villani sono disponibili Marco Tabacco, Gabriele Carbonaro, Leonardo Cappellani, Gabriele Randazzo, Matteo Spata, Oscar Gueli, Andrea Vullo e **Andrea Barbagallo (9 Kyu, cintura arancione)**. Marco Tabacco usa il riferimento del collage; la versione della foto di gruppo non compare nella selezione né tra gli avversari Arcade. I colori e le strisce delle cinture seguono i riferimenti forniti.
 
 Tutti possono combattere su entrambi i lati nelle modalità VS CPU, 2 giocatori e Allenamento, anche contro lo stesso personaggio. Entrano inoltre nel gruppo degli avversari della scalata Arcade, dove il giocatore usa il karateka creato. Ogni nuovo riferimento include pugni, calci, kaiten, passi, scatto, salto, parate, reazioni, caduta, KO, ripresa e vittoria. Il volto aggiornato di Gabriele Carbonaro è usato in tutte le sue sequenze.
 
 I 45 PNG sono conservati senza ricompressione dentro piccoli file JavaScript separati in `assets/karateka/`: questo permette di ritagliare correttamente le sagome anche aprendo il gioco da disco. Si caricano inizialmente solo i ritratti; le altre mosse si caricano per i due combattenti scelti, prima della presentazione VS. In caso di errore si può premere **Riprova**. Le animazioni degli incontri precedenti vengono liberate dalla memoria.
 
-La selezione, le tessere e il VS usano una stessa inquadratura per tutti: testa allineata, dimensioni proporzionate e centro del busto coerente. Il creatore Arcade mantiene la figura intera con i piedi allineati. `scripts/portrait-framing.js` gestisce queste viste senza modificare scala o animazioni in combattimento.
+La selezione, il VS e il creatore Arcade mostrano la figura intera con altezza, centro e linea dei piedi condivisi. Le tessere del roster usano invece la stessa inquadratura del volto. `scripts/portrait-framing.js` misura la sagoma visibile: il margine trasparente del foglio non influisce sulla scala.
+
+In combattimento `scripts/fighter-geometry.js` allinea gli appoggi alla sagoma effettiva, mantenendo piegamenti, salti e proporzioni delle pose. I corpi Arcade hanno una misura della testa coerente per genere; il collo modulare si fonde con la pelle e passa dietro al bavero, evitando tagli scuri e sovrapposizioni.
+
+`scripts/gi-branding.js` applica un unico emblema Kyokushin al petto, anche nei gi Arcade. La scritta segue la posa, rimane dietro a mani e braccia e conserva la lettura quando il personaggio cambia lato; le pose di schiena non ricevono una scritta frontale. La sorgente trasparente in `assets/branding/` è stata ricavata dal riferimento fotografico tramite ImageGen. I PNG originali sono conservati e la composizione avviene nel renderer.
 
 `scripts/karateka-atlas.js` contiene i rettangoli reali, gli appoggi e le scale. Tre fogli difesa hanno due pose che si toccano: per il ritorno in guardia e la vittoria vengono usate pose integre dello stesso personaggio. Le immagini restano inalterate e il renderer esclude i frammenti dei fotogrammi vicini. Il contatto dei nove attacchi coincide con le finestre del motore; danni e regole restano quelli originali.
 
@@ -180,6 +184,7 @@ Lo scenario riprende la palestra fornita come riferimento: tatami rosso, insegna
 | `.github/workflows/sync-arcade-leaderboard.yml` / `tools/sync-arcade-leaderboard.cjs` / `data/arcade-leaderboard.json` | Copia periodica e validata dei risultati pubblici su GitHub |
 | `scripts/flazio-launcher.js` | Launcher Flazio V8; la stessa sorgente è incorporata nei due frammenti da incollare |
 | `assets/karateka/` | Tutti i fogli dei nuovi karateka, caricati dal gioco quando servono |
+| `assets/branding/` | Emblema Kyokushin condiviso, PNG e involucro offline |
 | `assets/arcade/` | Fogli uomo/donna, teste, pose aggiuntive ed effetti visivi, con involucri JavaScript per l’uso offline |
 | `tests/flazio-host.html` | Pagina locale di prova con un contenitore adaptive largo 1200 px e trasformato |
 | `tests/flazio-component-host.html` | Prova del componente HTML annidato in un piccolo iframe Flazio; `?nonative=1` verifica il fallback senza fullscreen nativo |
@@ -187,6 +192,7 @@ Lo scenario riprende la palestra fornita come riferimento: tatami rosso, insegna
 | `tests/display-controller.test.cjs` / `tests/orientation-regression.test.cjs` / `tests/rotated-controls.test.cjs` | Gestione della vista, formati verticali/orizzontali e comandi dopo la rotazione |
 | `tests/roster-game.test.cjs` / `tests/karateka-renderer.test.cjs` | Roster e animazioni dei karateka |
 | `tests/arcade.test.cjs` / `tests/arcade-ui.test.cjs` / `tests/leaderboard*.test.cjs` / `server/sites/tests/` | Progressione, interfaccia, classifica anonima, archivio GitHub e database SQLite |
+| `tests/selection-standardization.html` / `tests/roster-grounding.html` / `tests/arcade-neck-audit.html` | Verifica visiva e geometrica di selezione, VS, appoggi, colli e capigliature |
 | `tests/render-preview.html` | Anteprima delle pose del roster nelle due direzioni |
 | `Incorpora.html` | Generatore dell’iframe generico con anteprima e copia del codice |
 | `INCORPORA.txt` | Istruzioni di pubblicazione e di inserimento nel sito |
@@ -253,4 +259,4 @@ Ricerca effettuata il **3 ottobre 2026**. Il grado di Samuel e l’ordine dei ri
 
 Le scie vengono disegnate soltanto nella finestra attiva della tecnica, seguendo il pugno o il piede visibile della posa, con scala, direzione e rotazione del karateka. Un contatto o un'interruzione elimina subito la scia. Gli impatti e le parate seguono il bersaglio durante il contraccolpo; la polvere compare soltanto negli atterraggi pesanti. Le esplosioni a terra non vengono usate sui colpi al corpo e gli effetti sprite sostituiscono le particelle duplicate. Pausa, hitstop, cambio round e movimento ridotto sono rispettati.
 
-`tests/combat-vfx-preview.html` verifica 234 agganci (nove mosse, undici karateka più i due corpi Arcade, entrambe le direzioni) e permette di animare le tecniche. `tests/combat-vfx.test.cjs` copre finestre attive, interruzioni, impatti, inseguimento del bersaglio, pausa e trasformazioni delle pose.
+`tests/combat-vfx-preview.html` verifica 216 agganci (nove mosse, dieci karateka più i due corpi Arcade, entrambe le direzioni) e permette di animare le tecniche. `tests/combat-vfx.test.cjs` copre finestre attive, interruzioni, impatti, inseguimento del bersaglio, pausa e trasformazioni delle pose.

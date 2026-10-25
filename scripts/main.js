@@ -241,7 +241,7 @@
     const surface=typeof id==='string'?$(id):id;
     if(!surface||!ready||!window.FighterArt)return;
     const p=surface.getContext('2d');p.clearRect(0,0,surface.width,surface.height);
-    if(window.FighterArt.drawSelectionPortrait)window.FighterArt.drawSelectionPortrait(p,fighter,0,0,surface.width,surface.height,{facing,bust});
+    if(window.FighterArt.drawSelectionPortrait)window.FighterArt.drawSelectionPortrait(p,fighter,0,0,surface.width,surface.height,{facing,bust,full:!bust});
     else window.FighterArt.drawPortrait(p,fighter,0,0,surface.width,surface.height);
   }
   function drawFrontPortraits() {

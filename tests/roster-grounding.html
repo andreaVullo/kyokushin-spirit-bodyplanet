@@ -1,0 +1,53 @@
+<!doctype html><meta charset="utf-8"><title>Standardizzazione e appoggio karateka</title>
+<style>body{margin:0;padding:20px;background:#17222c;color:#f5e9d2;font:14px system-ui}#status{white-space:pre-wrap}canvas{width:100%;max-width:1440px;background:#d8d1c6}h2{font-size:18px}</style>
+<h1>Scala comune e suole sul tatami</h1><pre id="status">Verifica…</pre><div id="portraits"></div>
+<script src="load-real-art.js"></script>
+<script>
+(async () => {
+  const loaded = await loadRealFighterArt();
+  const entries = Object.entries(KyokushinRoster).filter(([, character]) => character.assetId);
+  const results = [], failures = [], moves = Object.keys(KyokushinMoves);
+  const sheet = document.createElement('canvas'); sheet.width = entries.length * 180; sheet.height = 300;
+  document.querySelector('#portraits').append(sheet); const preview = sheet.getContext('2d');
+  const probe = document.createElement('canvas'); probe.width = 600; probe.height = 320;
+  const context = probe.getContext('2d', { willReadFrequently: true });
+  const bounds = () => {
+    const pixels = context.getImageData(0, 0, probe.width, probe.height).data;
+    let top = probe.height, bottom = 0;
+    for (let y = 0; y < probe.height; y++) for (let x = 0; x < probe.width; x++) {
+      if (pixels[(y * probe.width + x) * 4 + 3] < 100) continue;
+      top = Math.min(top, y); bottom = Math.max(bottom, y + 1);
+    }
+    return { top, bottom, height: bottom - top };
+  };
+  for (const [ordinal, [id, character]] of entries.entries()) {
+    await FighterArt.loadFighters([id]);
+    const poses = [{ state: 'idle' }, { state: 'block' }, { state: 'legBlock' },
+      ...[0, 1, 2, 3].map(step => ({ state: 'walk', walkCycle: step * Math.PI / 2 })),
+      ...[0, .3, .6, .9].map(dashProgress => ({ state: 'dash', dashProgress })),
+      { state: 'hit', stun: .2 }, { state: 'ko', hp: 0, recovery: .3 }, { state: 'victory' }];
+    for (const move of moves) {
+      const definition = KyokushinMoves[move], start = definition.start / definition.duration, end = definition.end / definition.duration;
+      for (const moveProgress of [0, start * .7, (start + end) / 2, (end + 1) / 2]) poses.push({ state: 'attack', move, moveProgress });
+    }
+    for (const facing of [1, -1]) for (const pose of poses) {
+      const fighter = { id, x: 300, y: 280, hp: 1000, stun: 0, recovery: 0, walkCycle: 0, facing, ...pose };
+      context.clearRect(0, 0, probe.width, probe.height);
+      context.globalAlpha = 0; FighterArt.draw(context, fighter, 0); context.globalAlpha = 1;
+      FighterArt.draw(context, fighter, .2);
+      const occupied = bounds();
+      if (Math.abs(occupied.bottom - fighter.y) > 1) failures.push(`${id}/${pose.move || pose.state}/${pose.moveProgress || 0}: floor ${occupied.bottom}`);
+      if (pose.state === 'idle' && Math.abs(occupied.height - 228) > 1) failures.push(`${id}: idle height ${occupied.height}`);
+      results.push({ id, pose: pose.move || pose.state, facing, height: occupied.height, floor: occupied.bottom });
+    }
+    preview.save(); preview.translate(ordinal * 180, 0);
+    preview.strokeStyle = '#897c68'; preview.beginPath(); preview.moveTo(0, 260); preview.lineTo(180, 260); preview.stroke();
+    FighterArt.draw(preview, { id, x: 90, y: 260, facing: 1, state: 'idle', scale: .85 }, 0);
+    preview.fillStyle = '#312c24'; preview.font = '12px system-ui'; preview.fillText(character.name, 5, 286, 170);
+    preview.restore();
+  }
+  const status = document.querySelector('#status'); status.dataset.result = failures.length ? 'FAIL' : 'PASS';
+  status.textContent = JSON.stringify({ result: status.dataset.result, fighters: entries.length, poses: results.length, loaded,
+    idleHeights: results.filter(row => row.pose === 'idle' && row.facing === 1).map(({ id, height }) => ({ id, height })), failures }, null, 2);
+})().catch(error => { document.querySelector('#status').dataset.result = 'FAIL'; document.querySelector('#status').textContent = error.stack; });
+</script>

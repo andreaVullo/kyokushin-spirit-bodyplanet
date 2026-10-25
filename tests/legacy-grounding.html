@@ -1,0 +1,77 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><title>Angelo e Samuel: appoggio e animazioni</title>
+<style>body{margin:0;padding:20px;background:#111c27;color:#eee3ce;font:14px system-ui}h1{font-size:24px;margin:0 0 10px}#status{color:#eaca80}table{border-collapse:collapse;width:100%;max-width:900px}td,th{padding:5px 10px;border-bottom:1px solid #3f5060;text-align:left}canvas{display:block;width:100%;max-width:1440px;background:#dcd5c8;margin:18px 0}pre{white-space:pre-wrap;font-size:11px}</style>
+<h1>Angelo e Samuel · controllo appoggio reale</h1><p id="status">Caricamento renderer e sprite…</p>
+<div id="summary"></div><canvas id="preview" width="1440" height="600"></canvas>
+<details><summary>Rapporto completo</summary><pre id="report"></pre></details>
+<script src="load-real-art.js"></script><script>
+(async () => {
+  const loaded = await loadRealFighterArt(); await FighterArt.load();
+  const cases = [], TAU = Math.PI * 2;
+  for (const time of [0, .2, .5, 1, 1.5]) {
+    cases.push({ label: 'idle', time, state: 'idle' });
+    cases.push({ label: 'block', time, state: 'block' });
+    cases.push({ label: 'legBlock', time, state: 'legBlock', legBlocking: true });
+  }
+  for (let step = 0; step < 8; step++) {
+    cases.push({ label: 'walk', state: 'walk', time: .5, walkCycle: step * TAU / 8 });
+    cases.push({ label: 'guard-walk', state: 'block', time: .5, walkCycle: step * TAU / 8, moving: true });
+  }
+  for (const dashBack of [false, true]) for (const dashProgress of [0, .125, .25, .375, .5, .625, .75, .875, 1])
+    cases.push({ label: dashBack ? 'dash-back' : 'dash', state: 'dash', time: .5, dashProgress, dashBack });
+  for (const state of ['jump', 'hit', 'victory']) cases.push({ label: state, state, time: .5 });
+  for (const time of [0, .08, .16, .24, .32, .5]) cases.push({ label: 'ko', state: 'ko', time, hp: 0, knockdown: true });
+  for (const move of Object.keys(KyokushinMoves)) {
+    const d = KyokushinMoves[move], start = d.start / d.duration, end = d.end / d.duration;
+    for (const moveProgress of [0, .01, .05, start * .7, start, (start + end) / 2, end, end + (1 - end) * .5, .94, 1])
+      cases.push({ label: move, state: 'attack', move, moveProgress, time: .5 });
+  }
+  const surface = document.createElement('canvas'); surface.width = 700; surface.height = 520;
+  const ctx = surface.getContext('2d', { willReadFrequently: true }), results = [], failures = [];
+  function bounds() {
+    const pixels = ctx.getImageData(0, 0, surface.width, surface.height).data;
+    let left = surface.width, top = surface.height, right = 0, bottom = 0;
+    for (let y = 0; y < surface.height; y++) for (let x = 0; x < surface.width; x++) if (pixels[(y * surface.width + x) * 4 + 3] >= 100) {
+      left = Math.min(left, x); top = Math.min(top, y); right = Math.max(right, x + 1); bottom = Math.max(bottom, y + 1);
+    }
+    return { left, top, right, bottom, height: bottom - top };
+  }
+  for (const id of ['angelo', 'samuel']) for (const facing of [1, -1]) for (const sample of cases) {
+    const f = { id, x: 350, y: 400, facing, hp: 1000, walkCycle: 0, hitFlash: 0, guardFlash: 0, stun: 0, ...sample };
+    ctx.clearRect(0, 0, surface.width, surface.height);
+    const cycle = f.walkCycle;
+    if (sample.moving) f.walkCycle -= .1;
+    ctx.globalAlpha = 0; FighterArt.draw(ctx, f, 0); ctx.globalAlpha = 1;
+    f.walkCycle = cycle;
+    FighterArt.draw(ctx, f, sample.time);
+    const actual = bounds(), offset = actual.bottom - f.y;
+    const row = { id, facing, pose: sample.label, time: sample.time, progress: sample.moveProgress ?? sample.dashProgress ?? sample.walkCycle ?? null, offset, height: actual.height };
+    if (actual.bottom <= actual.top || actual.left <= 0 || actual.right >= surface.width || actual.top <= 0 || actual.bottom >= surface.height) failures.push({ ...row, reason: 'empty-or-clipped' });
+    // Quiet standing and attacks without an authored lean must put their sole
+    // directly on the floor. Locomotion/KO/somersault are measured separately.
+    const stable = sample.state === 'attack' && sample.move !== 'kaiten' || ['hit', 'victory', 'jump'].includes(sample.state);
+    const balanced = ['idle', 'block', 'legBlock'].includes(sample.label);
+    if (stable && Math.abs(offset) > 1) failures.push({ ...row, reason: 'grounded-attack-floor' });
+    if (balanced && Math.abs(offset) > 2) failures.push({ ...row, reason: 'balance-outside-2px' });
+    if (sample.state === 'dash' && offset > 2 || sample.state === 'ko' && Math.abs(offset) > 2) failures.push({ ...row, reason: 'transformed-grounding' });
+    results.push(row);
+  }
+  const groups = [...new Set(results.map(row => row.pose))].map(pose => {
+    const rows = results.filter(row => row.pose === pose);
+    return { pose, min: Math.min(...rows.map(row => row.offset)), max: Math.max(...rows.map(row => row.offset)), heightMin: Math.min(...rows.map(row => row.height)), heightMax: Math.max(...rows.map(row => row.height)), samples: rows.length };
+  });
+  document.querySelector('#summary').innerHTML = '<table><thead><tr><th>Posa</th><th>Suola rispetto al tatami</th><th>Altezza</th><th>Prove</th></tr></thead><tbody>' + groups.map(row => `<tr><td>${row.pose}</td><td>${row.min}…${row.max} px</td><td>${row.heightMin}…${row.heightMax} px</td><td>${row.samples}</td></tr>`).join('') + '</tbody></table>';
+  const preview = document.querySelector('#preview').getContext('2d');
+  const examples = [{ state: 'idle', time: 0 }, { state: 'block', time: .2 }, { state: 'walk', walkCycle: Math.PI / 2, time: .5 }, { state: 'dash', dashProgress: .5, time: .5 }, { state: 'attack', move: 'mawashi', moveProgress: .4, time: .5 }, { state: 'ko', hp: 0, time: .5 }];
+  for (const [row, id] of ['angelo', 'samuel'].entries()) for (const [column, sample] of examples.entries()) {
+    const x = column * 240, y = row * 300; preview.save(); preview.translate(x, y);
+    preview.strokeStyle = '#84714f'; preview.beginPath(); preview.moveTo(0, 270); preview.lineTo(240, 270); preview.stroke();
+    const f = { id, x: 120, y: 270, facing: row ? -1 : 1, hp: 1000, walkCycle: 0, ...sample };
+    preview.globalAlpha = 0; FighterArt.draw(preview, f, 0); preview.globalAlpha = 1; FighterArt.draw(preview, f, sample.time);
+    preview.fillStyle = '#3d3529'; preview.font = '13px system-ui'; preview.fillText(id + ' · ' + (sample.move || sample.state), 8, 20); preview.restore();
+  }
+  const report = { result: failures.length ? 'FAIL' : 'PASS', renders: results.length, loaded, failures, groups, results };
+  document.querySelector('#report').textContent = JSON.stringify(report, null, 2);
+  const status = document.querySelector('#status'); status.dataset.result = report.result;
+  status.textContent = `${report.result} · ${results.length} render · 2 karateka · entrambe le direzioni · ${failures.length} errori di appoggio. Sollevamenti intenzionali misurati nella tabella.`;
+})().catch(error => { document.querySelector('#status').dataset.result = 'FAIL'; document.querySelector('#status').textContent = error.stack; });
+</script></html>
