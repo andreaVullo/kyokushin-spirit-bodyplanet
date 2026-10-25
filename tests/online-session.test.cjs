@@ -38,7 +38,7 @@ function fixture(role = 'host', prepare = async () => {}, options = {}) {
     dispose() { this.disposed = true; } pause() {} clearInput() {} setInput() {} update() { this.updates++; }
     setReconnecting(value) { this.reconnecting = value; }
   }
-  const session = new OnlineSession({ UI, Client, Engine, stages: options.stages, roster: { angelo: {}, samuel: {} }, endpoint: 'https://example.test', game: { getState: () => ({ fighters: [] }) },
+  const session = new OnlineSession({ UI, Client, Engine, stages: options.stages, roster: options.roster || { angelo: {}, samuel: {} }, endpoint: 'https://example.test', game: { getState: () => ({ fighters: [] }) },
     setTimeout(fn, ms) { const id = ++timerId; timers.set(id, { fn, ms }); return id; }, clearTimeout(id) { timers.delete(id); },
     onOpen() {}, onBack() {}, onLobby() { calls.lobby++; }, onPrepare(info) { calls.prepare.push(clone(info)); return prepare(info); },
     onVersus(info) { calls.versus.push(clone(info)); }, onStart(info) { calls.start.push(clone(info)); }, onPause(...args) { calls.pause.push(args); }
@@ -238,4 +238,25 @@ test('stage selection survives polling and return to room but resets when leavin
   await f.session.returnToRoom();
   assert.equal(f.session.ui.room.stageId, 'rifugio-gualberto');
   f.session.leave(); assert.equal(f.session.stageId, 'dojo'); assert.equal(f.session.remoteStageIds, null);
+});
+
+
+test('custom belts remain distinct through preparation, match start and rematch', async () => {
+  const fighters = ['custom-male-2', 'custom-male-20'];
+  const f = fixture('host', async () => {}, { roster: Object.fromEntries(fighters.map(id => [id, {}])) });
+  const client = await f.enter();
+  client.room.players.forEach((player, i) => { player.fighter = fighters[i]; });
+  f.ready(); await tick();
+  assert.deepEqual(f.calls.prepare[0].fighters, fighters);
+  f.session.receive({ type: 'online-loaded', epoch: 1 }); f.runTimer(1400);
+  assert.deepEqual(f.calls.start[0].fighters, fighters);
+  f.session.showResult(); f.session.rematch(); f.session.receive({ type: 'online-rematch', epoch: 1 }); await tick();
+  assert.deepEqual(f.calls.prepare[1].fighters, fighters); assert.equal(f.calls.prepare[1].epoch, 2);
+});
+test('changing a custom belt revokes readiness and updates only the local player', async () => {
+  const f = fixture(), client = await f.enter();
+  client.room.players[0].ready = true;
+  await f.session.ui.options.onUpdate({ fighter: 'custom-female-14' });
+  assert.deepEqual(client.updates.at(-1), { fighter: 'custom-female-14', ready: false });
+  assert.equal(client.room.players[1].fighter, 'samuel');
 });

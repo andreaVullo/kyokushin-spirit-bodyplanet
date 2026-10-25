@@ -37,3 +37,11 @@ body.landscape-layout.landscape-narrow .online-fighters{grid-template-columns:re
 body.landscape-layout.landscape-narrow .online-room-heading{align-items:flex-start}
 body.landscape-layout.landscape-narrow .online-room-heading>div:last-child{flex-direction:column;gap:5px}
 body.landscape-layout.landscape-flat .online-preview{height:80px}
+.online-custom-options{margin-top:12px;border:1px solid #cab17b66;padding:0 10px;background:#0d1722}
+.online-custom-options[hidden]{display:none}
+.online-custom-options summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font:700 11px/1.4 Arial,sans-serif;color:#f7d998;list-style:none}
+.online-custom-options summary:focus-visible{outline:2px solid #edc87e;outline-offset:2px}
+.online-custom-options p{font:11px/1.4 Arial,sans-serif;color:#c8d2d8;margin:0 0 10px}
+.online-custom-ranks{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:7px;padding-bottom:10px}
+.online-custom-ranks>button{min-height:44px;min-width:0;text-align:left;font-size:10px;line-height:1.4;white-space:normal;border-left:6px solid var(--rank-color)}
+.online-custom-ranks>[aria-pressed=true]{background:#554c3e;outline:2px solid #edc87e;outline-offset:-2px;color:#ffe5ae}

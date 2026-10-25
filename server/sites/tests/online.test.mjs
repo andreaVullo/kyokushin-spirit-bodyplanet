@@ -171,3 +171,28 @@ test('new white-belt karateka can create and join an online room', async () => {
   assert.equal(guest.status, 200);
   assert.deepEqual(guest.data.room.players.map(p => p.fighter), ['emanuele-micalizzi', 'francesco-privitera-1']);
 });
+
+
+test('online custom variants persist independently and changing belt resets readiness', async () => {
+  const env = { DB: database() };
+  const host = (await call(env, '/online/rooms', { body: player({ fighter: 'custom-male-0' }) })).data;
+  const path = `/online/rooms/${host.code}`;
+  const joined = await call(env, path + '/join', { body: player({ fighter: 'custom-male-20' }) });
+  assert.equal(joined.status, 200);
+  assert.deepEqual(joined.data.room.players.map(p => p.fighter), ['custom-male-0', 'custom-male-20']);
+  await call(env, path, { token: host.token, body: { action: 'update', ready: true } });
+  const changed = await call(env, path, { token: host.token, body: { action: 'update', fighter: 'custom-female-2' } });
+  assert.equal(changed.status, 200); assert.equal(changed.data.room.players[0].ready, false);
+  assert.deepEqual(changed.data.room.players.map(p => p.fighter), ['custom-female-2', 'custom-male-20']);
+});
+test('only the canonical custom genders and 21 ranks can create or update a room', async () => {
+  for (const gender of ['male', 'female']) for (let rank = 0; rank <= 20; rank++) {
+    const env = { DB: database() };
+    assert.equal((await call(env, '/online/rooms', { body: player({ fighter: `custom-${gender}-${rank}` }) })).status, 201);
+  }
+  for (const fighter of ['custom-male-21', 'custom-female--1', 'custom-male-01', 'custom-other-0', 'custom-male-NaN', 'custom-female-1.5']) {
+    const env = { DB: database() }, { host, path } = await pair(env);
+    assert.equal((await call(env, '/online/rooms', { body: player({ fighter }) })).status, 400);
+    assert.equal((await call(env, path, { token: host.token, body: { action: 'update', fighter } })).status, 400);
+  }
+});

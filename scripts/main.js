@@ -101,6 +101,7 @@
     onFinalLeaderboard: ()=>showDialog('leaderboard-dialog'),
     onRetry: loadArcadePreview
   });
+  window.DojoOnlineCustom?.install(game,characters,window.ArcadeArt);
   online = new window.DojoOnlineSession({game,roster:characters,endpoint:window.KYOKUSHIN_ONLINE_ENDPOINT,
     onOpen:showOnline,onBack:()=>showTitle(),onEvent,
     onLobby:()=>{active=false;paused=false;clearCombatInput();clearMatchPresentation();game.pause(true);setScreen('online');$('status-label').textContent='DOJO ONLINE';},
@@ -298,7 +299,8 @@
     instruction.append(targets);
     const hint=document.createElement('small');hint.textContent='← → SCEGLI · ↑ ↓ CAMBIA LATO';instruction.append(hint);
     const grid=panel.querySelector('.fighter-select');grid.replaceChildren();
-    for(const [id,character] of Object.entries(characters)){
+    for(const id of rosterIds){
+      const character=characters[id];
       const button=document.createElement('button');button.type='button';button.className='fighter-option';button.dataset.fighter=id;
       button.setAttribute('aria-label','Scegli '+character.name+(character.variant?' · '+character.variant:'')+', '+character.belt);
       const art=document.createElement('canvas');art.width=300;art.height=260;art.dataset.rosterPortrait=id;art.setAttribute('aria-hidden','true');

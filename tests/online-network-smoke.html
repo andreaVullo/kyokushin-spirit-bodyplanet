@@ -2,11 +2,12 @@
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verifica rete online reale</title><style>
 body{font:16px/1.5 system-ui;margin:0;background:#101923;color:#edf4ed;padding:24px}main{max-width:1000px;margin:auto}button{padding:14px 24px;font:700 18px system-ui;background:#f4d680;color:#14212b;border:0;border-radius:8px;cursor:pointer}button:disabled{opacity:.5}pre{white-space:pre-wrap;background:#071018;padding:20px;border:1px solid #586571;border-radius:8px}.pass{color:#8fe3a5}.fail{color:#ff9a94}#state{font-size:24px;font-weight:800}p{max-width:850px}small{color:#b9c3ca}
 </style></head><body><main><h1>Verifica online: due giocatori reali</h1><p>Questa prova apre due connessioni WebRTC e usa il servizio locale. Verifica ricerca avversario, mosse, pausa condivisa, ritorno nella stanza, rivincita e disconnessione in 1 vs 1 e allenamento.</p><p><small>Fixture di collaudo: la fine partita viene impostata esplicitamente per provare la rivincita. Nessuna classifica viene letta o modificata. Non usa il servizio pubblico.</small></p><button id="run">RUN — AVVIA VERIFICA</button><p id="state" role="status">Pronto</p><pre id="output">In attesa.</pre><pre id="measurements" hidden></pre></main>
-<script src="../scripts/roster.js"></script><script src="../scripts/stages.js"></script><script src="../scripts/game.js"></script><script src="../scripts/online-game.js"></script><script src="../scripts/online-client.js"></script><script src="../scripts/online-session.js"></script>
+<script src="../scripts/roster.js"></script><script src="../scripts/stages.js"></script><script src="../scripts/arcade.js"></script><script src="../scripts/online-custom.js"></script><script src="../scripts/game.js"></script><script src="../scripts/online-game.js"></script><script src="../scripts/online-client.js"></script><script src="../scripts/online-session.js"></script>
 <script>
 'use strict';
 const runButton=document.getElementById('run'),stateLabel=document.getElementById('state'),output=document.getElementById('output');
-const endpoint='http://127.0.0.1:8789';
+const endpoint='http://127.0.0.1:8789', customTest=new URLSearchParams(location.search).has('custom');
+const testRoster={...KyokushinRoster,...(customTest?DojoOnlineCustom.roster:{})};
 let currentPeers=[],running=false,results=[];
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 function log(text){output.textContent+=text+'\n';}
@@ -19,7 +20,8 @@ class FixtureUI{
 function peer(label){
  const value={label,events:[],starts:0,paused:false,failure:null};
  value.game=new KyokushinGame({onEvent:event=>value.events.push(event)});
- value.session=new DojoOnlineSession({game:value.game,roster:KyokushinRoster,endpoint,UI:FixtureUI,
+ if(customTest)DojoOnlineCustom.install(value.game,{}, {setCharacter(){}});
+ value.session=new DojoOnlineSession({game:value.game,roster:testRoster,endpoint,UI:FixtureUI,
    onOpen(){},onBack(){},onLobby(){value.game.pause(true);},onPrepare:async info=>{value.stageId=info.stageId;},onVersus(){},onStart(){value.starts++;},onPause:paused=>{value.paused=paused;},onEvent:event=>value.events.push(event)});
  value.session.ui.owner=value;value.session.open();return value;
 }
@@ -27,13 +29,14 @@ function describe(value){return {role:value.session.client?.role,phase:value.ses
 async function cleanup(){const values=currentPeers;currentPeers=[];for(const value of values){const client=value.session.client;value.session.leave();if(client)await client.leave();}await sleep(60);}
 async function checkMode(mode){
  const one=peer('A'),two=peer('B');currentPeers=[one,two];
+ const testIds=customTest?(mode==='training'?['custom-male-2','custom-male-13']:['custom-male-0','custom-female-20']):['angelo','samuel'];
  log('\n'+(mode==='training'?'ALLENAMENTO — matchmaking':'1 VS 1 — ingresso con codice stanza'));
  if(mode==='versus'){
-  await one.session.enter('create',{name:'QA Uno',fighter:'angelo',mode});
-  await two.session.enter('join',{name:'QA Due',fighter:'samuel',mode,code:one.session.room.code});
+  await one.session.enter('create',{name:'QA Uno',fighter:testIds[0],mode});
+  await two.session.enter('join',{name:'QA Due',fighter:testIds[1],mode,code:one.session.room.code});
  }else{
-  await one.session.enter('matchmake',{name:'QA Uno',fighter:'angelo',mode});
-  await two.session.enter('matchmake',{name:'QA Due',fighter:'samuel',mode});
+  await one.session.enter('matchmake',{name:'QA Uno',fighter:testIds[0],mode});
+  await two.session.enter('matchmake',{name:'QA Due',fighter:testIds[1],mode});
  }
  await until(()=>one.session.room?.players.length===2&&two.session.room?.players.length===2&&one.session.client?.connected&&two.session.client?.connected,'due connessioni WebRTC',30000);
  assert(one.session.room.code===two.session.room.code,'I due karateka devono trovarsi nella stessa stanza');
@@ -49,6 +52,8 @@ async function checkMode(mode){
  assert(currentPeers.every(p=>p.stageId===stageId),'Arena scelta uguale sui due dispositivi');
  if(mode==='training')assert(host.game.state.timer===Infinity&&guest.game.state.timer===Infinity,'Allenamento senza tempo');
  const firstEpoch=host.session.epoch;
+ assert(currentPeers.every(p=>p.game.state.fighters.map(f=>f.id).join(',')===testIds.join(',')),'Personaggi e cinture non sincronizzati');
+ log('✓ Personaggi e cinture: '+testIds.join(' / '));
  log('✓ Entrambi pronti · VS · combattimento sincronizzato');
  log('✓ Arena '+DojoStages.get(stageId).name+' · scelta e caricamento sincronizzati');
  host.session.setInput('right',true);guest.session.setInput('left',true);

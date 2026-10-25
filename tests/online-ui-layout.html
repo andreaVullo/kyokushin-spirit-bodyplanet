@@ -1,9 +1,10 @@
 <!doctype html><html lang="it"><meta charset="utf-8"><title>Verifica lobby e tastiere online mobile</title>
 <style>body{font:14px system-ui;background:#111c27;color:#f5e8c8;margin:16px}iframe{border:1px solid #9b875e;margin:16px 0;display:block}pre{white-space:pre-wrap}</style>
 <h1>Lobby online · telefono, rotazione bloccata e tastiere</h1><pre id="status">Caricamento…</pre><div id="fixtures"></div>
-<script src="load-real-art.js"></script><script>
+<script src="../scripts/arcade.js"></script><script src="../scripts/online-custom.js"></script><script src="load-real-art.js"></script><script>
 (async()=>{
  await loadRealFighterArt(); await FighterArt.load();
+ DojoOnlineCustom.install(new KyokushinGame(), {}, ArcadeArt);
  const html=await fetch('../Gioca.html').then(r=>r.text()),parsed=new DOMParser().parseFromString(html,'text/html');
  const styles=[...parsed.querySelectorAll('style,link[rel=stylesheet]')].map(e=>e.outerHTML).join('')+'<link rel="stylesheet" href="styles/online.css">';
  const cases=[{w:710,h:266},{w:568,h:240},{w:844,h:280},{w:320,h:568},{w:390,h:844,virtual:true}];
@@ -14,14 +15,14 @@
   const classes=['front-online','embedded','touch-active','force-touch',land?'landscape-layout':'',lh<=330?'landscape-tiny':'',lh<=380&&land?'landscape-short':'',c.virtual?'virtual-landscape landscape-requested':''].join(' ');
   const variables=`--view-width:${c.w}px;--view-height:${c.h}px;--layout-width:${lw}px;--layout-height:${lh}px;--view-left:0px;--view-top:0px;`;
   const load=new Promise(resolve=>frame.addEventListener('load',resolve,{once:true}));
-  frame.srcdoc=`<!doctype html><html style="${variables}"><head><base href="${new URL('../',location.href)}"><meta name="viewport" content="width=device-width,initial-scale=1">${styles}</head><body class="${classes}"><main id="game-shell"><section id="arcade" class="arcade expanded"><header class="arena-topline">BODYPLANET</header><div id="viewport" class="viewport"></div></section><div id="result-panel" hidden></div></main><script src="scripts/roster.js"><\/script><script src="scripts/name-keyboard.js"><\/script><script src="scripts/stages.js"><\/script><script src="scripts/online-ui.js"><\/script><script>window.calls=[];window.fixtureUI=new DojoOnlineUI({roster:KyokushinRoster,art:parent.FighterArt,onCreate:v=>calls.push(v),onReady:v=>calls.push(v),onStage:v=>calls.push({stageId:v})});fixtureUI.showHome({name:'ANDREA',fighter:'angelo',code:'AB23XY'});fixtureUI.nameKeys.setTouch(true);fixtureUI.codeKeys.setTouch(true);<\/script></body></html>`;
+  frame.srcdoc=`<!doctype html><html style="${variables}"><head><base href="${new URL('../',location.href)}"><meta name="viewport" content="width=device-width,initial-scale=1">${styles}</head><body class="${classes}"><main id="game-shell"><section id="arcade" class="arcade expanded"><header class="arena-topline">BODYPLANET</header><div id="viewport" class="viewport"></div></section><div id="result-panel" hidden></div></main><script src="scripts/roster.js"><\/script><script src="scripts/name-keyboard.js"><\/script><script src="scripts/stages.js"><\/script><script src="scripts/online-ui.js"><\/script><script>window.DojoArcade=parent.DojoArcade;window.ArcadeArt=parent.ArcadeArt;window.calls=[];window.fixtureUI=new DojoOnlineUI({roster:{...KyokushinRoster,...parent.DojoOnlineCustom.roster},art:parent.FighterArt,onCreate:v=>calls.push(v),onUpdate:v=>calls.push(v),onReady:v=>calls.push(v),onStage:v=>calls.push({stageId:v})});fixtureUI.showHome({name:'ANDREA',fighter:'angelo',code:'AB23XY'});fixtureUI.nameKeys.setTouch(true);fixtureUI.codeKeys.setTouch(true);<\/script></body></html>`;
   await load;await new Promise(r=>frame.contentWindow.requestAnimationFrame(()=>frame.contentWindow.requestAnimationFrame(r)));
   const d=frame.contentDocument,ui=frame.contentWindow.fixtureUI,errors=[],expect=(ok,msg)=>{if(!ok)errors.push(msg)};
   const rect=e=>e.getBoundingClientRect();
   const panel=d.querySelector('#online-lobby'),scroll=d.querySelector('.online-scroll'),footer=d.querySelector('.online-footer');
   expect(scroll.offsetTop+scroll.offsetHeight<=footer.offsetTop+1,'azioni sovrapposte alla zona scorrevole');
   expect(footer.offsetTop+footer.offsetHeight<=panel.offsetHeight+1,'azioni fuori dalla lobby');
-  expect(d.querySelectorAll('[data-online-fighter]').length===10,'roster non completo');
+  expect(d.querySelectorAll('[data-online-fighter]').length===14,'roster non completo');
   scroll.scrollTop=scroll.scrollHeight;
   expect(d.querySelector('.online-roster').offsetTop+d.querySelector('.online-roster').offsetHeight<=scroll.offsetTop+scroll.scrollTop+scroll.clientHeight+2,'ultimo karateka irraggiungibile');
   scroll.scrollTop=0;
@@ -58,6 +59,27 @@
   scroll.scrollTop=scroll.scrollHeight;
   expect(d.querySelector('.online-roster').offsetTop+d.querySelector('.online-roster').offsetHeight<=scroll.offsetTop+scroll.scrollTop+scroll.clientHeight+2,'ultimo karateka irraggiungibile con arene');
   expect(footer.offsetTop+footer.offsetHeight<=panel.offsetHeight+1,'pronto fuori lobby con arene');
+  ui.showHome({name:'ANDREA',fighter:'custom-female-0'});
+  const grades=d.querySelector('.online-custom-options'); grades.open=true;
+  expect(!grades.hidden,'gradi custom nascosti');
+  expect(d.querySelectorAll('[data-online-rank]').length===21,'gradi incompleti');
+  d.querySelector('[data-online-rank="20"]').click(); await ui.renderPreviews();
+  expect(ui.profileValue().fighter==='custom-female-20','10 Dan non inviato');
+  expect(d.querySelector('[data-online-fighter="custom-female-0"]').getAttribute('aria-pressed')==='true','selezione custom persa cambiando grado');
+  expect(d.querySelector('#online-profile-belt').textContent.includes('10 DAN'),'grado non visibile');
+  expect([...d.querySelectorAll('[data-online-rank]')].every(button=>button.offsetHeight>=44),'tasti cintura troppo piccoli');
+  expect(panel.scrollWidth<=panel.clientWidth+1,'gradi causano overflow laterale');
+  scroll.scrollTop=scroll.scrollHeight;
+  expect(grades.offsetTop+grades.offsetHeight<=scroll.scrollTop+scroll.clientHeight+scroll.offsetTop+2,'ultimo grado irraggiungibile');
+  expect(scroll.offsetTop+scroll.offsetHeight<=footer.offsetTop+1,'gradi sovrapposti al footer');
+  const art=d.querySelector('#online-profile-art'),pixels=art.getContext('2d').getImageData(0,0,art.width,art.height).data;
+  expect(pixels.some((value,index)=>index%4===3&&value>0),'sprite custom vuoto');
+  ui.showRoom({code:'AB23XY',mode:'training',role:'guest',players:[{slot:0,name:'MARCO',fighter:'custom-female-2',ready:true},{slot:1,name:'ANDREA',fighter:'custom-female-20',ready:false}]});
+  await ui.renderPreviews();
+  expect([...d.querySelectorAll('.online-player canvas')].map(canvas=>canvas.dataset.onlinePortrait).join(',')==='custom-female-2,custom-female-20','cinture stesso sesso si sovrascrivono');
+  expect(d.querySelectorAll('.online-player span')[0].textContent.includes('9 KYU'),'grado avversario assente');
+  d.querySelector('[data-online-rank="3"]').click();expect(frame.contentWindow.calls.at(-1)?.fighter==='custom-female-3','cambio cintura non inviato nella stanza');
+  d.querySelector('[data-online-fighter="angelo"]').click();expect(grades.hidden,'selettore cinture su personaggio normale');
   reports.push({case:frame.title,pass:!errors.length,errors});document.querySelector('#status').textContent=JSON.stringify(reports,null,2);
  }
  document.querySelector('#status').dataset.result=reports.every(r=>r.pass)?'PASS':'FAIL';

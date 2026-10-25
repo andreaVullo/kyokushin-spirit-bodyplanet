@@ -28,6 +28,7 @@
       this.stages = options.stages || global.DojoStages;
       this.art = options.art || global.FighterArt;
       this.profile = { name: '', fighter: Object.keys(this.roster)[0] || 'angelo', mode: 'versus' };
+      this.customRanks = { male: 0, female: 0 };
       this.busy = false; this.room = null; this.view = 'home'; this.previewToken = 0; this.connectionReady = false; this.connectionMessage = '';
       const host = options.host || document.getElementById('viewport');
       const panel = document.createElement('section'); this.panel = panel;
@@ -53,7 +54,7 @@
             <fieldset class="online-stage" hidden><legend>ARENA DELLA SFIDA</legend><div class="online-stage-options" role="group" aria-label="Scegli l’arena"></div><p id="online-stage-note"></p></fieldset>
             <p class="online-room-help">Scegli il tuo karateka e premi Pronto. Si parte quando siete pronti entrambi.</p>
           </section>
-          <section class="online-roster" aria-label="Scegli il tuo karateka"><div class="online-roster-heading"><span>03 / SCEGLI IL TUO KARATEKA</span><small id="online-roster-note">Puoi scegliere solo il tuo personaggio.</small></div><div class="online-fighters" role="group" aria-label="Karateka disponibili"></div></section>
+          <section class="online-roster" aria-label="Scegli il tuo karateka"><div class="online-roster-heading"><span>03 / SCEGLI IL TUO KARATEKA</span><small id="online-roster-note">Puoi scegliere solo il tuo personaggio.</small></div><div class="online-fighters" role="group" aria-label="Karateka disponibili"></div><details class="online-custom-options" hidden><summary id="online-custom-grade">SCEGLI IL GRADO DI CINTURA</summary><p>Il grado cambia la cintura, non la forza del karateka.</p><div class="online-custom-ranks" role="group" aria-label="Grado di cintura del tuo karateka"></div></details></section>
         </div>
         <footer class="online-footer"><div><small class="online-scroll-hint">Scorri per scegliere il karateka ↕</small><p id="online-status" role="status" aria-live="polite">Il dojo ti aspetta.</p><p id="online-error" role="alert"></p></div><button type="button" id="online-ready" class="online-primary" hidden>SONO PRONTO ✓</button><button type="button" id="online-leave" hidden>ESCI DALLA STANZA</button></footer>`;
       host.append(panel);
@@ -69,11 +70,22 @@
           onConfirm: () => this.setError('') });
       }
       for (const [id, fighter] of Object.entries(this.roster)) {
+        if (fighter.customGender && fighter.rankIndex !== 0) continue;
         const button = document.createElement('button'); button.type = 'button'; button.dataset.onlineFighter = id;
         button.setAttribute('aria-label', 'Scegli ' + fighter.name + ', ' + fighter.belt);
         const canvas = document.createElement('canvas'); canvas.width = 180; canvas.height = 190; canvas.dataset.onlinePortrait = id; canvas.setAttribute('aria-hidden', 'true');
         const name = document.createElement('strong'); name.textContent = fighter.name;
-        button.append(canvas, name); button.addEventListener('click', () => this.selectFighter(id)); this.$('.online-fighters').append(button);
+        button.append(canvas, name); button.addEventListener('click', () => this.selectFighter(fighter.customGender ? `custom-${fighter.customGender}-${this.customRanks[fighter.customGender]}` : id)); this.$('.online-fighters').append(button);
+      }
+      for (const rank of global.DojoArcade?.RANKS || []) {
+        const button = document.createElement('button'); button.type = 'button'; button.dataset.onlineRank = String(rank.index);
+        button.textContent = rank.label + ' · ' + rank.belt.replace('CINTURA ', '');
+        button.style.setProperty('--rank-color', rank.color);
+        button.addEventListener('click', () => {
+          const gender = this.roster[this.profile.fighter]?.customGender;
+          if (gender) this.selectFighter(`custom-${gender}-${rank.index}`);
+        });
+        this.$('.online-custom-ranks').append(button);
       }
       for (const stage of this.stages?.list || []) {
         const button = document.createElement('button'); button.type = 'button'; button.dataset.onlineStage = stage.id;
@@ -145,7 +157,7 @@
         const tag = document.createElement('small'); tag.textContent = player ? (player === local ? 'TU' : 'AVVERSARIO') + ' · ' + (player.ready ? 'PRONTO ✓' : 'SCEGLIE IL KARATEKA') : 'IN ATTESA';
         const canvas = document.createElement('canvas'); canvas.width = 360; canvas.height = 310; canvas.setAttribute('aria-hidden', 'true'); if (player && this.roster[player.fighter]) canvas.dataset.onlinePortrait = player.fighter; canvas.dataset.facing = slot === 0 ? '1' : '-1';
         const name = document.createElement('strong'); name.textContent = player?.name || 'IL TATAMI TI ASPETTA';
-        const fighter = document.createElement('span'); fighter.textContent = this.roster[player?.fighter]?.name || 'Condividi il codice con un amico';
+        const fighter = document.createElement('span'); fighter.textContent = this.roster[player?.fighter] ? this.roster[player.fighter].name + ' · ' + this.roster[player.fighter].rank : 'Condividi il codice con un amico';
         card.append(tag, canvas, name, fighter); players.append(card);
       }
       this.$('#online-ready').textContent = local?.ready ? 'NON SONO PRONTO' : 'SONO PRONTO ✓'; this.$('#online-ready').setAttribute('aria-pressed', String(!!local?.ready));
@@ -200,15 +212,36 @@
     renderProfile() {
       const fighter = this.roster[this.profile.fighter];
       this.$('#online-profile-fighter').textContent = fighter?.name || '';
-      this.$('#online-profile-belt').textContent = fighter?.belt || '';
+      this.$('#online-profile-belt').textContent = fighter ? fighter.rank + ' · ' + fighter.belt : '';
+      this.$('.online-custom-options').hidden = !fighter?.customGender;
+      if (fighter?.customGender) {
+        this.customRanks[fighter.customGender] = fighter.rankIndex;
+        this.$('#online-custom-grade').textContent = 'CINTURA: ' + fighter.rank + ' · CAMBIA ▾';
+      }
+      this.panel.querySelectorAll('[data-online-rank]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.onlineRank) === fighter?.rankIndex)));
       this.$('#online-profile-art').dataset.onlinePortrait = this.profile.fighter;
-      this.panel.querySelectorAll('[data-online-fighter]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.onlineFighter === this.profile.fighter)));
+      this.panel.querySelectorAll('[data-online-fighter]').forEach(button => {
+        const entry = this.roster[button.dataset.onlineFighter];
+        button.setAttribute('aria-pressed', String(entry.customGender ? entry.customGender === fighter?.customGender : button.dataset.onlineFighter === this.profile.fighter));
+        if (entry.customGender) {
+          const id = `custom-${entry.customGender}-${this.customRanks[entry.customGender]}`;
+          button.querySelector('canvas').dataset.onlinePortrait = id;
+          button.setAttribute('aria-label', 'Scegli ' + entry.name + ', ' + this.roster[id].rank + ', ' + this.roster[id].belt);
+        }
+      });
       this.panel.querySelectorAll('[data-online-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.onlineMode === this.profile.mode)));
       this.$('#online-mode-help').textContent = this.profile.mode === 'training' ? 'Allenatevi insieme, senza limite di tempo.' : 'Una sfida al meglio di tre round.';
     }
     async renderPreviews() {
+      if (this.panel.hidden) return;
       const token = ++this.previewToken, art = this.art || global.FighterArt; if (!art) return;
-      try { await art.load?.(); } catch (_) { return; }
+      try {
+        await art.load?.();
+        // Load only the two visible custom looks, not every possible belt variant.
+        const customIds = [...new Set([...this.panel.querySelectorAll('canvas[data-online-portrait]')].map(canvas => canvas.dataset.onlinePortrait).filter(id => this.roster[id]?.customGender))];
+        if (global.ArcadeArt) await Promise.all([...new Set(customIds.map(id => this.roster[id].customGender))].map(gender => global.ArcadeArt.load({ gender })));
+        else if (customIds.length) await art.loadFighters?.(customIds);
+      } catch (_) { if (token === this.previewToken) this.setError('Non riesco a caricare l’anteprima. Seleziona di nuovo il karateka per riprovare.'); return; }
       if (token !== this.previewToken) return;
       this.panel.querySelectorAll('canvas[data-online-portrait]').forEach(canvas => {
         const context = canvas.getContext('2d'); if (!context) return; context.clearRect(0, 0, canvas.width, canvas.height);
