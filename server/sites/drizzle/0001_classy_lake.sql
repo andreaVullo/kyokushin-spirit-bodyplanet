@@ -1,0 +1,1 @@
+CREATE INDEX `arcade_records_received_at_id_idx` ON `arcade_records` (`received_at`,`id`);

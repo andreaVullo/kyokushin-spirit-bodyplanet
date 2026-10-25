@@ -1,6 +1,6 @@
 # Kyokushin Spirit — BodyPlanet Dojo
 
-Picchiaduro 2D arcade per browser, ambientato nel dojo Fitness & Wellness BodyPlanet di Catania. Nove karateka (dieci scelte, con due versioni di Marco Tabacco), un creatore di personaggi per la scalata Arcade dalla cintura bianca al 10° Dan, combinazioni di pugni e calci, guardia, salti, scatti e kaiten. Nessuna installazione o dipendenza esterna necessaria per giocare; la classifica pubblica richiede una connessione a GitHub.
+Picchiaduro 2D arcade per browser, ambientato nel dojo Fitness & Wellness BodyPlanet di Catania. Nove karateka (dieci scelte, con due versioni di Marco Tabacco), un creatore di personaggi per la scalata Arcade dalla cintura bianca al 10° Dan, combinazioni di pugni e calci, guardia, salti, scatti e kaiten. Nessuna installazione o dipendenza esterna necessaria per giocare; la classifica pubblica richiede una connessione Internet.
 
 ## Gioca subito
 
@@ -53,7 +53,7 @@ I comandi touch compaiono automaticamente sui dispositivi touch. Il pulsante del
 - **Pollice sinistro:** trascina il joystick per muoverti e spingilo verso l’alto per saltare. Due spinte rapide nella stessa direzione, tornando al centro tra i due movimenti, eseguono il dash.
 - **Pollice destro:** quattro pulsanti circolari mostrano solo icone delle tecniche. Il singolo tasto **↻** passa ciclicamente fra tre gruppi: pugni → calci → speciale/difese → pugni. I tre puntini indicano il gruppo attivo. **Ushiro** si trova nel secondo e nel terzo gruppo; tieni premuta l’icona delle braccia o del ginocchio nel terzo gruppo per parare.
 - Si possono tenere premuti più comandi contemporaneamente, per esempio movimento e attacco. È possibile scorrere il dito tra i pulsanti per collegare le tecniche.
-- **Su mobile si gioca in orizzontale.** Con il launcher Flazio V6, **Entra nel dojo** adatta subito la stessa partita allo spazio visibile. Il telefono può restare verticale con il blocco rotazione attivo. Quando il browser diventa orizzontale, il gioco rimuove la rotazione aggiunta: non occorre cambiare le impostazioni del dispositivo.
+- **Su mobile si gioca in orizzontale.** Con il launcher Flazio V7, **Entra nel dojo** adatta subito la stessa partita allo spazio visibile. Il telefono può restare verticale con il blocco rotazione attivo. Quando il browser diventa orizzontale, il gioco rimuove la rotazione aggiunta: non occorre cambiare le impostazioni del dispositivo.
 - **Aprendo `Gioca.html` direttamente o in un iframe generico**, premi **Gioca in orizzontale** o **Schermo intero** per adattare il gioco anche con la rotazione bloccata. Il fullscreen nativo è facoltativo: se il browser lo rifiuta, resta disponibile la vista adattata. In un iframe generico lo spazio resta quello concesso dalla pagina ospitante; il launcher Flazio gestisce invece l’intera area visibile del sito. Le barre del browser possono restare visibili.
 - Pausa, cambio app, cambio orientamento e rilascio/interruzione del tocco azzerano i comandi: nessuna direzione rimane bloccata.
 - **Arcade**, **VS CPU** e **Allenamento** sono giocabili interamente su touch. La modalità **2 giocatori** richiede una tastiera per il secondo giocatore.
@@ -131,13 +131,15 @@ Dopo una vittoria scegli **Prossima sfida** per continuare oppure **Termina scal
 
 **Il progresso non è salvabile.** La sfida vive soltanto nella memoria della pagina: ricaricare, chiudere il gioco o chiudere il pannello Flazio perde l’avanzamento. Il cambio di orientamento mantiene invece la stessa partita aperta. Solo dopo sconfitta, abbandono o completamento si può pubblicare un risultato finale; la classifica non permette di riprendere la sfida.
 
-### Classifica pubblica su GitHub
+### Classifica pubblica e archivio GitHub
 
-Dal risultato finale, **Salva in classifica** invia il nome scelto e il punteggio al servizio del dojo, che li archivia su GitHub. **Al giocatore non serve un account:** basta il nome del karateka. Nome e dati del risultato diventano pubblici. Il gioco mostra la conferma solo dopo la risposta del servizio; **Verifica in classifica** permette di ricontrollare la presenza del record.
+Dal risultato finale, **Salva in classifica** invia il nome scelto e il risultato al servizio del dojo. **Al giocatore non serve un account:** basta il nome del karateka. Nome e dati del risultato diventano pubblici. Il gioco conferma soltanto dopo la scrittura nel database online; **Verifica in classifica** ne ricontrolla la presenza.
 
-La classifica legge i risultati pubblici online e mostra i primi 50, ordinati per grado, punteggio e durata. Un problema di rete o un limite temporaneo delle API non impedisce di giocare; si può riprovare con **Aggiorna classifica**. È una classifica amatoriale: i risultati sono calcolati dal browser, non certificati da un server. I dettagli di formato, moderazione e limite di lettura sono in [CLASSIFICA.md](CLASSIFICA.md).
+Il risultato è visibile subito nella classifica online. **La copia su GitHub è periodica**, tramite il workflow `sync-arcade-leaderboard.yml`, programmato ogni 15 minuti; GitHub può ritardarne l’esecuzione. Il file pubblico è [data/arcade-leaderboard.json](data/arcade-leaderboard.json). La conferma di salvataggio non dichiara già completata questa copia.
 
-Questa versione contiene client e servizio in `server/leaderboard-server.cjs`. **Il servizio di pubblicazione va ancora ospitato e collegato:** GitHub Pages serve i file del gioco, ma non esegue il codice server. L’endpoint in `scripts/leaderboard-config.js` è inizialmente vuoto; finché non viene configurato, il gioco segnala che la pubblicazione non è attiva e non dichiara salvati i risultati. Il token GitHub resta soltanto nell’ambiente del server, mai nel gioco. Le istruzioni sono in [server/README.md](server/README.md).
+La classifica mostra i primi 50, ordinati per grado, punteggio e durata. Se il servizio non risponde, prova a leggere la copia GitHub e avverte che potrebbe essere meno recente. Un problema di rete non impedisce di giocare. È una classifica amatoriale: i risultati sono calcolati dal browser e controllati nel formato, non certificati contro modifiche del gioco.
+
+Il [servizio pubblico del dojo](https://kyokushin-dojo-classifica.flazio1.chatgpt.site) è attivo su Sites, con database D1. L’endpoint è configurato in `scripts/leaderboard-config.js`; il sorgente completo è in `server/sites/`. Nessun token GitHub serve nel browser o nel servizio: la copia nel repository usa soltanto la credenziale temporanea di GitHub Actions. Dettagli e manutenzione: [CLASSIFICA.md](CLASSIFICA.md) e [server/README.md](server/README.md).
 
 ## Musica ed effetti
 
@@ -168,18 +170,21 @@ Lo scenario riprende la palestra fornita come riferimento: tatami rosso, insegna
 | `scripts/arcade.js` / `scripts/arcade-ui.js` | Scalata, promozioni, creazione del karateka e interfaccia dei risultati |
 | `scripts/arcade-art.js` / `scripts/arcade-atlas.js` | Animazioni del personaggio personalizzato, capigliature, cinture ed effetti dei colpi |
 | `scripts/leaderboard.js` / `scripts/leaderboard-config.js` / `CLASSIFICA.md` | Lettura dei record pubblici GitHub, invio anonimo e configurazione dell’endpoint |
-| `server/leaderboard-server.cjs` / `server/README.md` | Servizio Node per pubblicare su GitHub senza account giocatore, con credenziale esclusivamente server-side |
-| `scripts/flazio-launcher.js` | Launcher Flazio V6; la stessa sorgente è incorporata nei due frammenti da incollare |
+| `server/sites/` / `server/README.md` | Sorgente del servizio Sites/D1 online: invio anonimo e lettura della classifica |
+| `.github/workflows/sync-arcade-leaderboard.yml` / `tools/sync-arcade-leaderboard.cjs` / `data/arcade-leaderboard.json` | Copia periodica e validata dei risultati pubblici su GitHub |
+| `scripts/flazio-launcher.js` | Launcher Flazio V7; la stessa sorgente è incorporata nei due frammenti da incollare |
 | `assets/karateka/` | Tutti i fogli dei nuovi karateka, caricati dal gioco quando servono |
 | `assets/arcade/` | Fogli uomo/donna, teste, pose aggiuntive ed effetti visivi, con involucri JavaScript per l’uso offline |
 | `tests/flazio-host.html` | Pagina locale di prova con un contenitore adaptive largo 1200 px e trasformato |
+| `tests/flazio-component-host.html` | Prova del componente HTML annidato in un piccolo iframe Flazio; `?nonative=1` verifica il fallback senza fullscreen nativo |
 | `tests/flazio-launcher.test.cjs` | Rotazione del contenitore, iframe persistente, fullscreen, messaggi, caricamento e ripristino del sito |
 | `tests/display-controller.test.cjs` / `tests/orientation-regression.test.cjs` / `tests/rotated-controls.test.cjs` | Gestione della vista, formati verticali/orizzontali e comandi dopo la rotazione |
 | `tests/roster-game.test.cjs` / `tests/karateka-renderer.test.cjs` | Roster e animazioni dei karateka |
-| `tests/arcade.test.cjs` / `tests/leaderboard.test.cjs` / `tests/leaderboard-server.test.cjs` | Progressione, punteggi, creazione del personaggio e classifica GitHub anonima |
+| `tests/arcade.test.cjs` / `tests/arcade-ui.test.cjs` / `tests/leaderboard*.test.cjs` / `server/sites/tests/` | Progressione, interfaccia, classifica anonima, archivio GitHub e database SQLite |
 | `tests/render-preview.html` | Anteprima delle pose del roster nelle due direzioni |
 | `Incorpora.html` | Generatore dell’iframe generico con anteprima e copia del codice |
 | `INCORPORA.txt` | Istruzioni di pubblicazione e di inserimento nel sito |
+| `flazio-componente-gioca.html` | Card Gioca originale del sito con il launcher V7 caricato da GitHub Pages |
 | `iframe-flazio-html.html` | Frammento HTML completo da incollare nella modalità HTML di Flazio |
 | `iframe-flazio.html` | Solo JavaScript da incollare nella modalità Script di Flazio, senza aggiungere tag HTML |
 
@@ -193,35 +198,35 @@ La pagina del dojo è [Gioca del dojo](https://kyokushinkaicataniadojo.it/play).
 
 1. Aggiorna **`Gioca.html` e le cartelle intere `scripts/` e `assets/`** sullo stesso hosting HTTPS, mantenendo nomi e percorsi. Servono anche per i nuovi karateka, la modalità Arcade, le capigliature, le cinture e gli effetti dei colpi. Conserva `index.html` come reindirizzamento al gioco.
 2. Apri il collegamento pubblico a `Gioca.html` e controlla caricamento, selezione dei karateka, creazione Arcade e avvio dell’incontro. Controlla la lettura della classifica online senza inviare risultati di prova come record reali. `localhost` e `127.0.0.1` funzionano soltanto sul computer di sviluppo.
-3. Su Flazio sostituisci il precedente frammento con **una sola** delle due varianti V6 qui sotto, nella modalità corrispondente. Non tenere attivo anche il vecchio launcher.
+3. Su Flazio sostituisci il precedente frammento con **una sola** delle due varianti V7 qui sotto, nella modalità corrispondente. Non tenere attivo anche il vecchio launcher.
 4. Per la pubblicazione dei punteggi senza account, ospita il servizio descritto in **`server/README.md`**, configura il token solo sul server e inserisci l’URL HTTPS pubblico in **`scripts/leaderboard-config.js`**. Pubblicare soltanto il gioco su GitHub Pages non attiva il servizio di scrittura.
 
-### Flazio adaptive — launcher V6
+### Flazio adaptive — launcher V7
 
-La versione è **`onsite-dialog-v6`**. Entrambi i frammenti contengono tutto il codice del launcher; non devono scaricare un ulteriore script per avviarlo.
+La versione è **`onsite-dialog-v7`**. I due frammenti generici contengono tutto il codice del launcher. **`flazio-componente-gioca.html`** conserva invece la card Gioca del sito e carica il launcher da GitHub Pages: va incollato nella modalità HTML dopo avere pubblicato i file aggiornati.
 
 - **Modalità HTML, consigliata:** apri il componente Codice/Script di Flazio, seleziona **HTML** e incolla l’intero contenuto di **`iframe-flazio-html.html`**, compresi pulsante e tag `<script>`.
 - **Modalità Script:** seleziona **Script** e incolla l’intero contenuto di **`iframe-flazio.html`**. Il file contiene **solo JavaScript**, nonostante l’estensione `.html`: non aggiungere tag `<script>`, `<iframe>` o un documento HTML.
 
 **Entra nel dojo** apre il gioco sopra la pagina `/play` e richiede subito la vista orizzontale. Non occorre sbloccare la rotazione del telefono. Il launcher misura l’area visibile disponibile dopo avere riservato spazio ai comandi e alle aree sicure: se questa area è verticale, ruota soltanto l’iframe di 90° e ne scambia le dimensioni; quando diventa orizzontale, rimuove la trasformazione. Anche nei formati quasi quadrati la decisione segue lo spazio realmente utilizzabile. La decisione non dipende dall’orientamento hardware dichiarato dal dispositivo. Il gioco interno riceve la conferma del contenitore ed evita di ruotare di nuovo la propria interfaccia.
 
-Il pannello vive fuori dal componente adaptive, nel livello superiore del browser quando disponibile. Flazio può ricreare i propri elementi senza sostituire l’iframe della partita. Il launcher imposta temporaneamente `width=device-width, initial-scale=1, viewport-fit=cover`, neutralizza zoom e trasformazioni della pagina, considera le aree sicure del telefono e tiene il pulsante **Chiudi** accessibile. Dimensioni e posizione vengono aggiornate anche quando cambiano le barre del browser o la viewport visiva.
+Se Flazio esegue il componente HTML in un iframe dello stesso dominio, il launcher apre il pannello nella pagina principale. La partita resta fuori dal componente adaptive e continua quando Flazio ricrea i propri elementi. Per tutta la sessione il launcher mantiene `width=device-width, initial-scale=1, viewport-fit=cover` e neutralizza zoom e trasformazioni della pagina, anche se il sito li riscrive durante una rotazione. Considera le aree sicure del telefono e mantiene **Chiudi** accessibile. Le dimensioni obsolete della viewport visiva vengono scartate; posizione e spazio visibile seguono barre del browser e tastiera senza uscire dai bordi.
 
 Il fullscreen nativo viene richiesto quando disponibile, ma un rifiuto non impedisce la vista orizzontale. Il launcher non forza il blocco dell’orientamento di sistema. Le barre del browser possono restare visibili. Il pulsante della vista e quello interno al gioco permettono di uscire dall’adattamento e riattivarlo.
 
 Durante l’avvio compare **Caricamento del dojo…**; il gioco diventa interattivo dopo la conferma di avvio. Dopo 25 secondi compare **Riprova**. Non ci sono ricaricamenti automatici: un nuovo tentativo sostituisce solo il precedente iframe e i suoi eventuali messaggi tardivi vengono ignorati.
 
-**Chiudi ×** termina partita e audio e ripristina viewport, stili, zoom e posizione di scorrimento della pagina. Una nuova apertura riparte dal titolo. I messaggi tra gioco e launcher vengono controllati sia per origine sia per finestra mittente; gli identificativi delle richieste evitano che conferme obsolete prevalgano su comandi successivi.
+**Chiudi ×** termina partita e audio e ripristina viewport, stili e zoom più recenti della pagina adaptive, insieme alla posizione di scorrimento. Una nuova apertura riparte dal titolo. I messaggi tra gioco e launcher vengono controllati sia per origine sia per finestra mittente; gli identificativi delle richieste evitano che conferme obsolete prevalgano su comandi successivi.
 
-Per provare il contenitore senza pubblicare, avvia il server locale e apri **`tests/flazio-host.html`**. La pagina simula larghezza fissa, trasformazioni e ricostruzione del componente. Le prove automatiche e nel browser non sostituiscono una verifica su un telefono fisico.
+Per provare il contenitore senza pubblicare, avvia il server locale e apri **`tests/flazio-host.html`** oppure **`tests/flazio-component-host.html`**. La seconda pagina riproduce un componente HTML di 320 × 180 pixel dentro una pagina adaptive. Aggiungi **`?nonative=1`** a uno dei due indirizzi per simulare un browser senza fullscreen nativo e verificare l’adattamento CSS. Il pulsante **Ricalcola adaptive fra 3 secondi** permette di avviare il gioco prima che la pagina riscriva zoom, trasformazione e viewport. Le prove automatiche e nel browser non sostituiscono una verifica su un telefono fisico.
 
 ### Iframe generico
 
-Apri **`Incorpora.html`** per inserire l’indirizzo pubblico del gioco, provarlo e copiare un iframe responsive. Le istruzioni essenziali sono anche in **`INCORPORA.txt`**. Su Flazio adaptive usa i frammenti V6: il codice generico non controlla zoom, viewport o ricostruzione della pagina ospitante.
+Apri **`Incorpora.html`** per inserire l’indirizzo pubblico del gioco, provarlo e copiare un iframe responsive. Le istruzioni essenziali sono anche in **`INCORPORA.txt`**. Su Flazio adaptive usa i frammenti V7: il codice generico non controlla zoom, viewport o ricostruzione della pagina ospitante.
 
 `embed=1` attiva la vista compatta con audio, aiuto, pausa e schermo intero; `touch=1` mostra esplicitamente i comandi touch anche sul computer. `standalone=1`, in una pagina principale, aggiunge il collegamento **Torna al sito**. Riserva `hostdisplay=1` al launcher previsto dal progetto.
 
-Il comando **Schermo intero** può adattare il gioco in orizzontale senza obbligare a sbloccare la rotazione. Se il browser nega il fullscreen, un iframe generico conserva lo spazio assegnato dal sito: per gestire tutto lo schermo di una pagina Flazio serve il launcher V6. L’hosting deve permettere gli iframe; l’audio richiede comunque un gesto dell’utente.
+Il comando **Schermo intero** può adattare il gioco in orizzontale senza obbligare a sbloccare la rotazione. Se il browser nega il fullscreen, un iframe generico conserva lo spazio assegnato dal sito: per gestire tutto lo schermo di una pagina Flazio serve il launcher V7. L’hosting deve permettere gli iframe; l’audio richiede comunque un gesto dell’utente.
 
 Per ogni aggiornamento distribuisci nuovamente il pacchetto completo, comprese `scripts/` e `assets/`. Se cambia `scripts/flazio-launcher.js`, aggiorna anche le copie incorporate in entrambi i frammenti e sostituisci quello incollato su Flazio.
 

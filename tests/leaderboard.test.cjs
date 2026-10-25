@@ -203,11 +203,40 @@ test('anonymous submit confirms only a matching GitHub record and sends no brows
 
 test('unconfigured or failing relay reports errors without pretending a result was saved', async () => {
   await assert.rejects(new DojoLeaderboard().submit(record()), { code: 'not-configured' });
-  for (const [status, code] of [[400, 'invalid-record'], [403, 'origin'], [409, 'conflict'], [429, 'rate-limit'], [502, 'unavailable'], [503, 'not-configured']]) {
+  for (const [status, code] of [[400, 'invalid-record'], [403, 'origin'], [409, 'conflict'], [429, 'rate-limit'], [502, 'unavailable'], [503, 'unavailable']]) {
     const client = new DojoLeaderboard({ endpoint: 'https://scores.example.org/records', fetch: async () => ({ ok: false, status }) });
     await assert.rejects(client.submit(record()), { code });
   }
   await assert.rejects(new DojoLeaderboard({ endpoint: 'https://scores.example.org/records', fetch: async () => response({ id: 'wrong' }) }).submit(record()), { code: 'invalid-response' });
   assert.throws(() => new DojoLeaderboard({ endpoint: 'http://scores.example.org/records' }));
   assert.throws(() => new DojoLeaderboard({ endpoint: 'https://secret@example.org/records' }));
+});
+
+test('D1 service confirms immediate storage while explicitly leaving GitHub synchronization pending', async () => {
+  const client = new DojoLeaderboard({ endpoint: 'https://scores.example.org/records', fetch: async () => response({
+    id: record().id, stored: true, duplicate: false, githubSynced: false,
+    archiveUrl: 'https://github.com/andreaVullo/kyokushin-spirit-bodyplanet/blob/main/data/arcade-leaderboard.json',
+  }) });
+  const saved = await client.submit(record());
+  assert.equal(saved.stored, true); assert.equal(saved.githubSynced, false);
+  assert.equal(saved.issueNumber, undefined);
+});
+
+test('live service pagination and GitHub archive fallback preserve real result provenance', async () => {
+  const calls = [];
+  const client = new DojoLeaderboard({ endpoint: 'https://scores.example.org/records', fetch: async url => {
+    calls.push(url);
+    return response({ version: 1, records: [record({ id: calls.length === 1 ? 'run-00000001' : 'run-00000002' })],
+      updatedAt: '2026-10-25T00:00:00Z', nextCursor: calls.length === 1 ? '123456789.run-00000001' : null });
+  } });
+  const live = await client.load();
+  assert.equal(live.entries.length, 2); assert.equal(live.archive, false);
+  assert.ok(calls[1].includes('after='));
+  const fallback = new DojoLeaderboard({ endpoint: 'https://scores.example.org/records', fetch: async url => {
+    if (url.startsWith('https://scores.')) throw new Error('offline');
+    assert.ok(url.startsWith('https://raw.githubusercontent.com/andreaVullo/kyokushin-spirit-bodyplanet/'));
+    return response({ version: 1, records: [record()], updatedAt: '2026-10-24T00:00:00Z' });
+  } });
+  const archived = await fallback.load();
+  assert.equal(archived.archive, true); assert.equal(archived.entries.length, 1);
 });

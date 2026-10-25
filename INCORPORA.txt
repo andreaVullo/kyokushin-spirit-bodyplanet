@@ -1,5 +1,5 @@
 KYOKUSHIN SPIRIT — INCORPORA IL GIOCO NEL TUO SITO
-LAUNCHER FLAZIO V6 · onsite-dialog-v6
+LAUNCHER FLAZIO V7 · onsite-dialog-v7
 
 INDIRIZZI
 Pagina del dojo: https://kyokushinkaicataniadojo.it/play
@@ -16,7 +16,7 @@ PRIMA DI INCOLLARE IL LAUNCHER: PUBBLICA IL GIOCO COMPLETO
    come reindirizzamento al gioco. Includi tutta la cartella assets/arcade/.
 2. Prova l’URL pubblico: attendi il caricamento, seleziona un nuovo karateka
    e avvia un incontro. Un URL localhost o 127.0.0.1 è solo locale.
-3. Su Flazio sostituisci il vecchio frammento con UNA delle varianti V6.
+3. Su Flazio sostituisci il vecchio frammento con UNA delle varianti V7.
    Non lasciare due launcher diversi attivi nello stesso componente.
 
 ARCADE E CLASSIFICA
@@ -34,25 +34,29 @@ La rotazione del telefono mantiene la stessa partita aperta. Nessun dato
 della classifica consente di ripristinare un incontro o una scalata.
 
 Solo al termine (sconfitta, abbandono o 10 Dan) SALVA IN CLASSIFICA invia
-nome e risultato al servizio del dojo, che li archivia su GitHub.
-AL GIOCATORE NON SERVE UN ACCOUNT: basta il nome del karateka.
-Nome e risultato diventano pubblici; il gioco conferma solo dopo la risposta
-del servizio. VERIFICA IN CLASSIFICA ricontrolla l’avvenuta pubblicazione.
+nome e risultato al servizio del dojo. AL GIOCATORE NON SERVE UN ACCOUNT:
+basta il nome del karateka. Nome e risultato diventano pubblici. Il gioco
+conferma solo dopo la scrittura nel database online. VERIFICA IN CLASSIFICA
+ricontrolla la presenza del risultato.
 
-CLASSIFICA legge online i risultati dal repository e mostra i primi 50.
-Il gioco funziona anche offline; la classifica richiede connessione e può
-essere temporaneamente limitata dalle API GitHub. Non contiene token.
+IL SALVATAGGIO ONLINE È IMMEDIATO; LA COPIA SU GITHUB È PERIODICA.
+Il workflow sync-arcade-leaderboard.yml aggiorna data/arcade-leaderboard.json
+ogni 15 minuti, con possibili ritardi di GitHub Actions. La conferma online
+non dichiara già completata la copia GitHub.
+
+CLASSIFICA legge il servizio online e mostra i primi 50. Se il servizio
+non risponde, prova la copia GitHub e segnala che potrebbe essere meno
+recente. Il gioco funziona anche offline; la classifica richiede Internet.
 È una classifica amatoriale con risultati dichiarati dal browser, non
-certificati da un server. Vedi CLASSIFICA.md per dettagli e moderazione.
-Le funzioni locali arrivano sul sito soltanto dopo la pubblicazione.
+certificati contro modifiche del gioco. Vedi CLASSIFICA.md per i dettagli.
 
-IL SERVIZIO DI INVIO VA ANCORA ATTIVATO. Pubblica il servizio Node descritto
-in server/README.md su un hosting HTTPS e configura lì GITHUB_TOKEN con
-permesso Issues in scrittura per il solo repository del gioco. Il token
-non deve mai comparire nel browser, nei file pubblici o nel codice Flazio.
-Inserisci soltanto l’URL del servizio in scripts/leaderboard-config.js.
-L’endpoint vuoto iniziale mostra “pubblicazione non attiva”, senza inventare
-un salvataggio. GitHub Pages da solo non può eseguire questo servizio.
+Il servizio HTTPS è attivo:
+https://kyokushin-dojo-classifica.flazio1.chatgpt.site
+L’endpoint /records è configurato in scripts/leaderboard-config.js.
+Il sorgente è in server/sites/; le istruzioni sono in server/README.md.
+Non servono token GitHub nel gioco, nel servizio o nel codice Flazio.
+La copia su GitHub usa soltanto la credenziale temporanea del workflow.
+Le modifiche al gioco e al workflow arrivano online quando vengono pubblicate.
 
 La sequenza delle cinture segue Kyokushin World Federation; il punto di
 partenza bianco è descritto dal Kyokushinkaikan Honbu Daikanyama Dojo.
@@ -71,6 +75,11 @@ Seleziona Script e incolla TUTTO il contenuto di iframe-flazio.html.
 Nonostante l’estensione .html, questo file contiene SOLO JAVASCRIPT.
 Non aggiungere tag <script>, <iframe> o un documento HTML.
 
+CARD GIOCA DEL SITO
+flazio-componente-gioca.html mantiene la card originale e carica il launcher
+V7 da GitHub Pages. Incollalo in modalità HTML dopo avere pubblicato tutti
+i file aggiornati; sostituisce il componente precedente.
+
 COME SI ADATTA AL TELEFONO
 ENTRA NEL DOJO apre il gioco sopra la stessa pagina /play e attiva subito
 la vista orizzontale. Puoi tenere il blocco rotazione del telefono attivo.
@@ -81,10 +90,12 @@ anche nei formati quasi quadrati. Il gioco interno riconosce la gestione
 del contenitore e non applica una seconda rotazione.
 
 La stessa partita continua quando ruoti il telefono o Flazio ricrea il
-componente adaptive. Il pannello vive fuori dal componente del sito.
-Mentre è aperto, corregge temporaneamente viewport, zoom e trasformazioni
-ereditate dalla pagina; considera le aree sicure e mantiene Chiudi visibile.
-Le misure seguono anche le barre mobili del browser e la viewport visiva.
+componente adaptive. Anche se il codice HTML è dentro un piccolo iframe
+dello stesso dominio, il pannello viene aperto nella pagina principale.
+Per tutta la sessione corregge viewport, zoom e trasformazioni, anche se
+Flazio li riscrive dopo una rotazione. Considera le aree sicure, mantiene
+Chiudi visibile e scarta misure obsolete della viewport visiva. Posizione
+e dimensioni seguono barre del browser e tastiera entro i bordi disponibili.
 
 Il fullscreen nativo è facoltativo. Se il browser lo rifiuta, il gioco resta
 adattato in orizzontale nell’area disponibile. Non serve disattivare il
@@ -97,14 +108,19 @@ la conferma di avvio. Dopo 25 secondi compare Riprova, senza ricaricamenti
 automatici. Riprova sostituisce soltanto il tentativo precedente: rimane
 un solo iframe e i messaggi del tentativo precedente vengono ignorati.
 
-CHIUDI × termina partita e audio e ripristina viewport, stili, zoom e
-scorrimento del sito. Una nuova apertura riparte dal titolo. I messaggi
+CHIUDI × termina partita e audio e ripristina viewport, stili e zoom più
+recenti della pagina adaptive, insieme alla posizione di scorrimento. Una nuova apertura riparte dal titolo. I messaggi
 sono controllati per dominio e finestra mittente; le conferme delle richieste
 obsolete non devono prevalere sui comandi più recenti.
 
 PROVA LOCALE
 Avvia il server locale e apri tests/flazio-host.html. Simula una pagina
 adaptive larga 1200 px, trasformata, con ricostruzione del componente.
+Per il vero annidamento HTML usa tests/flazio-component-host.html: il
+pulsante è dentro un iframe di 320 × 180 pixel. Aggiungi ?nonative=1 a
+uno dei due indirizzi per provare l’adattamento CSS senza fullscreen nativo.
+Il pulsante Ricalcola adaptive fra 3 secondi simula la riscrittura di zoom,
+trasformazione e viewport dopo l’apertura del gioco.
 I test automatici si eseguono con: node --test tests/*.test.cjs
 Le prove nel browser non sostituiscono una verifica su un telefono fisico.
 
@@ -127,7 +143,7 @@ SU ALTRI SITI — IFRAME GENERICO
 3. Incolla il codice in un blocco HTML/iframe. L’hosting deve permettere
    l’incorporamento tramite iframe.
 
-Su Flazio adaptive usa i frammenti V6: l’iframe generico non gestisce
+Su Flazio adaptive usa i frammenti V7: l’iframe generico non gestisce
 viewport, zoom e ricostruzione della pagina ospitante. Schermo intero può
 adattare il gioco anche con rotazione bloccata, ma se il browser nega il
 fullscreen l’iframe resta nello spazio assegnato dal sito.
@@ -165,4 +181,4 @@ AGGIORNAMENTI SUCCESSIVI
 Distribuisci sempre il pacchetto completo con Gioca.html, scripts/ e assets/.
 Se cambia scripts/flazio-launcher.js, aggiorna anche il codice incorporato
 nei due frammenti e sostituisci quello incollato su Flazio. Il generatore
-Incorpora.html produce l’iframe generico, non il launcher adaptive V6.
+Incorpora.html produce l’iframe generico, non il launcher adaptive V7.

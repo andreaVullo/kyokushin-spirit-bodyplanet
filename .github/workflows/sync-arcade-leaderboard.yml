@@ -1,0 +1,43 @@
+name: Archive Arcade leaderboard
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sync-arcade-leaderboard.yml'
+      - 'tools/sync-arcade-leaderboard.cjs'
+      - 'scripts/leaderboard-config.js'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arcade-leaderboard-archive
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Read and validate public records
+        run: node tools/sync-arcade-leaderboard.cjs
+      - name: Commit only the leaderboard archive
+        shell: bash
+        run: |
+          if git diff --quiet -- data/arcade-leaderboard.json; then
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- data/arcade-leaderboard.json
+          git commit -m 'Update Arcade leaderboard archive'
+          git pull --rebase origin main
+          git push origin HEAD:main

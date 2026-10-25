@@ -70,7 +70,7 @@
         }));
       } catch (_) { /* A public issue may contain arbitrary text; ignore malformed records. */ }
     }
-    return valid.sort(compareRecords).slice(0, Math.max(1, Math.min(2000, limit)));
+    return valid.sort(compareRecords).slice(0, Math.max(1, Math.min(20000, limit)));
   }
 
   function issueBody(input) {
@@ -146,10 +146,16 @@
           if (response.status === 400 || response.status === 422) throw new LeaderboardError('invalid-record', 'Il risultato non è stato accettato dalla classifica.');
           if (response.status === 409) throw new LeaderboardError('conflict', 'Questa sfida è già stata pubblicata con un risultato diverso.');
           if (response.status === 403) throw new LeaderboardError('origin', 'Questo indirizzo del gioco non è ancora abilitato alla classifica.');
-          if (response.status === 503) throw new LeaderboardError('not-configured', 'La pubblicazione della classifica non è ancora attiva.');
+          if (response.status === 503) throw new LeaderboardError('unavailable', 'Il servizio della classifica non è disponibile al momento. Riprova tra poco.');
           throw new LeaderboardError('unavailable', 'Non riesco a pubblicare il risultato. Riprova tra poco.');
         }
         const result = await response.json();
+        if (result && result.id === record.id && result.stored === true &&
+            result.archiveUrl === `${this.repositoryUrl}/blob/main/data/arcade-leaderboard.json`) {
+          this.cached = null;
+          return Object.freeze({ id: result.id, stored: true, duplicate: result.duplicate === true,
+            githubSynced: result.githubSynced === true, archiveUrl: result.archiveUrl });
+        }
         if (!result || result.id !== record.id || !integer(result.issueNumber, 1, Number.MAX_SAFE_INTEGER) ||
             result.url !== `${this.repositoryUrl}/issues/${result.issueNumber}`) throw new LeaderboardError('invalid-response', 'La conferma della classifica non è valida.');
         this.cached = null;
@@ -164,9 +170,53 @@
       if (this.pending) return this.pending;
       if (!force && this.cached && Date.now() - this.cached.fetchedAt < this.ttl) return this.cached;
       if (!this.fetch) throw new LeaderboardError('offline', 'La classifica online non è disponibile in questo browser.');
-      this.pending = this.readIssues();
+      this.pending = this.endpoint ? this.readService().catch(() => this.readArchive()) : this.readIssues();
       try { this.cached = await this.pending; return this.cached; }
       finally { this.pending = null; }
+    }
+
+    async readJson(url) {
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer = controller ? setTimeout(() => controller.abort(), this.timeout) : null;
+      try {
+        const response = await this.fetch(url, { method: 'GET', credentials: 'omit',
+          headers: { Accept: 'application/json' }, signal: controller ? controller.signal : undefined });
+        if (!response.ok) throw new LeaderboardError('unavailable', 'Classifica non disponibile. Riprova tra poco.');
+        return await response.json();
+      } catch (error) {
+        if (error instanceof LeaderboardError) throw error;
+        throw new LeaderboardError('offline', 'Connessione alla classifica non riuscita. La partita resta disponibile.');
+      } finally { if (timer !== null) clearTimeout(timer); }
+    }
+
+    async readService() {
+      const records = []; let cursor = null, updatedAt = null;
+      for (let page = 0; page < 20; page++) {
+        const url = new URL(this.endpoint);
+        if (cursor) url.searchParams.set('after', cursor);
+        const data = await this.readJson(url.href);
+        if (!data || data.version !== 1 || !Array.isArray(data.records) || data.records.length > 1000 ||
+            (data.nextCursor !== null && (typeof data.nextCursor !== 'string' || !/^\d{1,16}\.[A-Za-z0-9_-]{8,80}$/.test(data.nextCursor)))) {
+          throw new LeaderboardError('invalid-response', 'La classifica online non è valida.');
+        }
+        records.push(...data.records.map(validateRecord)); updatedAt = data.updatedAt;
+        if (data.nextCursor === cursor && cursor !== null) throw new LeaderboardError('invalid-response', 'La classifica online non è valida.');
+        cursor = data.nextCursor;
+        if (!cursor) break;
+      }
+      return Object.freeze({ entries: Object.freeze(rankRecords(records, 20000)), partial: !!cursor,
+        source: this.endpoint, fetchedAt: Date.now(), updatedAt, submittedRuns: records.length, archive: false });
+    }
+
+    async readArchive() {
+      const url = `https://raw.githubusercontent.com/${this.owner}/${this.repository}/main/data/arcade-leaderboard.json`;
+      const data = await this.readJson(url);
+      if (!data || data.version !== 1 || !Array.isArray(data.records) || data.records.length > 50000) {
+        throw new LeaderboardError('invalid-response', 'L’archivio della classifica non è valido.');
+      }
+      const records = data.records.map(validateRecord);
+      return Object.freeze({ entries: Object.freeze(rankRecords(records, 20000)), partial: records.length > 20000,
+        source: url, fetchedAt: Date.now(), updatedAt: data.updatedAt || null, submittedRuns: records.length, archive: true });
     }
 
     async readIssues() {

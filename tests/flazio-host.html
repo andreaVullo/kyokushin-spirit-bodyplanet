@@ -3,7 +3,14 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=1200, initial-scale=1">
   <title>Verifica Flazio adaptive — Kyokushin Spirit</title>
-  <style>
+  <script>
+// Fixture-only: exercise the CSS fallback on browsers without native fullscreen.
+if(new URLSearchParams(location.search).get('nonative')==='1'){
+  Object.defineProperty(document.documentElement,'requestFullscreen',{value:undefined,configurable:true});
+  document.documentElement.dataset.fixtureFullscreen='unavailable';
+}
+</script>
+<style>
     html,body{margin:0;min-width:1200px;background:#eee8da;color:#17251f;font:17px/1.5 system-ui,sans-serif}
     #adaptive{width:1200px;min-height:1800px;transform-origin:0 0;transform:scale(.8);position:relative;margin:0 auto;background:#faf7f0}
     header{padding:40px;background:#17251f;color:#fff}main{padding:44px;max-width:800px}button{padding:14px 20px;border:1px solid #64735e;border-radius:8px;background:#fff;font:inherit;cursor:pointer}#component{padding:40px;border:2px dashed #64735e;margin:30px 0}code{font-size:.88em}footer{position:absolute;top:1400px;left:44px}#diagnostics{white-space:pre-wrap;font:13px/1.4 monospace;background:#eee;padding:20px}

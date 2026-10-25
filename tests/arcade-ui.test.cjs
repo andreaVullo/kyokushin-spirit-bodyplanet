@@ -53,7 +53,7 @@ test('submitting a result without an account disables duplicate clicks until a v
   request.resolve({ id: f.record.id }); await pending;
   assert.equal(f.get('arcade-publish').disabled, true);
   assert.match(f.get('arcade-publish').textContent, /SALVATO/);
-  assert.match(f.get('arcade-publish-status').textContent, /PUBBLICATO/);
+  assert.match(f.get('arcade-publish-status').textContent, /SALVATO/);
 });
 
 test('a failed submission exposes a retry with the same final record', async () => {
@@ -65,7 +65,7 @@ test('a failed submission exposes a retry with the same final record', async () 
   assert.equal(f.get('arcade-publish-status').textContent, 'Connessione interrotta');
   await f.ui.publishRecord();
   assert.deepEqual(calls, [f.record, f.record]);
-  assert.match(f.get('arcade-publish-status').textContent, /PUBBLICATO/);
+  assert.match(f.get('arcade-publish-status').textContent, /SALVATO/);
 });
 
 for (const fails of [false, true]) test(`late ${fails ? 'failed' : 'successful'} submission cannot overwrite a new run result`, async () => {
@@ -141,7 +141,7 @@ test('verification searches all fetched entries, even when a result is below the
   let f;
   f = fixture({ load: async () => [], details: () => ({ entries: [f.record] }) });
   await f.ui.checkRecord();
-  assert.match(f.get('arcade-publish-status').textContent, /PUBBLICATO/);
+  assert.match(f.get('arcade-publish-status').textContent, /IN CLASSIFICA/);
 });
 
 test('verification cannot start during publication and becomes available again after the save', async () => {
@@ -164,7 +164,7 @@ for (const fails of [false, true]) test(`an earlier ${fails ? 'failed' : 'empty'
   const save = f.ui.publishRecord();
   saving.resolve({ id: f.record.id }); await save;
   const savedMessage = f.get('arcade-publish-status').textContent;
-  assert.match(savedMessage, /PUBBLICATO/);
+  assert.match(savedMessage, /SALVATO/);
   if (fails) checking.reject(new Error('Verifica vecchia fallita')); else checking.resolve([]);
   await check;
   assert.equal(f.get('arcade-publish-status').textContent, savedMessage);
@@ -195,4 +195,33 @@ test('a temporarily stale public list preserves confirmed publication and the co
   assert.equal(f.ui.publishedId, null);
   await f.ui.checkRecord();
   assert.match(f.get('arcade-publish-status').textContent, /non ancora trovato/);
+});
+
+
+test('save confirmation distinguishes durable online storage from the later GitHub archive', async () => {
+  const f = fixture({ submit: async record => ({ id: record.id, stored: true, githubSynced: false }) });
+  await f.ui.publishRecord();
+  assert.match(f.get('arcade-publish-status').textContent, /RISULTATO SALVATO/);
+  assert.match(f.get('arcade-publish-status').textContent, /GitHub si aggiorna periodicamente/);
+  assert.doesNotMatch(f.get('arcade-publish-status').textContent, /ARCHIVIO GITHUB/);
+});
+
+for (const archive of [false, true]) test(`leaderboard explains its ${archive ? 'delayed archive' : 'live service'} source`, async () => {
+  const f = fixture({ load: async () => [], details: () => ({ archive }) });
+  await f.ui.loadLeaderboard(true);
+  const notice = f.get('leaderboard-note').textContent;
+  assert.match(notice, archive ? /Mostro la copia su GitHub/ : /classifica online/);
+  assert.match(notice, /Nessuna partita può essere ripresa/);
+  assert.equal(f.get('leaderboard-reload').disabled, false);
+});
+
+test('archive verification reports a confirmed GitHub copy only when that copy contains the record', async () => {
+  let found = false, f;
+  f = fixture({ submit: async record => ({ id: record.id }), load: async () => [], details: () => ({ archive: true, entries: found ? [f.record] : [] }) });
+  await f.ui.publishRecord();
+  await f.ui.checkRecord();
+  assert.equal(f.get('arcade-publish-status').textContent, 'Risultato salvato. La copia su GitHub si sta aggiornando.');
+  found = true;
+  await f.ui.checkRecord();
+  assert.match(f.get('arcade-publish-status').textContent, /PRESENTE ANCHE NELL’ARCHIVIO GITHUB/);
 });

@@ -134,7 +134,7 @@
         if (this.record !== record) return;
         this.publishedId = record.id;
         $('arcade-publish').textContent = 'RISULTATO SALVATO ✓';
-        $('arcade-publish-status').textContent = 'RISULTATO PUBBLICATO. OSU! La partita non viene salvata.';
+        $('arcade-publish-status').textContent = 'RISULTATO SALVATO. OSU! La copia su GitHub si aggiorna periodicamente. La partita non viene salvata.';
       } catch (error) {
         if (this.record !== record) return;
         $('arcade-publish').disabled = false;
@@ -156,7 +156,8 @@
         });
         status.textContent = records.length ? `${records.length} risultati in classifica.` : 'Il muro è ancora vuoto. La prima scalata può essere la tua.';
         const details = global.DojoLeaderboard.details?.();
-        $('leaderboard-note').textContent = details?.partial ? 'Sono mostrati i risultati disponibili nelle ultime 500 segnalazioni GitHub.' : 'Risultati pubblicati dalla community su GitHub. Nessuna partita può essere ripresa dalla classifica.';
+        const sourceNote = details?.archive ? 'Mostro la copia su GitHub: i risultati più recenti potrebbero arrivare dopo.' : 'Risultati salvati nella classifica online. La copia su GitHub si aggiorna periodicamente.';
+        $('leaderboard-note').textContent = (details?.partial ? 'Mostro una parte dei risultati disponibili. ' : '') + sourceNote + ' Nessuna partita può essere ripresa dalla classifica.';
         return records;
       } catch (error) { status.textContent = error.message || 'Classifica non disponibile. Riprova tra poco.'; return null; }
       finally { $('leaderboard-reload').disabled = false; }
@@ -168,8 +169,11 @@
       try {
         const records = await global.DojoLeaderboard.load({ force: true });
         if (this.record !== record || this.publicationVersion !== version) return;
-        const entries = global.DojoLeaderboard.details?.()?.entries || records;
-        $('arcade-publish-status').textContent = entries.some(r => r.id === record.id) ? 'RISULTATO PUBBLICATO. OSU!' : this.publishedId === record.id ? 'Risultato salvato. La classifica si sta aggiornando.' : 'Risultato non ancora trovato. Salvalo in classifica e riprova tra poco.';
+        const details = global.DojoLeaderboard.details?.();
+        const entries = details?.entries || records;
+        const present = details?.archive ? 'RISULTATO PRESENTE ANCHE NELL’ARCHIVIO GITHUB. OSU!' : 'RISULTATO IN CLASSIFICA. OSU! La copia su GitHub si aggiorna periodicamente.';
+        const pending = details?.archive ? 'Risultato salvato. La copia su GitHub si sta aggiornando.' : 'Risultato salvato. La classifica si sta aggiornando.';
+        $('arcade-publish-status').textContent = entries.some(r => r.id === record.id) ? present : this.publishedId === record.id ? pending : 'Risultato non ancora trovato. Salvalo in classifica e riprova tra poco.';
       } catch (error) { if (this.record === record && this.publicationVersion === version) $('arcade-publish-status').textContent = error.message || 'Verifica non disponibile.'; }
       finally { if (this.record === record && this.publicationVersion === version) $('arcade-check-result').disabled = false; }
     }

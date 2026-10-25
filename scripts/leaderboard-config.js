@@ -1,3 +1,3 @@
-/* Public URL only. Configure after deploying server/leaderboard-server.cjs.
-   Example: https://scores.example.org/records. Never put a GitHub token here. */
-window.KYOKUSHIN_LEADERBOARD_ENDPOINT = window.KYOKUSHIN_LEADERBOARD_ENDPOINT || '';
+/* Public endpoint only. Records save in D1; GitHub Actions archives them later.
+   No account or GitHub credential is needed by the player or this browser. */
+window.KYOKUSHIN_LEADERBOARD_ENDPOINT = window.KYOKUSHIN_LEADERBOARD_ENDPOINT || 'https://kyokushin-dojo-classifica.flazio1.chatgpt.site/records';

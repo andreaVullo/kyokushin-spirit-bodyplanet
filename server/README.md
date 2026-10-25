@@ -1,72 +1,46 @@
-# Servizio della classifica Arcade
+# Servizio online della classifica Arcade
 
-Questo servizio riceve i risultati anonimi dal browser e li archivia nelle Issues GitHub del gioco. Il giocatore usa solo il nome scelto. Nessuna credenziale GitHub arriva al browser e nessun progresso della partita viene salvato.
+Il servizio è pubblicato su **[kyokushin-dojo-classifica.flazio1.chatgpt.site](https://kyokushin-dojo-classifica.flazio1.chatgpt.site)**. I giocatori inviano soltanto il nome scelto e il risultato finale, senza account. La scrittura avviene nel database D1; un workflow separato copia periodicamente i risultati nel repository GitHub. Non viene salvato l’avanzamento della partita.
 
-**Il servizio non è ancora pubblicato.** Il pacchetto contiene il server eseguibile e i test; occorre collegare un hosting HTTPS e configurare la credenziale. GitHub Pages e il componente HTML di Flazio non eseguono processi Node.
+## Sorgenti e distribuzione
 
-## Requisiti e avvio
+`server/sites/` contiene il progetto Sites/Vinext completo, con dipendenze bloccate, migrazione D1, handler e test. Sono esclusi dipendenze installate, build, database locali, credenziali e stato degli strumenti. Questa cartella sostituisce il precedente server Node con token Issues: il servizio attuale non richiede credenziali GitHub.
 
-Node.js 22 o successivo, senza pacchetti aggiuntivi. Conservare `server/leaderboard-server.cjs` insieme a `scripts/leaderboard.js`, usato per validare i record. Servono un endpoint HTTPS e una cartella scrivibile persistente per l’indice dei record.
+Distribuzione verificata il 25 ottobre 2026:
 
-Configurare nell’ambiente del servizio:
+- Progetto Sites: `appgprj_6add6f19c5b8819186886c015a2bd7f8`.
+- Versione: `appgprj_6add6f19c5b8819186886c015a2bd7f8~appgver_d1cafb8c372c8191905852228a596081`.
+- Commit del repository sorgente Sites: `16ce728ff1332d611ec9949bb77b18bddf9f467e`.
+- `GET /health` ha confermato servizio pronto e D1 presente.
+- Lettura pubblica, preflight dall’origine GitHub Pages e rifiuto di un record non valido sono stati verificati. Nessun risultato di prova è stato inserito in produzione.
 
-| Variabile | Valore |
-| --- | --- |
-| `GITHUB_TOKEN` | Token fine-grained dell’account che archivia i risultati, limitato al solo repository con **Issues: read and write**. Nessun permesso Contents richiesto. |
-| `ALLOWED_ORIGINS` | Origini del gioco separate da virgola; per il gioco GitHub Pages: `https://andreavullo.github.io`. Conta l’origine dell’iframe, non quella della pagina Flazio esterna. |
-| `LEADERBOARD_STORE` | Percorso assoluto su disco persistente, per esempio `/var/lib/dojo/records-index.json`. Il processo deve poter creare e aggiornare il file. |
-| `HOST` | `127.0.0.1` dietro un reverse proxy sullo stesso server; `0.0.0.0` solo se richiesto dalla rete privata dell’hosting. |
-| `PORT` | Porta assegnata dall’hosting; valore predefinito `8787`. |
-| `TRUST_PROXY` | Lasciare `0`. Usare `1` soltanto con un reverse proxy fidato che **sostituisce** `X-Forwarded-For`, impedendo al client di fornirlo. |
+Gli aggiornamenti di `server/sites/` devono essere distribuiti allo **stesso progetto Sites** usando il flusso Sites. Un normale push del gioco su GitHub aggiorna i file, ma non ridistribuisce automaticamente il servizio. Conservare `.openai/hosting.json` e la cronologia delle migrazioni; non creare un nuovo database a ogni aggiornamento. Il README dentro `sites/` descrive sviluppo e build.
 
-Il repository predefinito è `andreaVullo/kyokushin-spirit-bodyplanet`. `GITHUB_OWNER` e `GITHUB_REPOSITORY_NAME` sono facoltative per un altro archivio, che deve essere configurato anche nel client.
+## API
 
-Il token va inserito nel gestore dei segreti dell’hosting o in `server/.env`, escluso da Git. Non scriverlo in un file pubblico, nel codice Flazio, nei log o in una richiesta del browser. `.env.example` contiene solo i nomi delle variabili.
+- `GET /health`: stato del servizio e del database, senza dati riservati.
+- `GET /records`: archivio pubblico paginato; `nextCursor` nullo segnala l’ultima pagina.
+- `POST /records`: JSON del risultato finale, massimo 4096 byte.
 
-Avvio con variabili configurate dall’hosting:
+Dopo una scrittura confermata, il servizio restituisce `{id, stored:true, duplicate, githubSynced:false, archiveUrl}`. `githubSynced:false` ricorda che la copia GitHub avviene in seguito. Ripetere lo stesso record restituisce `duplicate:true`; riusare l’id con dati cambiati produce un conflitto.
 
-```sh
-node server/leaderboard-server.cjs
-```
+Il client del gioco è collegato tramite `scripts/leaderboard-config.js`. Usa HTTPS e non invia cookie. L’origine ammessa per scrivere è `https://andreavullo.github.io`: conta l’origine dell’iframe del gioco, non quella della pagina Flazio esterna. Per cambiare hosting del gioco, aggiornare la variabile server `ALLOWED_ORIGINS` con le origini esatte. Le letture sono pubbliche.
 
-Per una configurazione locale in `server/.env`:
+D1 condivide i contatori tra le istanze: massimo 5 tentativi ogni 10 minuti per indirizzo e 30 al minuto in totale. L’indirizzo fornito dalla rete Cloudflare viene trasformato in un’impronta temporanea; non è aggiunto ai record. CORS e rate limit riducono gli abusi comuni, ma non autenticano il giocatore e non certificano i punteggi.
 
-```sh
-node --env-file=server/.env server/leaderboard-server.cjs
-```
+## Copia GitHub
 
-Esporre il processo dietro HTTPS e mantenere persistente il percorso dell’indice. L’indice contiene identificativo, numero della Issue e impronta del risultato; non contiene il token né dati per riprendere partite. Il percorso predefinito è `server/data/records-index.json`, escluso da Git, se la variabile non è impostata.
+Il workflow `.github/workflows/sync-arcade-leaderboard.yml` legge l’API pubblica e aggiorna solo `data/arcade-leaderboard.json`. È programmato ogni 15 minuti, con eventuali ritardi di GitHub Actions; è disponibile anche l’avvio manuale. Usa esclusivamente il `GITHUB_TOKEN` temporaneo di Actions con `contents: write`, senza token personali nel servizio.
 
-## Collegare il gioco
+`tools/sync-arcade-leaderboard.cjs` valida pagine e record prima della sostituzione atomica. Un errore conserva la copia precedente. Nessun nome o campo del risultato viene interpolato in comandi shell. Controllare le esecuzioni nella scheda Actions del repository dopo la pubblicazione del workflow.
 
-1. Verificare `GET /health`: risponde con `{"ready":true}` quando token, origini e indice sono inizializzati. Questo controllo non crea Issues e non prova la validità del token su GitHub.
-2. Inserire l’URL HTTPS di `POST /records` in `scripts/leaderboard-config.js`; caricare questo file prima di `scripts/leaderboard.js`.
-3. Pubblicare il gioco aggiornato. Il pulsante **Salva in classifica** invia il record soltanto dopo la scelta del giocatore.
+## Test
 
-Non è stato inserito un endpoint dimostrativo attivo. Con URL vuoto il gioco dichiara che il servizio non è collegato. L’URL HTTP è accettato dal client solo per localhost, utile per lo sviluppo; in produzione serve HTTPS.
-
-## Richieste e limiti
-
-`POST /records` riceve un oggetto JSON di massimo **4096 byte**. Schema, nome, grado, punteggio e fine della sfida vengono ricontrollati sul server. La risposta confermata è:
-
-```json
-{"id":"identificativo-della-sfida","issueNumber":1,"url":"https://github.com/andreaVullo/kyokushin-spirit-bodyplanet/issues/1","duplicate":false}
-```
-
-Il numero è soltanto un esempio del formato, non un record creato. Una richiesta ripetuta con lo stesso risultato restituisce `duplicate:true`; lo stesso id con dati cambiati viene rifiutato. Richieste contemporanee per lo stesso id condividono un solo invio GitHub. L’indice persiste fino a 20.000 identificativi; in sua assenza il servizio cerca il record anche nelle ultime 500 Issues.
-
-Sono consentiti al massimo **5 tentativi ogni 10 minuti per indirizzo** e **30 al minuto in totale** per processo. Questi limiti sono in memoria: per più repliche o volumi elevati occorre un limitatore condiviso. Senza `TRUST_PROXY`, il servizio usa l’indirizzo della connessione; dietro un proxy tutti i visitatori possono quindi condividere lo stesso limite. Configurare il proxy prima di aprire il servizio al pubblico.
-
-Sono ammesse solo le origini configurate, tramite CORS con elenco esplicito, senza cookie o credenziali del browser. CORS riduce gli usi da altre pagine, ma non autentica un client: il nome è libero e i punteggi sono dichiarati dal browser. I limiti prevengono abusi comuni, non costituiscono un sistema anti-cheat.
-
-Gli errori espongono soltanto codici: `invalid-record`, `origin`, `rate-limit`, `conflict`, `not-configured` o `upstream`. La risposta GitHub e il token non vengono restituiti al client. Non sono previsti invii automatici in caso di errore; il giocatore può riprovare la stessa sfida senza farla contare due volte.
-
-## Verifica
+Dalla radice del gioco, con Node.js 22.13 o successivo:
 
 ```sh
-node --test tests/leaderboard.test.cjs tests/leaderboard-server.test.cjs
+node --test tests/leaderboard.test.cjs tests/leaderboard-sync.test.cjs tests/arcade-ui.test.cjs
+node --test server/sites/tests/service.test.mjs
 ```
 
-I test simulano GitHub: nessun record viene pubblicato e non serve un token. Coprono invio anonimo, schema, dimensioni, origini, rate limit, richieste simultanee, riavvio con indice, recovery dall’archivio ed errori senza segreti.
-
-La pubblicazione effettiva si verifica con un risultato reale scelto dal giocatore, dopo aver collegato il servizio. Non creare record di test nella classifica pubblica.
+I test del servizio usano SQLite reale in memoria e lo stesso SQL della migrazione D1. Le verifiche di produzione devono usare richieste di lettura o record invalidi; la prima scrittura pubblica valida deve essere un risultato reale scelto dal giocatore.
