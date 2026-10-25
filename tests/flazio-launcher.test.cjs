@@ -1,6 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const vm = require('node:vm');
 const { createLauncher, computeFrameLayout, measureViewport, trusted, install } = require('../scripts/flazio-launcher.js');
 
 class Events {
@@ -22,7 +23,7 @@ class Element extends Events {
     if (tag === 'iframe') this.contentWindow = { messages: [], postMessage(data, origin) { this.messages.push({ data, origin }); } };
   }
   appendChild(el) { return this.insertBefore(el, null); }
-  insertBefore(el, before) { el.remove(); el.parentNode = this; const i = this.children.indexOf(before); this.children.splice(i < 0 ? this.children.length : i, 0, el); return el; }
+  insertBefore(el, before) { el.remove(); el.parentNode = this; const i = this.children.indexOf(before); this.children.splice(i < 0 ? this.children.length : i, 0, el); if (el.tagName === 'SCRIPT' && el.textContent && this.doc.context && !this.doc.blockInlineScripts) vm.runInContext(el.textContent, this.doc.context); return el; }
   remove() { if (this.parentNode) { const list = this.parentNode.children; list.splice(list.indexOf(this), 1); this.parentNode = null; } }
   setAttribute(k, v) { this.attrs.set(k, v); if (k === 'open') this.open = true; }
   getAttribute(k) { return this.attrs.get(k) ?? null; }
@@ -54,6 +55,7 @@ function environment(width = 390, height = 844) {
     scrollTo(x, y) { this.scrollX = x; this.scrollY = y; },
     MutationObserver: class { constructor(fn) { this.callback = fn; win.observer = this; } observe(node, options) { (this.observed ||= []).push({ node, options }); } disconnect() { this.disconnected = true; } }
   });
+  doc.context = vm.createContext({ window: win, URL, console });
   return { win, doc, meta, pending, launcher: createLauncher(win, { gameUrl: '../Gioca.html' }),
     resize(w, h) { win.innerWidth = doc.documentElement.clientWidth = win.visualViewport.width = w; win.innerHeight = doc.documentElement.clientHeight = win.visualViewport.height = h; } };
 }
@@ -291,4 +293,53 @@ test('host keeps pinch zoom dimensions but rejects oversized stale viewports of 
   assert.deepEqual(measureViewport(win), { width: 844, height: 390, left: 0, top: 0 });
   Object.assign(win.visualViewport, { width: 422, height: 195, scale: 2, offsetLeft: 600, offsetTop: 300 });
   assert.deepEqual(measureViewport(win), { width: 422, height: 195, left: 422, top: 195 });
+});
+
+test('the top-page controller, timer callbacks and event listeners are created in the top realm', () => {
+  const host = environment(), component = environment(320, 180); component.win.top = host.win;
+  const launcher = install(component.win, { gameUrl: '../Gioca.html' });
+  const HostFunction = vm.runInContext('Function', host.doc.context);
+  assert.equal(launcher.open instanceof HostFunction, true, 'controller must not retain the component realm');
+  launcher.open();
+  assert.equal([...host.pending.values()].every(fn => fn instanceof HostFunction), true);
+  assert.equal([...host.win.listeners.get('message')].every(fn => fn instanceof HostFunction), true);
+  const close = host.doc.querySelectorAll('button').find(button => button.textContent === 'Chiudi ×');
+  assert.equal([...close.listeners.get('click')].every(fn => fn instanceof HostFunction), true);
+  assert.equal(host.doc.querySelectorAll('[data-kyokushin-open]').length, 0, 'bootstrap must not add a second launch button');
+  launcher.close();
+});
+
+test('CSP external bootstrap runs in the host, deduplicates pending loads and adds no host button', () => {
+  const host = environment(), first = environment(320, 180), second = environment(320, 180);
+  host.doc.blockInlineScripts = true;
+  for (const component of [first, second]) {
+    component.win.top = host.win;
+    const script = component.doc.createElement('script'); script.src = 'http://127.0.0.1:8765/scripts/flazio-launcher.js';
+    component.doc.currentScript = script; component.doc.head.appendChild(script);
+    assert.equal(install(component.win, { gameUrl: '../Gioca.html' }), null);
+  }
+  const scripts = host.doc.querySelectorAll('script'); assert.equal(scripts.length, 1);
+  const external = scripts[0]; assert.equal(external.getAttribute('data-kyokushin-host-only'), 'true');
+  assert.equal(external.getAttribute('data-game-url'), 'http://127.0.0.1:8765/Gioca.html');
+  host.doc.currentScript = external;
+  vm.runInContext(require('node:fs').readFileSync(require.resolve('../scripts/flazio-launcher.js'), 'utf8'), host.doc.context);
+  const launcher = host.win.KyokushinLauncher;
+  assert.equal(launcher.open instanceof vm.runInContext('Function', host.doc.context), true);
+  assert.equal(host.doc.querySelectorAll('[data-kyokushin-open]').length, 0);
+  const button = second.doc.querySelector('[data-kyokushin-open]');
+  second.doc.dispatch('click', { target: { closest: () => button }, preventDefault() {} });
+  assert.equal(launcher.getState().opened, true); launcher.close();
+});
+test('failed external bootstrap can retry and never installs a controller in the component realm', () => {
+  const host = environment(), component = environment(); component.win.top = host.win;
+  host.doc.blockInlineScripts = true;
+  const source = component.doc.createElement('script'); source.src = 'http://127.0.0.1:8765/scripts/flazio-launcher.js';
+  component.doc.currentScript = source; component.doc.head.appendChild(source);
+  install(component.win, { gameUrl: '../Gioca.html' });
+  const external = host.doc.querySelectorAll('script')[0]; external.dispatch('error');
+  assert.equal(host.doc.querySelectorAll('script').length, 0);
+  assert.equal(host.win.KyokushinLauncher, undefined);
+  assert.equal(component.win.KyokushinLauncher, undefined);
+  install(component.win, { gameUrl: '../Gioca.html' });
+  assert.equal(host.doc.querySelectorAll('script').length, 1);
 });

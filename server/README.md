@@ -9,9 +9,10 @@ Il servizio è pubblicato su **[kyokushin-dojo-classifica.flazio1.chatgpt.site](
 Distribuzione verificata il 25 ottobre 2026:
 
 - Progetto Sites: `appgprj_6add6f19c5b8819186886c015a2bd7f8`.
-- Versione: `appgprj_6add6f19c5b8819186886c015a2bd7f8~appgver_d1cafb8c372c8191905852228a596081`.
-- Commit del repository sorgente Sites: `16ce728ff1332d611ec9949bb77b18bddf9f467e`.
+- Versione: `appgprj_6add6f19c5b8819186886c015a2bd7f8~appgver_9ee81e104b888191a68081d3f0bc1711`.
+- Commit del repository sorgente Sites: `9591c718269fd712ac7380389fc35630c389fe20`.
 - `GET /health` ha confermato servizio pronto e D1 presente.
+- La seconda migrazione aggiunge l’indice `(received_at, id)` per la paginazione ordinata; SQLite ne verifica l’uso senza ordinamento temporaneo.
 - Lettura pubblica, preflight dall’origine GitHub Pages e rifiuto di un record non valido sono stati verificati. Nessun risultato di prova è stato inserito in produzione.
 
 Gli aggiornamenti di `server/sites/` devono essere distribuiti allo **stesso progetto Sites** usando il flusso Sites. Un normale push del gioco su GitHub aggiorna i file, ma non ridistribuisce automaticamente il servizio. Conservare `.openai/hosting.json` e la cronologia delle migrazioni; non creare un nuovo database a ogni aggiornamento. Il README dentro `sites/` descrive sviluppo e build.

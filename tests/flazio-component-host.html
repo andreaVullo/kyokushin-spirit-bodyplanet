@@ -12,5 +12,17 @@ if(new URLSearchParams(location.search).get('nonative')==='1'){
 <script>
 document.getElementById('replace').onclick=function(){var frame=document.getElementById('component');frame.src='flazio-component.html?rebuild='+Date.now();};
 document.getElementById('delayed-adaptive').onclick=function(){setTimeout(function(){document.documentElement.style.zoom='.68';document.body.style.transform='scale(.68)';document.querySelector('meta[name="viewport"]').content='width=1200, initial-scale=.68';},3000);};
+// ?destroycomponent=1 models Flazio removing the realm that ran the fragment.
+// The host owns this timer, so the test itself survives the component removal.
+if(new URLSearchParams(location.search).get('destroycomponent')==='1'){
+  var destructionWatch=setInterval(function(){
+    if(!window.KyokushinLauncher||!window.KyokushinLauncher.getState().opened)return;
+    clearInterval(destructionWatch);
+    setTimeout(function(){
+      var frame=document.getElementById('component');if(frame)frame.remove();
+      document.documentElement.dataset.componentDestroyed='true';
+    },1500);
+  },100);
+}
 setInterval(function(){var launcher=window.KyokushinLauncher,state=launcher&&launcher.getState();document.getElementById('diagnostics').textContent=JSON.stringify({version:launcher&&launcher.version,innerWidth:innerWidth,innerHeight:innerHeight,opened:state&&state.opened,layout:state&&state.layout,topPageGameFrames:document.querySelectorAll('#kyokushin-host-v6 iframe').length},null,2);},500);
 </script></body></html>

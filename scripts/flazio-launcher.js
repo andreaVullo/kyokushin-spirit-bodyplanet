@@ -1,4 +1,4 @@
-/* Kyokushin Spirit — Flazio adaptive launcher, onsite-dialog-v7.
+/* Kyokushin Spirit — Flazio adaptive launcher, onsite-dialog-v8.
  * The host alone rotates the iframe; its document receives landscape dimensions.
  * This file is also copied inline into the two Flazio pasteable fragments.
  */
@@ -7,12 +7,13 @@
   var api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api;
   else api.install(root);
-})(typeof window === 'undefined' ? null : window, function () {
+})(typeof window === 'undefined' ? null : window, function createAPI() {
   'use strict';
-  var KEY = '__kyokushinFlazioLauncherV7';
-  var DELEGATE = '__kyokushinFlazioDelegateV7';
+  var KEY = '__kyokushinFlazioLauncherV8';
+  var DELEGATE = '__kyokushinFlazioDelegateV8';
+  var LOADING = '__kyokushinFlazioBootstrapV8';
   var GAME = 'https://andreavullo.github.io/kyokushin-spirit-bodyplanet/Gioca.html';
-  var VERSION = 'onsite-dialog-v7';
+  var VERSION = 'onsite-dialog-v8';
   var VIEWPORT = 'width=device-width, initial-scale=1, viewport-fit=cover';
   function positive(value, fallback) { return Number.isFinite(value) && value > 0 ? value : fallback; }
   function offset(value, maximum) { return Number.isFinite(value) ? Math.max(0, Math.min(maximum, value)) : 0; }
@@ -61,6 +62,35 @@
     try { if (win.top && win.top.document && win.top.document.documentElement) return win.top; }
     catch (_) { /* Cross-origin parents are outside this launcher's authority. */ }
     return win;
+  }
+  function bootstrapHost(host, sourceScript, gameUrl) {
+    if (host[KEY]) return host[KEY];
+    var doc = host.document, script = doc.createElement('script');
+    var nonce = sourceScript && (sourceScript.nonce || sourceScript.getAttribute('nonce'));
+    if (nonce) script.setAttribute('nonce', nonce);
+    // Passing top to a function created in the component does not move that
+    // function into top's realm. The entire factory must execute in the host:
+    // otherwise callbacks can stop when Flazio navigates/recreates its iframe,
+    // and postMessage may identify that component as the sender instead of top.
+    script.textContent = '(' + createAPI.toString() + ')().install(window,' +
+      JSON.stringify({ gameUrl: gameUrl, hostOnly: true }) + ');';
+    try { doc.head.appendChild(script); } catch (_) {} finally { script.remove(); }
+    if (host[KEY]) return host[KEY];
+    // An external fragment can still bootstrap when CSP disallows inline code.
+    // Its script runs in the host realm too; never fall back to a child-owned
+    // controller. A repeated component installation shares this pending load.
+    if (sourceScript && sourceScript.src && !host[LOADING]) {
+      var external = doc.createElement('script');
+      external.src = sourceScript.src; external.async = true;
+      external.setAttribute('data-game-url', gameUrl);
+      external.setAttribute('data-kyokushin-host-only', 'true');
+      if (nonce) external.setAttribute('nonce', nonce);
+      external.addEventListener('error', function () {
+        if (host[LOADING] === external) { delete host[LOADING]; external.remove(); }
+      });
+      host[LOADING] = external; doc.head.appendChild(external);
+    }
+    return null;
   }
   function createLauncher(win, options) {
     options = options || {};
@@ -313,17 +343,29 @@
     if (!launcher) {
       var gameUrl = options && options.gameUrl || script && script.getAttribute('data-game-url');
       var absoluteGameUrl = new URL(gameUrl || GAME, doc.baseURI || win.location.href).href;
-      launcher = host[KEY] = createLauncher(host, { gameUrl: absoluteGameUrl });
-      host.KyokushinLauncher = launcher;
+      if (host !== win) launcher = bootstrapHost(host, script, absoluteGameUrl);
+      else {
+        launcher = host[KEY] = createLauncher(host, { gameUrl: absoluteGameUrl });
+        host.KyokushinLauncher = launcher; delete host[LOADING];
+      }
     }
-    win.KyokushinLauncher = launcher;
+    if (launcher) win.KyokushinLauncher = launcher;
+    if (options && options.hostOnly || script && script.getAttribute('data-kyokushin-host-only') === 'true') return launcher;
     if (!doc[DELEGATE]) {
       doc[DELEGATE] = true;
       doc.addEventListener('click', function (event) {
         var target = event.target && event.target.closest && event.target.closest('[data-kyokushin-open]');
         // Call directly from the trusted click: delaying the host call would
         // lose the user activation required by native fullscreen on phones.
-        if (target) { event.preventDefault(); launcher.open(); }
+        if (target) {
+          event.preventDefault(); var current = host[KEY];
+          if (current) { win.KyokushinLauncher = current; current.open(); }
+          else {
+            var notice = doc.querySelector('[data-kyokushin-launch-error]');
+            if (!notice) { notice = doc.createElement('p'); notice.setAttribute('data-kyokushin-launch-error', ''); notice.setAttribute('role', 'status'); target.parentNode.appendChild(notice); }
+            notice.textContent = host[LOADING] ? 'Il gioco si sta caricando. Riprova tra un momento.' : 'Il sito non consente di avviare il gioco. Ricarica la pagina e riprova.';
+          }
+        }
       });
     }
     // Flazio may execute the fragment again after recreating its components.

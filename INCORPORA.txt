@@ -1,5 +1,5 @@
 KYOKUSHIN SPIRIT — INCORPORA IL GIOCO NEL TUO SITO
-LAUNCHER FLAZIO V7 · onsite-dialog-v7
+LAUNCHER FLAZIO V8 · onsite-dialog-v8
 
 INDIRIZZI
 Pagina del dojo: https://kyokushinkaicataniadojo.it/play
@@ -16,7 +16,7 @@ PRIMA DI INCOLLARE IL LAUNCHER: PUBBLICA IL GIOCO COMPLETO
    come reindirizzamento al gioco. Includi tutta la cartella assets/arcade/.
 2. Prova l’URL pubblico: attendi il caricamento, seleziona un nuovo karateka
    e avvia un incontro. Un URL localhost o 127.0.0.1 è solo locale.
-3. Su Flazio sostituisci il vecchio frammento con UNA delle varianti V7.
+3. Su Flazio sostituisci il vecchio frammento con UNA delle varianti V8.
    Non lasciare due launcher diversi attivi nello stesso componente.
 
 ARCADE E CLASSIFICA
@@ -77,7 +77,7 @@ Non aggiungere tag <script>, <iframe> o un documento HTML.
 
 CARD GIOCA DEL SITO
 flazio-componente-gioca.html mantiene la card originale e carica il launcher
-V7 da GitHub Pages. Incollalo in modalità HTML dopo avere pubblicato tutti
+V8 da GitHub Pages. Incollalo in modalità HTML dopo avere pubblicato tutti
 i file aggiornati; sostituisce il componente precedente.
 
 COME SI ADATTA AL TELEFONO
@@ -91,7 +91,9 @@ del contenitore e non applica una seconda rotazione.
 
 La stessa partita continua quando ruoti il telefono o Flazio ricrea il
 componente adaptive. Anche se il codice HTML è dentro un piccolo iframe
-dello stesso dominio, il pannello viene aperto nella pagina principale.
+dello stesso dominio, il pannello e tutto il codice che lo gestisce vengono
+eseguiti nella pagina principale. Timer, messaggi e pulsanti continuano a
+funzionare se Flazio distrugge o ricarica l’iframe del componente.
 Per tutta la sessione corregge viewport, zoom e trasformazioni, anche se
 Flazio li riscrive dopo una rotazione. Considera le aree sicure, mantiene
 Chiudi visibile e scarta misure obsolete della viewport visiva. Posizione
@@ -119,6 +121,9 @@ adaptive larga 1200 px, trasformata, con ricostruzione del componente.
 Per il vero annidamento HTML usa tests/flazio-component-host.html: il
 pulsante è dentro un iframe di 320 × 180 pixel. Aggiungi ?nonative=1 a
 uno dei due indirizzi per provare l’adattamento CSS senza fullscreen nativo.
+Aggiungi destroycomponent=1 alla prova del componente HTML per rimuovere
+il suo iframe 1,5 secondi dopo l’apertura: caricamento, rotazione e Chiudi
+devono continuare a funzionare.
 Il pulsante Ricalcola adaptive fra 3 secondi simula la riscrittura di zoom,
 trasformazione e viewport dopo l’apertura del gioco.
 I test automatici si eseguono con: node --test tests/*.test.cjs
@@ -143,7 +148,7 @@ SU ALTRI SITI — IFRAME GENERICO
 3. Incolla il codice in un blocco HTML/iframe. L’hosting deve permettere
    l’incorporamento tramite iframe.
 
-Su Flazio adaptive usa i frammenti V7: l’iframe generico non gestisce
+Su Flazio adaptive usa i frammenti V8: l’iframe generico non gestisce
 viewport, zoom e ricostruzione della pagina ospitante. Schermo intero può
 adattare il gioco anche con rotazione bloccata, ma se il browser nega il
 fullscreen l’iframe resta nello spazio assegnato dal sito.
@@ -181,4 +186,4 @@ AGGIORNAMENTI SUCCESSIVI
 Distribuisci sempre il pacchetto completo con Gioca.html, scripts/ e assets/.
 Se cambia scripts/flazio-launcher.js, aggiorna anche il codice incorporato
 nei due frammenti e sostituisci quello incollato su Flazio. Il generatore
-Incorpora.html produce l’iframe generico, non il launcher adaptive V7.
+Incorpora.html produce l’iframe generico, non il launcher adaptive V8.
