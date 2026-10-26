@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-25T18:47:25.250Z",
+  "updatedAt": "2026-10-26T19:42:40.384Z",
   "records": [
     {
       "version": 1,
@@ -18,6 +18,23 @@
       "matches": 15,
       "elapsedSeconds": 284.936,
       "createdAt": "2026-10-25T18:47:22.794Z"
+    },
+    {
+      "version": 1,
+      "id": "079a6396-4a81-4bad-83e1-5205ddd1c6a2",
+      "name": "Marco",
+      "gender": "male",
+      "hairstyle": 3,
+      "score": 4873,
+      "wins": 2,
+      "rankIndex": 2,
+      "rankId": "9-kyu",
+      "rankLabel": "9 KYU",
+      "completed": false,
+      "reason": "abandoned",
+      "matches": 2,
+      "elapsedSeconds": 28.722,
+      "createdAt": "2026-10-26T17:58:32.793Z"
     },
     {
       "version": 1,
@@ -106,6 +123,23 @@
     },
     {
       "version": 1,
+      "id": "78648489-a93f-4b47-9047-5609850ac1c1",
+      "name": "PDOR",
+      "gender": "male",
+      "hairstyle": 2,
+      "score": 35559,
+      "wins": 12,
+      "rankIndex": 12,
+      "rankId": "2-dan",
+      "rankLabel": "2 DAN",
+      "completed": false,
+      "reason": "defeat",
+      "matches": 13,
+      "elapsedSeconds": 210.176,
+      "createdAt": "2026-10-26T19:42:38.128Z"
+    },
+    {
+      "version": 1,
       "id": "94c8383b-b7a0-413f-a0e1-eeaa5b26b2f6",
       "name": "Luca",
       "gender": "male",
@@ -120,6 +154,23 @@
       "matches": 1,
       "elapsedSeconds": 16.1,
       "createdAt": "2026-10-25T08:45:17.111Z"
+    },
+    {
+      "version": 1,
+      "id": "e7d907dc-5b8a-46dc-9671-bc5e7d7a5cdd",
+      "name": "Thomas Sacrato",
+      "gender": "male",
+      "hairstyle": 0,
+      "score": 75147,
+      "wins": 20,
+      "rankIndex": 20,
+      "rankId": "10-dan",
+      "rankLabel": "10 DAN",
+      "completed": true,
+      "reason": "completed",
+      "matches": 20,
+      "elapsedSeconds": 311.017,
+      "createdAt": "2026-10-26T18:09:18.339Z"
     }
   ]
 }
