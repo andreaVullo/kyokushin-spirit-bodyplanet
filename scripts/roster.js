@@ -114,6 +114,12 @@
     "name": "ROBERTO DE MARZI", "short": "ROBERTO DE MARZI",
     "rank": "KARATEKA · 2 KYU", "belt": "CINTURA MARRONE",
     "beltColor": "brown", "variant": "", "assetId": "13-roberto-de-marzi"
+  },
+  "tommaso-porto": {
+    "name": "TOMMASO PORTO", "short": "TOMMASO PORTO",
+    "rank": "KARATEKA · 10 KYU", "belt": "CINTURA ARANCIONE",
+    "beltColor": "orange", "variant": "", "assetId": "14-tommaso-porto"
   }
+
 }).map(([id, metadata]) => [id, Object.freeze(metadata)])));
 })(typeof window !== "undefined" ? window : globalThis);

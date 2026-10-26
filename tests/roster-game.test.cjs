@@ -15,6 +15,7 @@ for (const file of ['scripts/roster.js', 'scripts/game.js']) {
 const { KyokushinGame, KyokushinRoster } = context;
 
 const names = {
+  "tommaso-porto": "TOMMASO PORTO",
   "maurizio-zappala": "MAURIZIO ZAPPALÀ",
   "roberto-de-marzi": "ROBERTO DE MARZI",
   'emanuele-micalizzi': 'EMANUELE MICALIZZI',
@@ -215,4 +216,10 @@ test('new karateka retain their own school and belt without an invented dan', ()
  assert.equal(KyokushinRoster['maurizio-zappala'].belt, 'CINTURA NERA');
  assert.equal(KyokushinRoster['roberto-de-marzi'].rank, 'KARATEKA · 2 KYU');
  assert.equal(KyokushinRoster['roberto-de-marzi'].beltColor, 'brown');
+});
+
+test('Tommaso Porto wears a plain orange belt at 10 kyu', () => {
+ assert.equal(KyokushinRoster['tommaso-porto'].rank,'KARATEKA · 10 KYU');
+ assert.equal(KyokushinRoster['tommaso-porto'].belt,'CINTURA ARANCIONE');
+ assert.equal(KyokushinRoster['tommaso-porto'].beltColor,'orange');
 });

@@ -4,7 +4,7 @@ body{margin:0;padding:20px;background:#111c27;color:#f4ead5;font:14px system-ui}
 </style>
 <h1>Scelta personaggio e VS · scala e posizione comuni</h1>
 <p id="status">Caricamento dei renderer reali e delle immagini del gioco…</p>
-<p id="legend">14 karateka del dojo · 5 capigliature uomo · 5 capigliature donna. Linea oro: appoggio comune; linea azzurra: altezza comune.</p>
+<p id="legend">15 karateka del dojo · 5 capigliature uomo · 5 capigliature donna. Linea oro: appoggio comune; linea azzurra: altezza comune.</p>
 <button id="full" aria-pressed="true">Figura intera / VS</button><button id="bust" aria-pressed="false">Ritratti elenco</button><button id="size">Ingrandisci</button>
 <div class="grid" id="grid"></div><details><summary>Misure e risultati</summary><pre id="report"></pre></details>
 <script src="load-real-art.js"></script>
@@ -42,7 +42,7 @@ body{margin:0;padding:20px;background:#111c27;color:#f4ead5;font:14px system-ui}
     return { left, top, right, bottom, width: right - left, height: bottom - top, center: (left + right) / 2 };
   }
   const failures = [], measurements = [];
-  if (entries.filter(entry => entry.type === 'dojo').length !== 14) failures.push('Il roster deve contenere quattordici karateka.');
+  if (entries.filter(entry => entry.type === 'dojo').length !== 15) failures.push('Il roster deve contenere quindici karateka.');
   if (entries.filter(entry => entry.name === 'MARCO TABACCO').length !== 1 || entries.some(entry => /foto.gruppo/.test(entry.id))) failures.push('Marco Tabacco compare più volte.');
   for (const [width, height] of [[600, 640], [300, 320], [300, 260]]) {
     probe.width = width; probe.height = height;
