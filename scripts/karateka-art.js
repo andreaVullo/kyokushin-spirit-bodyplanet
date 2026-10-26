@@ -11,6 +11,7 @@
   // Measured hairline-to-chin geometry in each intact idle cutout. Full atlas
   // rectangles include a wide stance, which must not shrink faces in cards.
   const portraitHeads = {
+    "15-remo-valerio-labbia": [170, 2, 85, 83],
     "14-tommaso-porto": [179, 2, 83, 85],
     "12-maurizio-zappala": [129, 2, 71, 70],
     "13-roberto-de-marzi": [180, 2, 75, 69],
@@ -137,7 +138,7 @@
         };
         image.src = source;
       };
-      script.src = new URL(key + '.js?v=20261026-2', root).href;
+      script.src = new URL(key + '.js?v=20261026-3', root).href;
       document.head.append(script);
     }).finally(() => pending.delete(key));
     pending.set(key, promise);

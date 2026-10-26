@@ -119,6 +119,11 @@
     "name": "TOMMASO PORTO", "short": "TOMMASO PORTO",
     "rank": "KARATEKA · 10 KYU", "belt": "CINTURA ARANCIONE",
     "beltColor": "orange", "variant": "", "assetId": "14-tommaso-porto"
+  },
+  "remo-valerio-labbia": {
+    "name": "REMO VALERIO LABBIA", "short": "REMO VALERIO LABBIA",
+    "rank": "KARATEKA · MU KYU", "belt": "CINTURA BIANCA",
+    "beltColor": "white", "variant": "", "assetId": "15-remo-valerio-labbia"
   }
 
 }).map(([id, metadata]) => [id, Object.freeze(metadata)])));

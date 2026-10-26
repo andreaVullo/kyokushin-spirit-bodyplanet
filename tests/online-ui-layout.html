@@ -22,7 +22,7 @@
   const panel=d.querySelector('#online-lobby'),scroll=d.querySelector('.online-scroll'),footer=d.querySelector('.online-footer');
   expect(scroll.offsetTop+scroll.offsetHeight<=footer.offsetTop+1,'azioni sovrapposte alla zona scorrevole');
   expect(footer.offsetTop+footer.offsetHeight<=panel.offsetHeight+1,'azioni fuori dalla lobby');
-  expect(d.querySelectorAll('[data-online-fighter]').length===17,'roster non completo');
+  expect(d.querySelectorAll('[data-online-fighter]').length===18,'roster non completo');
   scroll.scrollTop=scroll.scrollHeight;
   expect(d.querySelector('.online-roster').offsetTop+d.querySelector('.online-roster').offsetHeight<=scroll.offsetTop+scroll.scrollTop+scroll.clientHeight+2,'ultimo karateka irraggiungibile');
   scroll.scrollTop=0;
