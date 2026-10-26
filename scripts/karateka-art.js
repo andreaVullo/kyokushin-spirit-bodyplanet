@@ -138,7 +138,7 @@
         };
         image.src = source;
       };
-      script.src = new URL(key + '.js?v=20261026-3', root).href;
+      script.src = new URL(key + '.js?v=20261026-4', root).href;
       document.head.append(script);
     }).finally(() => pending.delete(key));
     pending.set(key, promise);

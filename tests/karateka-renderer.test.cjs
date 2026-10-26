@@ -252,3 +252,19 @@ test('the real atlas has bounded regions and resolves all aliases to retained so
     }
   }
 });
+
+test('Maurizio keeps adult proportions across punches and uses the full-size victory', () => {
+  const context = { window: {} };
+  vm.runInNewContext(fs.readFileSync(path.join(root, 'scripts/karateka-atlas.js'), 'utf8'), context);
+  const sheets = context.window.KyokushinSpriteAtlas['12-maurizio-zappala'];
+  // These are upright punches with mild knee flexion, not crouches or falls.
+  // The old hook row collapsed to 80% of the standing height.
+  for (const frame of sheets.pugni.frames) {
+    const ratio = frame.opaque_bounds[3] / sheets.pugni.nominal_height;
+    assert.ok(ratio >= .9 && ratio <= 1.1, `punch ${frame.index}: body height ratio ${ratio}`);
+  }
+  const victory = sheets.difesa.frames[15];
+  assert.equal(victory.source_sheet, 'base');
+  assert.equal(victory.source_frame, 11);
+  assert.deepEqual(Array.from(victory.region), Array.from(sheets.base.frames[11].region));
+});

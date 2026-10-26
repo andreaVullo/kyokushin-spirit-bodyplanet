@@ -1,0 +1,32 @@
+<!doctype html><meta charset="utf-8"><title>Maurizio — controllo proporzioni</title>
+<style>body{margin:0;padding:16px;background:#17222c;color:#f5e9d2;font:15px system-ui}h1{font-size:22px}canvas{width:100%;max-width:850px;background:#d8d1c6}pre{white-space:pre-wrap}</style>
+<h1>Maurizio Zappalà · proporzioni e appoggio</h1><pre id="status">Verifica…</pre><canvas id="preview" width="1000" height="660"></canvas>
+<script src="load-real-art.js"></script><script>
+(async () => {
+  await loadRealFighterArt(); await FighterArt.loadFighters(['maurizio-zappala']);
+  const poses = [{label:'Guardia',state:'idle'}];
+  for(const move of ['tsuki','gyaku','shita','kagi']) {
+    const m=KyokushinMoves[move], start=m.start/m.duration,end=m.end/m.duration;
+    for(const [i,moveProgress] of [0,start*.7,(start+end)/2,(end+1)/2].entries())
+      poses.push({label:move+' · '+(i+1),state:'attack',move,moveProgress});
+  }
+  poses.push({label:'Vittoria',state:'victory'},{label:'Calcio',state:'attack',move:'mae',moveProgress:.5},{label:'Passo',state:'walk',walkCycle:1});
+  const canvas=document.querySelector('#preview'),ctx=canvas.getContext('2d');
+  const probe=document.createElement('canvas');probe.width=600;probe.height=400;const p=probe.getContext('2d',{willReadFrequently:true});
+  const results=[],failures=[]; let shown=0; const overview=new Set([0,3,7,9,10,11,13,14,15,16,17,18]);
+  for(const [i,pose] of poses.entries()) {
+    const f={id:'maurizio-zappala',x:300,y:350,hp:1000,stun:0,recovery:0,facing:1,walkCycle:0,...pose};
+    p.clearRect(0,0,600,400);FighterArt.draw(p,f,.2);
+    const data=p.getImageData(0,0,600,400).data;let top=400,bottom=0;
+    for(let y=0;y<400;y++)for(let x=0;x<600;x++)if(data[(y*600+x)*4+3]>=100){top=Math.min(top,y);bottom=Math.max(bottom,y+1);}
+    const height=bottom-top;results.push({pose:pose.label,height,bottom});
+    if(Math.abs(bottom-350)>1)failures.push(pose.label+': appoggio');
+    if(pose.state==='attack'&&pose.move!=='mae'&&(height<205||height>255))failures.push(pose.label+': scala '+height);
+    if(pose.state==='victory'&&height<240)failures.push('Vittoria troppo piccola');
+    if(!overview.has(i))continue; const slot=shown++; const x=(slot%4)*250,y=Math.floor(slot/4)*220;ctx.save();ctx.translate(x,y);ctx.strokeStyle='#a49787';ctx.beginPath();ctx.moveTo(10,192);ctx.lineTo(240,192);ctx.stroke();
+    FighterArt.draw(ctx,{...f,x:125,y:192,scale:.64},.2);ctx.fillStyle='#292521';ctx.font='14px system-ui';ctx.fillText(pose.label+' · '+height+' px',12,215);ctx.restore();
+  }
+  const status=document.querySelector('#status');status.dataset.result=failures.length?'FAIL':'PASS';status.textContent=status.dataset.result+' · 20 pose · '+(failures.join(', ')||'Scala stabile nei pugni, vittoria completa, piedi sul tatami.');
+  const report=document.createElement('details');report.innerHTML='<summary>Misure</summary>';const pre=document.createElement('pre');pre.textContent=JSON.stringify(results,null,2);report.append(pre);document.body.append(report);
+})().catch(e=>{document.querySelector('#status').dataset.result='FAIL';document.querySelector('#status').textContent=e.stack;});
+</script>
