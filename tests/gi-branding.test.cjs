@@ -94,3 +94,9 @@ test('offline envelope preserves the generated PNG byte for byte', () => {
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../assets/branding/kyokushin-kanji.js'), 'utf8'), { window: { __kyokushinRegisterBranding: (key, value) => { assert.equal(key, 'kyokushin-kanji'); actual = Buffer.from(value.split(',')[1], 'base64'); } } });
   assert.deepEqual(actual, fs.readFileSync(path.join(__dirname, '../assets/branding/kyokushin-kanji.png')));
 });
+
+test('Maurizio plain Goju-ryu gi is never altered by Kyokushin branding', () => {
+ for (const category of ['base','pugni','calci','movimento','difesa'])
+  for (let index=0;index<(category==='base'?12:16);index++)
+   assert.equal(branding.namedOptions('12-maurizio-zappala',category,index,300).skip,true);
+});

@@ -233,6 +233,8 @@
   }
 
   function namedOptions(assetId, category, index, nominal) {
+    // Maurizio wears a plain black Gōjū-ryū gi, not the dojo Kyokushin emblem.
+    if (assetId === "12-maurizio-zappala") return { nominal, skip: true };
     const options = { nominal }, reference = placementHints.namedReferences[category + ':' + index];
     if (!reference || (category === 'pugni' && [6, 10, 14].includes(index)) || (category === 'calci' && index >= 12 && index < 15)) return options;
     const frame = global.KyokushinSpriteAtlas?.[assetId]?.[category]?.frames[index];

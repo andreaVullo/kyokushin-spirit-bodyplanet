@@ -28,7 +28,7 @@
   expect(scroll.offsetTop+scroll.offsetHeight<=footer.offsetTop+1,'footer sopra la zona scorrevole');
   expect(footer.offsetTop+footer.offsetHeight<=panel.offsetHeight+1,'footer fuori dalla lobby');
   expect(panel.scrollWidth<=panel.clientWidth+1,'overflow orizzontale lobby');
-  expect(d.querySelectorAll('[data-online-fighter]').length===14,'roster non completo');
+  expect(d.querySelectorAll('[data-online-fighter]').length===16,'roster non completo');
   const inputs=[['#online-name-keys','#online-name-keyboard','#online-name','ANDREA'],['#online-code-keys','#online-code-keyboard','#online-code','AB23XY']];
   for(const [trigger,id,input,text] of inputs){
     d.querySelector(input).dispatchEvent(new win.PointerEvent('pointerdown',{pointerType:'touch',bubbles:true}));

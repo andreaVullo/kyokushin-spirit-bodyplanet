@@ -104,6 +104,16 @@
     "beltColor": "white",
     "variant": "",
     "assetId": "11-francesco-privitera-1"
+  },
+  "maurizio-zappala": {
+    "name": "MAURIZIO ZAPPALÀ", "short": "MAURIZIO ZAPPALÀ",
+    "rank": "KARATEKA · GŌJŪ-RYŪ", "belt": "CINTURA NERA",
+    "beltColor": "black", "variant": "", "assetId": "12-maurizio-zappala"
+  },
+  "roberto-de-marzi": {
+    "name": "ROBERTO DE MARZI", "short": "ROBERTO DE MARZI",
+    "rank": "KARATEKA · 2 KYU", "belt": "CINTURA MARRONE",
+    "beltColor": "brown", "variant": "", "assetId": "13-roberto-de-marzi"
   }
 }).map(([id, metadata]) => [id, Object.freeze(metadata)])));
 })(typeof window !== "undefined" ? window : globalThis);

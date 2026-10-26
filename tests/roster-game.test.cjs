@@ -15,6 +15,8 @@ for (const file of ['scripts/roster.js', 'scripts/game.js']) {
 const { KyokushinGame, KyokushinRoster } = context;
 
 const names = {
+  "maurizio-zappala": "MAURIZIO ZAPPALÀ",
+  "roberto-de-marzi": "ROBERTO DE MARZI",
   'emanuele-micalizzi': 'EMANUELE MICALIZZI',
   'francesco-privitera-1': 'FRANCESCO PRIVITERA 1',
   angelo: 'ANGELO',
@@ -206,4 +208,11 @@ test('named ranks follow the belt progression and both new characters are Mu kyu
  for(const [id,rank,color] of [['marco-tabacco-collage','8 KYU','blue'],['gabriele-carbonaro','6 KYU','yellow'],['leonardo-cappellani','7 KYU','blue-yellow'],['gabriele-randazzo','9 KYU','orange-blue'],['andrea-barbagallo','10 KYU','orange'],['emanuele-micalizzi','MU KYU','white'],['francesco-privitera-1','MU KYU','white']]){
   assert.equal(KyokushinRoster[id].rank,'KARATEKA · '+rank);assert.equal(KyokushinRoster[id].beltColor,color);
  }
+});
+
+test('new karateka retain their own school and belt without an invented dan', () => {
+ assert.equal(KyokushinRoster['maurizio-zappala'].rank, 'KARATEKA · GŌJŪ-RYŪ');
+ assert.equal(KyokushinRoster['maurizio-zappala'].belt, 'CINTURA NERA');
+ assert.equal(KyokushinRoster['roberto-de-marzi'].rank, 'KARATEKA · 2 KYU');
+ assert.equal(KyokushinRoster['roberto-de-marzi'].beltColor, 'brown');
 });
