@@ -110,7 +110,7 @@
     onPrepare:async info=>{
       active=false;paused=false;clearCombatInput();clearMatchPresentation();
       Object.assign(config,{player:info.fighters[0],opponent:info.fighters[1],mode:info.mode,stageId:stages?.get(info.stageId).id||'dojo'});
-      const [arena]=await Promise.all([loadStage(config.stageId),window.FighterArt.loadFighters(info.fighters),window.ArcadeVFX?.load()]);
+      const [arena]=await Promise.all([loadStage(config.stageId),window.FighterArt.loadFighters(info.fighters),window.ArcadeVFX?.load({fighters:info.fighters})]);
       if(arena.fallback)throw new Error('Non riesco a caricare l’arena scelta per entrambi i karateka.');
       if(online?.active&&online.info?.epoch===info.epoch)applyStage(arena);
     },
@@ -449,7 +449,7 @@
     const requestId=++matchLoadId,screenToken=transitionId;
     sound.init();
     try {
-      const [arena]=await Promise.all([loadStage(config.stageId),window.FighterArt.loadFighters([config.player,config.opponent]),window.ArcadeVFX?.load()]);
+      const [arena]=await Promise.all([loadStage(config.stageId),window.FighterArt.loadFighters([config.player,config.opponent]),window.ArcadeVFX?.load({fighters:[config.player,config.opponent]})]);
       if(requestId!==matchLoadId||arcadeRun!==run||transitionId!==screenToken)return;
       applyStage(arena);
       matchLoading=false;arcadeUI.setBusy(false);$('rematch-button').disabled=false;
@@ -508,7 +508,7 @@
     const requestId=++matchLoadId,screenToken=transitionId;
     const fighterIds=[config.player,opponentId()];
     try{
-      const [arena]=await Promise.all([loadStage(stageId),window.FighterArt.loadFighters(fighterIds),window.ArcadeVFX?.load()]);
+      const [arena]=await Promise.all([loadStage(stageId),window.FighterArt.loadFighters(fighterIds),window.ArcadeVFX?.load({fighters:fighterIds})]);
       if(requestId!==matchLoadId||screen!=='select'||transitionId!==screenToken)return;
       applyStage(arena);
       matchLoading=false;updateSelection();setScreen('versus','versus-screen');

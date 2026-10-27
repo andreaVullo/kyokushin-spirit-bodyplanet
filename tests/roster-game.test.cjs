@@ -15,6 +15,7 @@ for (const file of ['scripts/roster.js', 'scripts/game.js']) {
 const { KyokushinGame, KyokushinRoster } = context;
 
 const names = {
+  "gabriele-di-paola": "GABRIELE DI PAOLA",
   "remo-valerio-labbia": "REMO VALERIO LABBIA",
   "tommaso-porto": "TOMMASO PORTO",
   "maurizio-zappala": "MAURIZIO ZAPPALÀ",
@@ -33,6 +34,11 @@ const names = {
   'andrea-barbagallo': 'ANDREA BARBAGALLO',
 };
 const ids = Object.keys(names);
+test('Gabriele is a casual-clothed guest without a karate rank or belt', () => {
+  assert.equal(KyokushinRoster['gabriele-di-paola'].rank, 'OSPITE SPECIALE');
+  assert.equal(KyokushinRoster['gabriele-di-paola'].beltColor, 'none');
+  assert.equal(KyokushinRoster['gabriele-di-paola'].assetId, '16-gabriele-di-paola');
+});
 const damages = { tsuki: 65, gyaku: 95, shita: 90, kagi: 110, gedan: 90, mae: 120, mawashi: 145, ushiro: 185, kaiten: 235 };
 
 function newGame(options = {}, random = () => .9) {

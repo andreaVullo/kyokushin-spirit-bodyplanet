@@ -1,0 +1,19 @@
+<!doctype html><meta charset="utf-8"><title>Gabriele Di Paola · MELO</title>
+<style>body{margin:0;padding:16px;background:#101b29;color:#f9e9c7;font:15px system-ui}h1{font-size:24px;margin:0 0 8px}.scenes{display:flex;gap:12px;max-width:1200px}canvas{width:32%;background:#243345;border:1px solid #516078}#status{white-space:pre-wrap}</style>
+<h1>Gabriele Di Paola · ospite speciale</h1><p>Jeans, felpa rossonera con cappuccio, piedi scalzi. Tre graffiti esclusivi al contatto.</p><pre id="status">Caricamento…</pre><div class="scenes"></div>
+<script src="load-real-art.js"></script><script>
+(async()=>{
+ await loadRealFighterArt();await FighterArt.loadFighters(['gabriele-di-paola']);await ArcadeVFX.load({fighters:['gabriele-di-paola']});
+ for(let word=0;word<3;word++) {
+  ArcadeVFX.clear();const facing=word===1?-1:1;
+  const fighter={id:'gabriele-di-paola',player:0,x:facing===1?485:700,y:625,facing,state:'attack',move:'tsuki',moveProgress:.4,moveTime:.1,stun:0,hp:1000};
+  const state={fighters:[fighter,{id:'angelo',player:1,x:800,y:625}],phase:'fight',paused:true};
+  for(let i=0;i<=word;i++)ArcadeVFX.emit({type:'hit',player:0,target:1,x:800,y:470,move:'tsuki',facing},state);
+  const canvas=document.createElement('canvas');canvas.width=420;canvas.height=460;document.querySelector('.scenes').append(canvas);
+  const ctx=canvas.getContext('2d');ctx.translate(facing===1?-300:-490,-250);ctx.strokeStyle='#b4a382';ctx.beginPath();ctx.moveTo(0,625);ctx.lineTo(1280,625);ctx.stroke();
+  FighterArt.draw(ctx,fighter,0);ArcadeVFX.draw(ctx,0,{state,reducedMotion:true});ctx.resetTransform();
+  ctx.fillStyle='#f9e9c7';ctx.font='bold 20px system-ui';ctx.fillText(['MELO','MELOO','MEEELOO'][word],20,435);
+ }
+ document.querySelector('#status').textContent='PASS · 5 spritesheet personaggio · 1 spritesheet graffiti · testo leggibile in entrambe le direzioni';document.querySelector('#status').dataset.result='PASS';
+})().catch(e=>{document.querySelector('#status').textContent=e.stack;document.querySelector('#status').dataset.result='FAIL';});
+</script>

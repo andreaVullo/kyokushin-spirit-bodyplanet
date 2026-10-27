@@ -95,8 +95,9 @@ test('offline envelope preserves the generated PNG byte for byte', () => {
   assert.deepEqual(actual, fs.readFileSync(path.join(__dirname, '../assets/branding/kyokushin-kanji.png')));
 });
 
-test('Maurizio plain Goju-ryu gi is never altered by Kyokushin branding', () => {
+test('Maurizio plain Goju-ryu gi and Gabriele casual clothing keep their original artwork', () => {
+ for (const assetId of ['12-maurizio-zappala','16-gabriele-di-paola'])
  for (const category of ['base','pugni','calci','movimento','difesa'])
   for (let index=0;index<(category==='base'?12:16);index++)
-   assert.equal(branding.namedOptions('12-maurizio-zappala',category,index,300).skip,true);
+   assert.equal(branding.namedOptions(assetId,category,index,300).skip,true);
 });

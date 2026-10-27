@@ -120,6 +120,11 @@
     "rank": "KARATEKA · 10 KYU", "belt": "CINTURA ARANCIONE",
     "beltColor": "orange", "variant": "", "assetId": "14-tommaso-porto"
   },
+  "gabriele-di-paola": {
+    "name": "GABRIELE DI PAOLA", "short": "GABRIELE DI PAOLA",
+    "rank": "OSPITE SPECIALE", "belt": "FELPA ROSSONERA · JEANS",
+    "beltColor": "none", "variant": "", "assetId": "16-gabriele-di-paola"
+  },
   "remo-valerio-labbia": {
     "name": "REMO VALERIO LABBIA", "short": "REMO VALERIO LABBIA",
     "rank": "KARATEKA · MU KYU", "belt": "CINTURA BIANCA",

@@ -2,19 +2,19 @@
 const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-async function harness() {
+async function harness(fighters = []) {
   let h;
   const document = { currentScript: { src: 'file:///game/scripts/arcade-art.js' }, createElement() { return { remove() {} }; },
-    head: { append(script) { h.__arcadeRegisterSprite('vfx', 'fixture'); script.onload(); } } };
-  class Image { set src(value) { this.onload(); } }
+    head: { append(script) { const key = new URL(script.src).pathname.split('/').pop().split('.')[0]; h.__arcadeRegisterSprite(key, key); script.onload(); } } };
+  class Image { set src(value) { this.key = value; this.onload(); } }
   h = vm.createContext({ document, Image, URL, setTimeout, clearTimeout, FighterArt: { height: 228,
     strikePoint: f => ({ x: f.x + f.facing * 100, y: f.y - 150 }) } });
   h.window = h;
   for (const file of ['game.js','strike-point.js','arcade-art.js']) vm.runInContext(fs.readFileSync(path.join(root,'scripts',file),'utf8'), h);
-  await h.ArcadeVFX.load();
-  const draws = [];
-  const ctx = { save() {}, restore() {}, translate(x,y) { this.position = [x,y]; }, scale(x,y) { this.facing=x; }, rotate(a) { this.angle=a; },
-    drawImage(...args) { draws.push({ position:this.position, facing:this.facing, angle:this.angle, alpha:this.globalAlpha, sourceY:args[2] }); } };
+  await h.ArcadeVFX.load({ fighters });
+  const draws = [], stack = [];
+  const ctx = { facing:1, save() { stack.push({position:this.position,facing:this.facing,angle:this.angle,globalAlpha:this.globalAlpha}); }, restore() { Object.assign(this,stack.pop()); }, translate(x,y) { this.position = [x,y]; }, scale(x,y) { this.facing=x; }, rotate(a) { this.angle=a; },
+    drawImage(...args) { draws.push({ key:args[0].key, position:this.position, facing:this.facing, angle:this.angle, alpha:this.globalAlpha, sourceX:args[1], sourceY:args[2] }); } };
   const game = new h.KyokushinGame();game.start({mode:'versus'});const state=game.getState();state.phase='fight';
   const draw=(dt=0,options={})=>{draws.length=0;h.ArcadeVFX.draw(ctx,dt,{state,...options});return draws;};
   return {h,game,state,draw,draws};
@@ -68,4 +68,35 @@ test('actual sprite endpoint follows scale, facing and the rotating heel transfo
   f.facing=-1;assert.equal(h.FighterStrikePoint.point(f,source,g).x,230);
   f.scale=2;const large=h.FighterStrikePoint.point(f,source,{x:0,y:-360,scale:2});assert.equal(large.x,160);assert.equal(large.y,325);
   f.facing=1;f.scale=1;const rotated=h.FighterStrikePoint.point(f,source,g,{angle:.1,pivot:-108,lift:20});assert.ok(rotated);assert.notEqual(rotated.x,p.x);assert.notEqual(rotated.y,p.y);assert.equal(reads,1);
+});
+
+test('Gabriele alone shouts on contact, cycles all three graffiti and resets each round',async()=>{
+  const {h,state,draw}=await harness(['gabriele-di-paola']);
+  state.fighters[0].id='gabriele-di-paola';
+  const event={type:'hit',player:0,target:1,x:700,y:480,move:'tsuki',facing:1};
+  for(const type of ['attack','whiff','jump','land']) {
+    h.ArcadeVFX.emit({...event,type},state);assert.equal(draw().filter(d=>d.key==='melo').length,0,type);
+  }
+  for(const [i,move] of Object.keys(h.KyokushinMoves).entries()) {
+    h.ArcadeVFX.emit({...event,move,type:i%2?'block':'hit'},state);
+    const text=draw().filter(d=>d.key==='melo');assert.equal(text.length,1,'bounded combo effects');
+    assert.equal(text[0].sourceY,[0,295,600][i%3]);
+  }
+  h.ArcadeVFX.emit({type:'round'},state);assert.equal(draw().length,0);
+  h.ArcadeVFX.emit({...event,player:1,target:0},state);assert.equal(draw().filter(d=>d.key==='melo').length,0);
+  h.ArcadeVFX.emit(event,state);assert.equal(draw().find(d=>d.key==='melo').sourceY,0);
+});
+
+test('graffiti follow online interpolated fighters, stay readable facing left and freeze in pause',async()=>{
+  const {h,state,draw}=await harness(['gabriele-di-paola']);
+  state.fighters[1].id='gabriele-di-paola';
+  h.ArcadeVFX.emit({type:'hit',player:1,target:0,x:500,y:480,move:'mae',facing:-1},state);
+  const first=draw().find(d=>d.key==='melo');assert.equal(first.facing,1);
+  const clone={...state,fighters:state.fighters.map(f=>({...f,x:f.x+20,y:f.y-10}))};
+  const next=draw(0,{state:clone}).find(d=>d.key==='melo');
+  assert.equal(next.position[0]-first.position[0],20);assert.equal(next.position[1]-first.position[1],-10);
+  clone.paused=true;for(let i=0;i<10;i++)assert.ok(draw(.1,{state:clone}).find(d=>d.key==='melo'));
+  clone.paused=false;clone.hitstop=.02;for(let i=0;i<10;i++)assert.ok(draw(.1,{state:clone}).find(d=>d.key==='melo'));
+  clone.hitstop=0;assert.ok(draw(.1,{state:clone,reducedMotion:true}).find(d=>d.key==='melo'));
+  for(let i=0;i<5;i++)draw(.1,{state:clone});assert.equal(draw().filter(d=>d.key==='melo').length,0);
 });

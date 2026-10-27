@@ -375,12 +375,20 @@
     get ready() { return previous.ready; }, height: previous.height };
 
   const effects = [];
+  const shouts = [], shoutSequence = new Map();
+  const SHOUT_FIGHTER = 'gabriele-di-paola';
+  // Original transparent text atlas: each crop includes its paint splashes.
+  const shoutFrames = [
+    [[0,0,390,288],[395,0,437,288],[835,0,455,288],[1340,0,434,288]],
+    [[0,295,390,287],[400,295,450,287],[850,288,500,300],[1360,295,414,287]],
+    [[0,600,375,287],[375,600,475,287],[850,580,510,307],[1360,600,414,287]]
+  ];
   let vfxReady = false, reducedMotion = false;
   const vfxRows = { hit: 0, heavy: 1, block: 2, attack: 3, dust: 4, critical: 5 };
   const vfxColumns = [0, 209, 410, 618, 860, 1063, 1254];
   const vfxBands = [0, 216, 410, 634, 835, 1017, 1254];
   function emit(event, state) {
-    if (event?.type === 'round') { effects.length = 0; return false; }
+    if (event?.type === 'round') { clearEffects(); return false; }
     if (!vfxReady || !event || !['hit', 'block', 'land'].includes(event.type)) return false;
     // A tatami does not explode under every step, dash or ordinary landing.
     if (event.type === 'land' && !event.heavy) return false;
@@ -402,7 +410,36 @@
     if (effects.length >= 28) effects.shift();
     effects.push({ type, x, y, size, duration, life: 0, facing: event.facing || 1,
       target, offsetX: target ? x - target.x : 0, offsetY: target ? y - target.y : 0 });
+    const attacker = state?.fighters?.[event.player];
+    if (images.has('melo') && ['hit', 'block'].includes(event.type) && attacker?.id === SHOUT_FIGHTER) {
+      const sequence = shoutSequence.get(event.player) || 0;
+      shoutSequence.set(event.player, sequence + 1);
+      // One shout per attacker prevents fast combos from covering the screen.
+      const previous = shouts.findIndex(shout => shout.player === event.player);
+      if (previous >= 0) shouts.splice(previous, 1);
+      shouts.push({ player: event.player, word: sequence % 3, facing: event.facing || 1, life: 0, duration: .48 });
+    }
     return true;
+  }
+  function clearEffects() { effects.length = 0; shouts.length = 0; shoutSequence.clear(); }
+  function drawShouts(ctx, step, state) {
+    for (let i = shouts.length - 1; i >= 0; i--) {
+      const shout = shouts[i]; shout.life += step;
+      // Use player slots instead of object identity: online rendering interpolates clones.
+      const fighter = state?.fighters?.[shout.player];
+      if (shout.life >= shout.duration || fighter?.id !== SHOUT_FIGHTER) { shouts.splice(i, 1); continue; }
+      const progress = shout.life / shout.duration;
+      const frame = reducedMotion ? 1 : Math.min(3, Math.floor(progress * 4));
+      const [sx,sy,sw,sh] = shoutFrames[shout.word][frame];
+      const width = (shout.word === 2 ? 194 : 162) * (reducedMotion ? .8 : 1);
+      const height = width * sh / sw;
+      const x = clamp(fighter.x + shout.facing * 115, width / 2 + 12, 1280 - width / 2 - 12);
+      const y = Math.max(100 + height / 2, fighter.y - 250 - (reducedMotion ? 0 : progress * 18));
+      ctx.save();ctx.globalAlpha = (reducedMotion ? .8 : 1) * Math.min(1,(1-progress)*4);
+      ctx.translate(x,y);
+      // Text never mirrors, even when Gabriele faces left.
+      ctx.drawImage(images.get('melo'),sx,sy,sw,sh,-width/2,-height/2,width,height);ctx.restore();
+    }
   }
   function drawEffectFrame(ctx, type, frame, x, y, size, facing = 1, alpha = .92, angle = 0) {
     if (!vfxReady) return;
@@ -449,7 +486,11 @@
       const y = effect.target ? effect.target.y + effect.offsetY : effect.y;
       drawEffectFrame(ctx, effect.type, frame, x, y, size, effect.facing, reducedMotion ? .55 : effect.type === 'dust' ? .4 : .9);
     }
+    drawShouts(ctx, step, options.state);
   }
-  global.ArcadeVFX = { async load() { await loadImage('vfx'); vfxReady = true; }, emit, draw: drawVFX, drawFrame: drawEffectFrame,
-    clear() { effects.length = 0; }, set reducedMotion(value) { reducedMotion = !!value; }, get reducedMotion() { return reducedMotion; }, get ready() { return vfxReady; } };
+  global.ArcadeVFX = { async load(options = {}) {
+    await Promise.all([loadImage('vfx'), ...(options.fighters?.includes(SHOUT_FIGHTER) ? [loadImage('melo')] : [])]);
+    vfxReady = true;
+  }, emit, draw: drawVFX, drawFrame: drawEffectFrame,
+    clear: clearEffects, set reducedMotion(value) { reducedMotion = !!value; }, get reducedMotion() { return reducedMotion; }, get ready() { return vfxReady; } };
 })(window);
