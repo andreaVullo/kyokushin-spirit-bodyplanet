@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-27T18:50:16.769Z",
+  "updatedAt": "2026-11-13T21:10:07.691Z",
   "records": [
     {
       "version": 1,
@@ -154,6 +154,23 @@
       "matches": 13,
       "elapsedSeconds": 210.176,
       "createdAt": "2026-10-26T19:42:38.128Z"
+    },
+    {
+      "version": 1,
+      "id": "90af5bcb-f99f-4b31-a9cd-c3d3293f8b6d",
+      "name": "GAE87",
+      "gender": "male",
+      "hairstyle": 0,
+      "score": 44591,
+      "wins": 15,
+      "rankIndex": 15,
+      "rankId": "5-dan",
+      "rankLabel": "5 DAN",
+      "completed": false,
+      "reason": "defeat",
+      "matches": 16,
+      "elapsedSeconds": 373.434,
+      "createdAt": "2026-11-13T21:10:05.463Z"
     },
     {
       "version": 1,
