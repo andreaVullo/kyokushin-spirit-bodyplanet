@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-13T21:10:07.691Z",
+  "updatedAt": "2026-11-18T10:15:48.932Z",
   "records": [
     {
       "version": 1,
@@ -188,6 +188,23 @@
       "matches": 1,
       "elapsedSeconds": 16.1,
       "createdAt": "2026-10-25T08:45:17.111Z"
+    },
+    {
+      "version": 1,
+      "id": "e53e4cb0-3688-42f8-9109-e79f71214f21",
+      "name": "LUCIANO CHIARAMONTE",
+      "gender": "male",
+      "hairstyle": 1,
+      "score": 11868,
+      "wins": 5,
+      "rankIndex": 5,
+      "rankId": "6-kyu",
+      "rankLabel": "6 KYU",
+      "completed": false,
+      "reason": "defeat",
+      "matches": 6,
+      "elapsedSeconds": 117.95,
+      "createdAt": "2026-11-18T10:15:47.553Z"
     },
     {
       "version": 1,
